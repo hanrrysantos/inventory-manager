@@ -23,7 +23,6 @@ public class ProductService {
                p -> {
                    throw new RuntimeException();
                });
-        
        Product product = mapper.toEntity(request);
 
        Product savedProduct = repository.save(product);
