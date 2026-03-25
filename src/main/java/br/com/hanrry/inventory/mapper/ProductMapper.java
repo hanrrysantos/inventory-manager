@@ -21,10 +21,6 @@ public interface ProductMapper {
     @Mapping(target = "totalQuantity", expression = "java(calculateTotalQuantity(product))")
     ProductResponseDTO toDTO(Product product);
 
-    @Mapping(source = "category.name", target = "categoryName")
-    @Mapping(target = "totalQuantity", expression = "java(calculateTotalQuantity(product))")
-    List<ProductResponseDTO> toDTOList(List<Product> productList);
-
     default Long calculateTotalQuantity(Product product) {
         if (product.getBatchs() == null) {
             return 0L;
