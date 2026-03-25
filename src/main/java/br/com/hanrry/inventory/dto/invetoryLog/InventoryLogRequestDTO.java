@@ -1,9 +1,9 @@
 package br.com.hanrry.inventory.dto.invetoryLog;
 
-import br.com.hanrry.inventory.entity.Type;
+import br.com.hanrry.inventory.entity.LogType;
 
 public record InventoryLogRequestDTO(
-        Type type,
+        LogType type,
         Long quantity,
         Long batchId
 ) {
