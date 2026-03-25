@@ -5,7 +5,7 @@ public record ProductResponseDTO (
         String name,
         String sku,
         Long totalQuantity,
-        String categoryName
-
+        String categoryName,
+        Long minStock
 ){
 }
