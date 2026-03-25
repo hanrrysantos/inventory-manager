@@ -7,8 +7,6 @@ import br.com.hanrry.inventory.entity.Product;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import java.util.List;
-
 @Mapper(componentModel = "spring")
 public interface ProductMapper {
 
@@ -22,11 +20,11 @@ public interface ProductMapper {
     ProductResponseDTO toDTO(Product product);
 
     default Long calculateTotalQuantity(Product product) {
-        if (product.getBatchs() == null) {
+        if (product.getBatches() == null) {
             return 0L;
         }
         long total = 0L;
-        for (Batch batch : product.getBatchs()) {
+        for (Batch batch : product.getBatches()) {
             if (batch.getQuantity() != null) {
                 total += batch.getQuantity();
             }
