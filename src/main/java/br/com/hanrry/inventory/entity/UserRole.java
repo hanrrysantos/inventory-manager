@@ -1,6 +1,6 @@
 package br.com.hanrry.inventory.entity;
 
-public enum Type {
-    BUY,
-    SELL
+public enum UserRole {
+    ADMIN,
+    USER
 }

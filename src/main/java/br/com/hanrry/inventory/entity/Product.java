@@ -33,5 +33,5 @@ public class Product {
     private Category category;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
-    private List<Batch> batchs = new ArrayList<>();
+    private List<Batch> batches = new ArrayList<>();
 }
