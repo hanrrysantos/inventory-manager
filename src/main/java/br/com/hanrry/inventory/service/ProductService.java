@@ -4,8 +4,8 @@ import br.com.hanrry.inventory.dto.product.ProductRequestDTO;
 import br.com.hanrry.inventory.dto.product.ProductResponseDTO;
 import br.com.hanrry.inventory.dto.product.UpdateProdcutRequestDTO;
 import br.com.hanrry.inventory.entity.Product;
-import br.com.hanrry.inventory.exception.product.ProductAlreadyExists;
-import br.com.hanrry.inventory.exception.product.ProductNotFound;
+import br.com.hanrry.inventory.exception.product.ProductAlreadyExistsException;
+import br.com.hanrry.inventory.exception.product.ProductNotFoundException;
 import br.com.hanrry.inventory.mapper.ProductMapper;
 import br.com.hanrry.inventory.repository.ProductRepository;
 import org.springframework.data.domain.Page;
@@ -28,7 +28,7 @@ public class ProductService {
 
         productRepository.findBySku(request.sku()).ifPresent(
                p -> {
-                   throw new ProductAlreadyExists("Product already exists");
+                   throw new ProductAlreadyExistsException("Product already exists");
                });
        Product product = productMapper.toEntity(request);
 
@@ -45,7 +45,7 @@ public class ProductService {
 
     public ProductResponseDTO findProductById(Long id){
         Product product = productRepository.findById(id).orElseThrow(
-                () -> new ProductNotFound("Product not found with this id: " + id)
+                () -> new ProductNotFoundException("Product not found with this id: " + id)
         );
 
         return productMapper.toDTO(product);
@@ -53,7 +53,7 @@ public class ProductService {
 
     public ProductResponseDTO updateProduct(Long id, UpdateProdcutRequestDTO request){
         Product product = productRepository.findById(id).orElseThrow(
-                () -> new ProductNotFound("Product not found with this id: " + id)
+                () -> new ProductNotFoundException("Product not found with this id: " + id)
         );
 
         if(request.name() != null && !request.name().isBlank()) {
