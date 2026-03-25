@@ -4,8 +4,8 @@ import br.com.hanrry.inventory.dto.category.CategoryRequestDTO;
 import br.com.hanrry.inventory.dto.category.CategoryResponseDTO;
 import br.com.hanrry.inventory.entity.Category;
 import br.com.hanrry.inventory.exception.category.CascadeCategoryException;
-import br.com.hanrry.inventory.exception.category.CategoryAlreadyExists;
-import br.com.hanrry.inventory.exception.category.CategoryNotFound;
+import br.com.hanrry.inventory.exception.category.CategoryAlreadyExistsException;
+import br.com.hanrry.inventory.exception.category.CategoryNotFoundException;
 import br.com.hanrry.inventory.mapper.CategoryMapper;
 import br.com.hanrry.inventory.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +24,7 @@ public class CategoryService {
 
         categoryRepository.findByNameIgnoreCase(request.name()).ifPresent(
                 c -> {
-                    throw new CategoryAlreadyExists("Category already exists");
+                    throw new CategoryAlreadyExistsException("Category already exists");
                 });
 
         Category category = categoryMapper.toEntity(request);
@@ -42,7 +42,7 @@ public class CategoryService {
 
     public CategoryResponseDTO findCategoryById(Long id){
         Category category = categoryRepository.findById(id).orElseThrow(
-                () -> new CategoryNotFound("Category not found with this id: " + id)
+                () -> new CategoryNotFoundException("Category not found with this id: " + id)
         );
 
         return categoryMapper.toDTO(category);
@@ -50,7 +50,7 @@ public class CategoryService {
 
     public CategoryResponseDTO updateCategory(Long id, CategoryRequestDTO request) {
         Category category = categoryRepository.findById(id).orElseThrow(
-                () -> new CategoryNotFound("Category not found with this id: " + id)
+                () -> new CategoryNotFoundException("Category not found with this id: " + id)
         );
 
             if (request.description() != null && !request.description().isBlank()) {
@@ -68,7 +68,7 @@ public class CategoryService {
 
     public void deleteCategoryById(Long id){
         Category category = categoryRepository.findById(id).orElseThrow(
-                () -> new CategoryNotFound("Category not found with this id: " + id)
+                () -> new CategoryNotFoundException("Category not found with this id: " + id)
         );
 
         if (!category.getProducts().isEmpty()) {
