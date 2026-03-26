@@ -6,6 +6,7 @@ import br.com.hanrry.inventory.exception.batch.InvalidQuantityException;
 import br.com.hanrry.inventory.exception.category.CascadeCategoryException;
 import br.com.hanrry.inventory.exception.category.CategoryAlreadyExistsException;
 import br.com.hanrry.inventory.exception.category.CategoryNotFoundException;
+import br.com.hanrry.inventory.exception.pdf.WritePdfException;
 import br.com.hanrry.inventory.exception.product.ProductAlreadyExistsException;
 import br.com.hanrry.inventory.exception.product.ProductNotFoundException;
 import br.com.hanrry.inventory.exception.user.EmailAlreadyExistsException;
@@ -89,6 +90,14 @@ public class GlobalExceptionHandler {
     public ResponseEntity<StandardError> handleInvalidQuantityException(InvalidQuantityException ex, HttpServletRequest request){
         String error = "InvalidQuantity";
         HttpStatus status = HttpStatus.UNPROCESSABLE_ENTITY;
+        StandardError err = new StandardError(Instant.now(), status.value(), error, ex.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(status).body(err);
+    }
+
+    @ExceptionHandler(WritePdfException.class)
+    public ResponseEntity<StandardError> handleWritePdfException(WritePdfException ex, HttpServletRequest request){
+        String error = "WritePdfException";
+        HttpStatus status = HttpStatus.BAD_REQUEST;
         StandardError err = new StandardError(Instant.now(), status.value(), error, ex.getMessage(), request.getRequestURI());
         return ResponseEntity.status(status).body(err);
     }
