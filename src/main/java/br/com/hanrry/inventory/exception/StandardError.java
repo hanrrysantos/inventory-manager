@@ -11,6 +11,6 @@ public record StandardError (
         Integer status,
         String error,
         String message,
-        String oath
+        String path
 ){
 }
