@@ -22,11 +22,9 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Email
     @Column(unique = true, nullable = false)
     private String email;
 
-    @Min(8)
     @Column(nullable = false)
     private String password;
 
