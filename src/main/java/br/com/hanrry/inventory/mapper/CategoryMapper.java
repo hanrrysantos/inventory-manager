@@ -17,4 +17,6 @@ public interface CategoryMapper {
 
     CategoryResponseDTO toDTO(Category category);
 
+    List<CategoryResponseDTO> toDTOList(List<Category> categories);
+
 }
