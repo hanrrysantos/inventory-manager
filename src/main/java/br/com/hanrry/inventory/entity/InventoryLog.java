@@ -21,13 +21,17 @@ public class InventoryLog {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Type type;
+    private LogType type;
 
     @Column(nullable = false)
     private Long quantity;
 
     @CreationTimestamp
     private LocalDateTime timestamp;
+
+    @ManyToOne
+    @JoinColumn(name = "product_id", nullable = false)
+    private Product product;
 
     @ManyToOne
     @JoinColumn(name = "batch_id")

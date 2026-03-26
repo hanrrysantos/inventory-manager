@@ -12,7 +12,9 @@ public interface BatchRepository extends JpaRepository<Batch, Long> {
 
     List<Batch> findByProductIdAndQuantityGreaterThanOrderByExpiryDateAsc(Long productId, Long quantity);
 
-    List<Batch> findByExpiryDateBeforeAndQuantityGreaterThan(LocalDate date, Long quantity);
+    Optional<Batch> findByBatchNumber(String batchNumber);
 
-    List<Batch> findByQuantityLessThanEqual(Long quantity);
+    List<Batch> findByProductId(Long productId);
+
+    List<Batch> findByExpiryDateBefore(LocalDate date);
 }

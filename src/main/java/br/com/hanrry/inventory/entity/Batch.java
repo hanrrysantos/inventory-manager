@@ -21,7 +21,7 @@ public class Batch {
     private Long id;
 
     @Column(name = "batch_number", nullable = false)
-    private Long batchNumber;
+    private String batchNumber;
 
     @Column(nullable = false)
     private Long quantity;

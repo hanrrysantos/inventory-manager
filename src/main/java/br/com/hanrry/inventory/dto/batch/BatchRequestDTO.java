@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public record BatchRequestDTO (
-        Long batchNumber,
+        String batchNumber,
         Long quantity,
         LocalDate expiryDate,
         BigDecimal price,
