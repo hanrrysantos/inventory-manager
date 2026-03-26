@@ -39,7 +39,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ProductAlreadyExistsException.class)
     public ResponseEntity<StandardError> handleProductAlreadyExistsException(ProductAlreadyExistsException ex, HttpServletRequest request){
-        String error = "UserNotFoundException";
+        String error = "ProductAlreadyExistsException";
         HttpStatus status = HttpStatus.CONFLICT;
         StandardError err = new StandardError(Instant.now(), status.value(), error, ex.getMessage(), request.getRequestURI());
         return ResponseEntity.status(status).body(err);
@@ -79,7 +79,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(InsufficientStockException.class)
     public ResponseEntity<StandardError> handleInsufficientStockException(InsufficientStockException ex, HttpServletRequest request){
-        String error = "Insufficient Stock";
+        String error = "InsufficientStock";
         HttpStatus status = HttpStatus.BAD_REQUEST;
         StandardError err = new StandardError(Instant.now(), status.value(), error, ex.getMessage(), request.getRequestURI());
         return ResponseEntity.status(status).body(err);
@@ -87,7 +87,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(InvalidQuantityException.class)
     public ResponseEntity<StandardError> handleInvalidQuantityException(InvalidQuantityException ex, HttpServletRequest request){
-        String error = "Invalid Quantity";
+        String error = "InvalidQuantity";
         HttpStatus status = HttpStatus.UNPROCESSABLE_ENTITY;
         StandardError err = new StandardError(Instant.now(), status.value(), error, ex.getMessage(), request.getRequestURI());
         return ResponseEntity.status(status).body(err);
