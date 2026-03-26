@@ -25,7 +25,7 @@ spring:
     host: smtp.gmail.com
     port: 587
     username: sheinhanrry@gmail.com
-    password: tiss qbhf ojvm kavb
+    password: ivcy zsvm bplo kwov
     properties:
       mail:
         smtp:
