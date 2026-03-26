@@ -2,6 +2,7 @@ package br.com.hanrry.inventory.service;
 
 import br.com.hanrry.inventory.dto.batch.BatchRequestDTO;
 import br.com.hanrry.inventory.dto.batch.BatchResponseDTO;
+import br.com.hanrry.inventory.dto.batch.ConsumeBatchRequestDTO;
 import br.com.hanrry.inventory.dto.product.ProductResponseDTO;
 import br.com.hanrry.inventory.entity.Batch;
 import br.com.hanrry.inventory.entity.LogType;
@@ -29,9 +30,7 @@ public class    BatchService {
     private final BatchRepository batchRepository;
     private final InventoryLogService inventoryLogService;
     private final ProductRepository productRepository;
-    private final ProductService productService;
-    private final PdfService pdfService;
-    private final EmailService emailService;
+    private final StockAlertManager stockAlertManager;
 
     @Transactional
     public BatchResponseDTO createBatch(BatchRequestDTO request) {
@@ -56,30 +55,33 @@ public class    BatchService {
     }
 
     @Transactional
-    public BatchResponseDTO addStockToBatch(Long id, Long quantity) {
+    public BatchResponseDTO addStock(Long id, BatchRequestDTO request) {
         Batch batch = batchRepository.findById(id)
                 .orElseThrow(() -> new BatchNotFound
                         ("Batch not found with this id: " + id));
 
-        if (quantity <= 0) {
+        Long quantityToAdd = request.quantity();
+
+        if (quantityToAdd <= 0) {
             throw new InvalidQuantityException
                     ("The quantity must be greater than 0");
         }
 
-        batch.setQuantity(batch.getQuantity() + quantity);
+        batch.setQuantity(batch.getQuantity() + quantityToAdd);
         Batch savedBatch = batchRepository.save(batch);
 
-        inventoryLogService.createLog(savedBatch, quantity, LogType.INPUT);
+        inventoryLogService.createLog(savedBatch, quantityToAdd, LogType.INPUT);
 
         return batchMapper.toDTO(savedBatch);
     }
 
     @Transactional
-    public void consumeStock(Long productId, Long totalQueOClienteQuer) {
-        List<Batch> batches = batchRepository.
-                findByProductIdAndQuantityGreaterThanOrderByExpiryDateAsc(productId, 0L);
+    public void consumeStock(ConsumeBatchRequestDTO request) {
 
-        long oQuantoAindaFaltaPegar = totalQueOClienteQuer;
+        List<Batch> batches = batchRepository.
+                findByProductIdAndQuantityGreaterThanOrderByExpiryDateAsc(request.productId(), 0L);
+
+        long oQuantoAindaFaltaPegar = request.quantityToConsume();
 
         for (Batch batch : batches) {
             if (oQuantoAindaFaltaPegar <= 0) break;
@@ -104,43 +106,12 @@ public class    BatchService {
             throw new InsufficientStockException("Insufficient Stock");
         }
 
-        this.checkLowStockAndNotify(productId);
+        this.stockAlertManager.checkLowStockAndNotify(request.productId());
     }
 
     public List<BatchResponseDTO> findExpiredBatches() {
-        return batchMapper.toDTOList(batchRepository.findByExpiryDateBefore(LocalDate.now()));
-    }
+        List<Batch> batchesExpired = batchRepository.findByExpiryDateBefore(LocalDate.now());
 
-    private void checkLowStockAndNotify(Long productId) {
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new ProductNotFoundException
-                        ("Product not found with this id: " + productId)
-                );
-
-        long currentStock = 0;
-        List<Batch> activeBatches = batchRepository.findByProductId(productId);
-        for (Batch b : activeBatches) {
-            currentStock += b.getQuantity();
-        }
-
-        if (currentStock <= product.getMinStock()) {
-            this.sendNotificationWithReport(product.getName());
-        }
-    }
-
-    public byte[] generateLowStockReport() {
-        List<ProductResponseDTO> lowStockProducts = productService.getLowStockProducts();
-        if (lowStockProducts.isEmpty()) return new byte[0];
-
-        // Chama o serviço real que você criou
-        return pdfService.generateLowStockReport(lowStockProducts);
-    }
-
-    public void sendNotificationWithReport(String productName) {
-        byte[] pdfReport = generateLowStockReport();
-        if (pdfReport.length > 0) {
-            // Chama o serviço de e-mail real com o anexo
-            emailService.sendLowStockAlert(productName, pdfReport);
-        }
+        return batchMapper.toDTOList(batchesExpired);
     }
 }
