@@ -26,6 +26,9 @@ public class Batch {
     @Column(nullable = false)
     private Long quantity;
 
+    @Column(nullable = false, name = "manufacturing_date")
+    private LocalDate manufacturingDate;
+
     @Column(nullable = false, name = "expiry_date")
     private LocalDate expiryDate;
 
