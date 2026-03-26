@@ -5,8 +5,9 @@ import java.time.LocalDate;
 
 public record BatchResponseDTO (
         Long id,
-        Long batchNumber,
+        String batchNumber,
         Long quantity,
+        LocalDate manufacturingDate,
         LocalDate expiryDate,
         BigDecimal price,
         Long productId,
