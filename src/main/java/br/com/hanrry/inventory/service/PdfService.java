@@ -1,6 +1,7 @@
 package br.com.hanrry.inventory.service;
 
 import br.com.hanrry.inventory.dto.product.ProductResponseDTO;
+import br.com.hanrry.inventory.exception.pdf.WritePdfException;
 import com.lowagie.text.*;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
@@ -20,32 +21,28 @@ public class PdfService {
             PdfWriter.getInstance(document, out);
             document.open();
 
-            // Título
-            Font fontTitle = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 18);
+            Font fontTitle = FontFactory.getFont(FontFactory.COURIER_BOLD, 18);
             Paragraph title = new Paragraph("Relatório de Reposição de Estoque", fontTitle);
             title.setAlignment(Element.ALIGN_CENTER);
             document.add(title);
-            document.add(new Paragraph(" ")); // Espaço em branco
+            document.add(new Paragraph(" "));
 
-            // Criando a Tabela (4 colunas)
-            PdfPTable table = new PdfPTable(4);
+            PdfPTable table = new PdfPTable(5);
             table.setWidthPercentage(100);
 
-            // Cabeçalho da Tabela
             table.addCell("Produto");
             table.addCell("Categoria");
             table.addCell("Estoque Atual");
             table.addCell("Estoque Mínimo");
+            table.addCell("Reposição Necessária");
 
-            // Preenchendo com os dados
-            // Preenchendo com os dados corrigidos
-            for (ProductResponseDTO p : products) {
-                table.addCell(p.name());
-                table.addCell(p.categoryName());
-                table.addCell(String.valueOf(p.totalQuantity())); // Corrigido para totalQuantity
-                table.addCell(String.valueOf(p.minStock()));      // Corrigido para minStock
+            for (ProductResponseDTO productsLowStock : products) {
+                table.addCell(productsLowStock.name());
+                table.addCell(productsLowStock.categoryName());
+                table.addCell(String.valueOf(productsLowStock.totalQuantity()));
+                table.addCell(String.valueOf(productsLowStock.minStock()));
 
-                long necessidade = p.minStock() - p.totalQuantity();
+                long necessidade = productsLowStock.minStock() - productsLowStock.totalQuantity();
                 table.addCell(String.valueOf(necessidade));
             }
 
@@ -53,7 +50,7 @@ public class PdfService {
             document.close();
 
         } catch (DocumentException e) {
-            throw new RuntimeException("Erro ao gerar PDF", e);
+            throw new WritePdfException("Error generating PDF");
         }
 
         return out.toByteArray();
