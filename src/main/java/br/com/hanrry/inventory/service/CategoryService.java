@@ -12,14 +12,19 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class    CategoryService {
+@Transactional(readOnly = true)
+public class CategoryService {
 
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
 
+    @Transactional
     public CategoryResponseDTO createCategory(CategoryRequestDTO request){
 
         categoryRepository.findByNameIgnoreCase(request.name()).ifPresent(
@@ -34,10 +39,10 @@ public class    CategoryService {
         return categoryMapper.toDTO(savedCategory);
     }
 
-    public Page<CategoryResponseDTO> findAllCategories(Pageable pageable){
-        Page<Category> categories = categoryRepository.findAll(pageable);
+    public List<CategoryResponseDTO> findAllCategories(){
+        List<Category> categories = categoryRepository.findAll();
 
-        return categories.map(categoryMapper::toDTO);
+        return categoryMapper.toDTOList(categories);
     }
 
     public CategoryResponseDTO findCategoryById(Long id){
@@ -48,6 +53,7 @@ public class    CategoryService {
         return categoryMapper.toDTO(category);
     }
 
+    @Transactional
     public CategoryResponseDTO updateCategory(Long id, CategoryRequestDTO request) {
         Category category = categoryRepository.findById(id).orElseThrow(
                 () -> new CategoryNotFoundException("Category not found with this id: " + id)
@@ -66,6 +72,7 @@ public class    CategoryService {
         return categoryMapper.toDTO(savedCategory);
     }
 
+    @Transactional
     public void deleteCategoryById(Long id){
         Category category = categoryRepository.findById(id).orElseThrow(
                 () -> new CategoryNotFoundException("Category not found with this id: " + id)
