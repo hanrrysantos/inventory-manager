@@ -5,8 +5,6 @@ import br.com.hanrry.inventory.dto.user.UserResponseDTO;
 import br.com.hanrry.inventory.entity.User;
 import org.mapstruct.Mapper;
 
-import java.util.List;
-
 @Mapper(componentModel = "spring")
 public interface UserMapper {
 
