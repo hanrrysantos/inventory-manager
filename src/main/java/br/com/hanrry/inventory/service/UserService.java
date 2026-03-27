@@ -12,6 +12,7 @@ import br.com.hanrry.inventory.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -22,6 +23,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
 
     public UserResponseDTO createUser(UserRequestDTO request){
 
@@ -31,7 +33,7 @@ public class UserService {
 
         User user = userMapper.toEntity(request);
 
-        user.setPassword("vou colocar o password encoder ainda");
+        user.setPassword(passwordEncoder.encode(request.password()));
         user.setRole(UserRole.USER);
         user.setCreatedAt(LocalDateTime.now());
 
