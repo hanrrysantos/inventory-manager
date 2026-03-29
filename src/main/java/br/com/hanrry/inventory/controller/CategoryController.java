@@ -1,5 +1,6 @@
 package br.com.hanrry.inventory.controller;
 
+import br.com.hanrry.inventory.controller.docs.CategoryControllerDocs;
 import br.com.hanrry.inventory.dto.category.CategoryRequestDTO;
 import br.com.hanrry.inventory.dto.category.CategoryResponseDTO;
 import br.com.hanrry.inventory.service.CategoryService;
@@ -14,7 +15,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/categories")
 @RequiredArgsConstructor
-public class CategoryController {
+public class CategoryController implements CategoryControllerDocs {
 
     private final CategoryService categoryService;
 
