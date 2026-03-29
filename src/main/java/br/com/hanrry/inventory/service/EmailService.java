@@ -8,24 +8,32 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class EmailService {
 
     private final JavaMailSender mailSender;
 
-    public void sendLowStockAlert(String productName, byte[] pdfAttachment) {
+    public void sendLowStockAlert(List<String> productNames, byte[] pdfAttachment) {
         try {
             MimeMessage message = mailSender.createMimeMessage();
-            // true indica que teremos anexos (multipart)
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
-            helper.setTo("seu-email-de-destino@gmail.com");
-            helper.setSubject("⚠️ ALERTA DE ESTOQUE: " + productName);
-            helper.setText("Olá,\n\nO estoque do produto " + productName +
-                    " atingiu o nível crítico. Segue em anexo o relatório de reposição.");
+            helper.setTo("sheinhanrry@gmail.com");
+            helper.setSubject("ALERTA DE ESTOQUE");
 
-            // Adicionando o PDF como anexo
+            String nomesFormatados = String.join(", ", productNames);
+
+            StringBuilder body = new StringBuilder();
+            body.append("Olá,\n\n");
+            body.append("Os seguintes produtos atingiram o nível crítico de estoque:\n");
+            body.append(nomesFormatados).append(".\n\n");
+            body.append("Segue em anexo o relatório detalhado de reposição para todos os itens em falta.");
+
+            helper.setText(body.toString());
+
             helper.addAttachment("relatorio_reposicao.pdf", new ByteArrayResource(pdfAttachment));
 
             mailSender.send(message);
