@@ -9,6 +9,7 @@ import br.com.hanrry.inventory.exception.category.CategoryNotFoundException;
 import br.com.hanrry.inventory.exception.pdf.WritePdfException;
 import br.com.hanrry.inventory.exception.product.ProductAlreadyExistsException;
 import br.com.hanrry.inventory.exception.product.ProductNotFoundException;
+import br.com.hanrry.inventory.exception.security.InvalidTokenException;
 import br.com.hanrry.inventory.exception.user.EmailAlreadyExistsException;
 import br.com.hanrry.inventory.exception.user.UserNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -98,6 +99,14 @@ public class GlobalExceptionHandler {
     public ResponseEntity<StandardError> handleWritePdfException(WritePdfException ex, HttpServletRequest request){
         String error = "WritePdfException";
         HttpStatus status = HttpStatus.BAD_REQUEST;
+        StandardError err = new StandardError(Instant.now(), status.value(), error, ex.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(status).body(err);
+    }
+
+    @ExceptionHandler(InvalidTokenException.class)
+    public ResponseEntity<StandardError> handleInvalidTokenException(InvalidTokenException ex, HttpServletRequest request){
+        String error = "InvalidTokenException";
+        HttpStatus status = HttpStatus.UNAUTHORIZED;
         StandardError err = new StandardError(Instant.now(), status.value(), error, ex.getMessage(), request.getRequestURI());
         return ResponseEntity.status(status).body(err);
     }
