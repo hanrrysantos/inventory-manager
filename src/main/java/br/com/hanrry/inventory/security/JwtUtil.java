@@ -1,6 +1,7 @@
 package br.com.hanrry.inventory.security;
 
 import br.com.hanrry.inventory.exception.security.InvalidTokenException;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -44,7 +45,7 @@ public class JwtUtil {
                     .build()
                     .parseSignedClaims(token);
             return true;
-        } catch (InvalidTokenException e) {
+        } catch (JwtException e) {
             return false;
         }
     }
