@@ -33,16 +33,17 @@ public class StockAlertManager {
     }
 
     private void sendNotificationWithReport(String productName) {
-        byte[] pdfReport = generateLowStockReport();
-        if (pdfReport.length > 0) {
-            emailService.sendLowStockAlert(productName, pdfReport);
-        }
-    }
 
-    private byte[] generateLowStockReport() {
         List<ProductResponseDTO> lowStockProducts = productService.getLowStockProducts();
-        if (lowStockProducts.isEmpty()) return new byte[0];
 
-        return pdfService.generateLowStockReport(lowStockProducts);
+        if (!lowStockProducts.isEmpty()) {
+            List<String> allProductNames = lowStockProducts.stream()
+                    .map(ProductResponseDTO::name)
+                    .toList();
+
+            byte[] pdfReport = pdfService.generateLowStockReport(lowStockProducts);
+
+            emailService.sendLowStockAlert(allProductNames, pdfReport);
+        }
     }
 }
