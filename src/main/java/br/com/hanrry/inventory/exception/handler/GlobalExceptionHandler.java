@@ -50,7 +50,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ProductNotFoundException.class)
     public ResponseEntity<StandardError> handleProductNotFoundException(ProductNotFoundException ex, HttpServletRequest request){
         String error = "ProductNotFoundException";
-        HttpStatus status = HttpStatus.CONFLICT;
+        HttpStatus status = HttpStatus.NOT_FOUND;
         StandardError err = new StandardError(Instant.now(), status.value(), error, ex.getMessage(), request.getRequestURI());
         return ResponseEntity.status(status).body(err);
     }
