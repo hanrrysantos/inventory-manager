@@ -16,6 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -50,10 +51,10 @@ public class UserService {
         return userMapper.toDTO(user);
     }
 
-    public Page<UserResponseDTO> findAllUsers(Pageable pageable){
-        Page<User> users = userRepository.findAll(pageable);
+    public List<UserResponseDTO> findAllUsers(){
+        List<User> users = userRepository.findAll();
 
-        return users.map(userMapper::toDTO);
+        return userMapper.toDTOList(users);
     }
 
     public UserResponseDTO updateUser(Long id, UpdateUserRequestDTO request){
