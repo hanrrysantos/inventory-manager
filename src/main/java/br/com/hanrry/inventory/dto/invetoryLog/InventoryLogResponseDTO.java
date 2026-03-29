@@ -1,12 +1,12 @@
 package br.com.hanrry.inventory.dto.invetoryLog;
 
-import br.com.hanrry.inventory.entity.Type;
+import br.com.hanrry.inventory.entity.LogType;
 
 import java.time.LocalDateTime;
 
 public record InventoryLogResponseDTO(
         Long id,
-        Type type,
+        LogType type,
         LocalDateTime timestamp,
         Long quantity,
         Long batchId,

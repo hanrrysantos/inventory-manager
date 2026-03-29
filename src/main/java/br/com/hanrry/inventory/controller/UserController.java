@@ -1,5 +1,6 @@
 package br.com.hanrry.inventory.controller;
 
+import br.com.hanrry.inventory.controller.docs.UserControllerDocs;
 import br.com.hanrry.inventory.dto.user.UpdateUserRequestDTO;
 import br.com.hanrry.inventory.dto.user.UserResponseDTO;
 import br.com.hanrry.inventory.service.UserService;
@@ -10,10 +11,12 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping(value = "api/v1/users")
 @RequiredArgsConstructor
-public class UserController {
+public class UserController implements UserControllerDocs {
 
     private final UserService userService;
 
@@ -27,11 +30,9 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<UserResponseDTO>> findAllUsers(
-            @PageableDefault(size = 3, sort = "id")
-            Pageable pageable
+    public ResponseEntity<List<UserResponseDTO>> findAllUsers(
     ){
-        Page<UserResponseDTO> users = userService.findAllUsers(pageable);
+        List<UserResponseDTO> users = userService.findAllUsers();
 
         return ResponseEntity.ok().body(users);
     }

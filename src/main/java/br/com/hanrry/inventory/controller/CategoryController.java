@@ -1,23 +1,21 @@
 package br.com.hanrry.inventory.controller;
 
+import br.com.hanrry.inventory.controller.docs.CategoryControllerDocs;
 import br.com.hanrry.inventory.dto.category.CategoryRequestDTO;
 import br.com.hanrry.inventory.dto.category.CategoryResponseDTO;
-import br.com.hanrry.inventory.dto.product.UpdateProdcutRequestDTO;
 import br.com.hanrry.inventory.service.CategoryService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/categories")
 @RequiredArgsConstructor
-public class CategoryController {
+public class CategoryController implements CategoryControllerDocs {
 
     private final CategoryService categoryService;
 
@@ -31,7 +29,6 @@ public class CategoryController {
         return ResponseEntity.created(uri).body(category);
     }
 
-
     @GetMapping("/{id}")
     public ResponseEntity<CategoryResponseDTO> findCategoryById(
             @PathVariable Long id
@@ -42,11 +39,8 @@ public class CategoryController {
     }
 
     @GetMapping()
-    public ResponseEntity<Page<CategoryResponseDTO>> findAllCategories(
-            @PageableDefault(size = 3, sort = "id")
-            Pageable pageable
-    ){
-        Page<CategoryResponseDTO> categoryList = categoryService.findAllCategories(pageable);
+    public ResponseEntity<List<CategoryResponseDTO>> findAllCategories(){
+        List<CategoryResponseDTO> categoryList = categoryService.findAllCategories();
 
         return ResponseEntity.ok().body(categoryList);
     }

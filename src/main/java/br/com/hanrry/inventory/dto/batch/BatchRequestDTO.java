@@ -4,8 +4,9 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public record BatchRequestDTO (
-        Long batchNumber,
+        String batchNumber,
         Long quantity,
+        LocalDate manufacturingDate,
         LocalDate expiryDate,
         BigDecimal price,
         Long productId

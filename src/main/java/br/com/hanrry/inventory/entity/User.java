@@ -15,18 +15,19 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "users")
+@Table(name = "tb_users")
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Email
+    @Column(nullable = false)
+    private String name;
+
     @Column(unique = true, nullable = false)
     private String email;
 
-    @Min(8)
     @Column(nullable = false)
     private String password;
 

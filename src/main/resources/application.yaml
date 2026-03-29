@@ -1,18 +1,19 @@
 spring:
+  jwt:
+    secret: ${JWT_SECRET}
+    expiration: ${JWT_EXPIRATION}
   application:
     name: inventory-manager
 
-  # Configuração do Banco de Dados PostgreSQL
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/inventorymanager
-    username: postgres
-    password: 1234
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
 
-  # Configuração do JPA / Hibernate
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
     show-sql: true
     open-in-view: false
     properties:
@@ -20,12 +21,11 @@ spring:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
-  # Configuração do Spring Mail (Exemplo Gmail)
   mail:
     host: smtp.gmail.com
     port: 587
     username: sheinhanrry@gmail.com
-    password: tiss qbhf ojvm kavb
+    password: ${EMAIL_CODE}
     properties:
       mail:
         smtp:
@@ -33,3 +33,6 @@ spring:
           starttls:
             enable: true
             required: true
+springdoc:
+  swagger-ui:
+    tags-sorter: alpha

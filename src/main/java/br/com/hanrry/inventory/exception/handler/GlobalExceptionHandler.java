@@ -6,8 +6,10 @@ import br.com.hanrry.inventory.exception.batch.InvalidQuantityException;
 import br.com.hanrry.inventory.exception.category.CascadeCategoryException;
 import br.com.hanrry.inventory.exception.category.CategoryAlreadyExistsException;
 import br.com.hanrry.inventory.exception.category.CategoryNotFoundException;
+import br.com.hanrry.inventory.exception.pdf.WritePdfException;
 import br.com.hanrry.inventory.exception.product.ProductAlreadyExistsException;
 import br.com.hanrry.inventory.exception.product.ProductNotFoundException;
+import br.com.hanrry.inventory.exception.security.InvalidTokenException;
 import br.com.hanrry.inventory.exception.user.EmailAlreadyExistsException;
 import br.com.hanrry.inventory.exception.user.UserNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -39,7 +41,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ProductAlreadyExistsException.class)
     public ResponseEntity<StandardError> handleProductAlreadyExistsException(ProductAlreadyExistsException ex, HttpServletRequest request){
-        String error = "UserNotFoundException";
+        String error = "ProductAlreadyExistsException";
         HttpStatus status = HttpStatus.CONFLICT;
         StandardError err = new StandardError(Instant.now(), status.value(), error, ex.getMessage(), request.getRequestURI());
         return ResponseEntity.status(status).body(err);
@@ -48,7 +50,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ProductNotFoundException.class)
     public ResponseEntity<StandardError> handleProductNotFoundException(ProductNotFoundException ex, HttpServletRequest request){
         String error = "ProductNotFoundException";
-        HttpStatus status = HttpStatus.CONFLICT;
+        HttpStatus status = HttpStatus.NOT_FOUND;
         StandardError err = new StandardError(Instant.now(), status.value(), error, ex.getMessage(), request.getRequestURI());
         return ResponseEntity.status(status).body(err);
     }
@@ -79,7 +81,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(InsufficientStockException.class)
     public ResponseEntity<StandardError> handleInsufficientStockException(InsufficientStockException ex, HttpServletRequest request){
-        String error = "Insufficient Stock";
+        String error = "InsufficientStock";
         HttpStatus status = HttpStatus.BAD_REQUEST;
         StandardError err = new StandardError(Instant.now(), status.value(), error, ex.getMessage(), request.getRequestURI());
         return ResponseEntity.status(status).body(err);
@@ -87,8 +89,24 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(InvalidQuantityException.class)
     public ResponseEntity<StandardError> handleInvalidQuantityException(InvalidQuantityException ex, HttpServletRequest request){
-        String error = "Invalid Quantity";
+        String error = "InvalidQuantity";
         HttpStatus status = HttpStatus.UNPROCESSABLE_ENTITY;
+        StandardError err = new StandardError(Instant.now(), status.value(), error, ex.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(status).body(err);
+    }
+
+    @ExceptionHandler(WritePdfException.class)
+    public ResponseEntity<StandardError> handleWritePdfException(WritePdfException ex, HttpServletRequest request){
+        String error = "WritePdfException";
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        StandardError err = new StandardError(Instant.now(), status.value(), error, ex.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(status).body(err);
+    }
+
+    @ExceptionHandler(InvalidTokenException.class)
+    public ResponseEntity<StandardError> handleInvalidTokenException(InvalidTokenException ex, HttpServletRequest request){
+        String error = "InvalidTokenException";
+        HttpStatus status = HttpStatus.UNAUTHORIZED;
         StandardError err = new StandardError(Instant.now(), status.value(), error, ex.getMessage(), request.getRequestURI());
         return ResponseEntity.status(status).body(err);
     }
