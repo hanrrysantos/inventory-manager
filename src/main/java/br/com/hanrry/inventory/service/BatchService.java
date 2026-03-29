@@ -1,5 +1,6 @@
 package br.com.hanrry.inventory.service;
 
+import br.com.hanrry.inventory.dto.batch.AddStockBatchRequestDTO;
 import br.com.hanrry.inventory.dto.batch.BatchRequestDTO;
 import br.com.hanrry.inventory.dto.batch.BatchResponseDTO;
 import br.com.hanrry.inventory.dto.batch.ConsumeBatchRequestDTO;
@@ -55,12 +56,12 @@ public class    BatchService {
     }
 
     @Transactional
-    public BatchResponseDTO addStock(Long id, BatchRequestDTO request) {
+    public BatchResponseDTO addStock(Long id, AddStockBatchRequestDTO request) {
         Batch batch = batchRepository.findById(id)
                 .orElseThrow(() -> new BatchNotFound
                         ("Batch not found with this id: " + id));
 
-        Long quantityToAdd = request.quantity();
+        Long quantityToAdd = request.quantityToAdd();
 
         if (quantityToAdd <= 0) {
             throw new InvalidQuantityException

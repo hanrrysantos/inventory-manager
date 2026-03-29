@@ -1,11 +1,12 @@
 package br.com.hanrry.inventory.controller;
 
+import br.com.hanrry.inventory.controller.docs.BatchControllerDocs;
+import br.com.hanrry.inventory.dto.batch.AddStockBatchRequestDTO;
 import br.com.hanrry.inventory.dto.batch.BatchRequestDTO;
 import br.com.hanrry.inventory.dto.batch.BatchResponseDTO;
 import br.com.hanrry.inventory.dto.batch.ConsumeBatchRequestDTO;
 import br.com.hanrry.inventory.service.BatchService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -16,7 +17,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/batches")
 @RequiredArgsConstructor
-public class BatchController {
+public class BatchController implements BatchControllerDocs {
 
     private final BatchService batchService;
 
@@ -33,7 +34,7 @@ public class BatchController {
     @PatchMapping("/{id}/add")
     public ResponseEntity<BatchResponseDTO> addStock(
             @PathVariable Long id,
-            @RequestBody BatchRequestDTO request
+            @RequestBody AddStockBatchRequestDTO request
     ){
         BatchResponseDTO batch = batchService.addStock(id, request);
         return ResponseEntity.ok().body(batch);
