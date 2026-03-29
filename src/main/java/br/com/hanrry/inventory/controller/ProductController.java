@@ -1,5 +1,6 @@
 package br.com.hanrry.inventory.controller;
 
+import br.com.hanrry.inventory.controller.docs.ProductControllerDocs;
 import br.com.hanrry.inventory.dto.product.ProductRequestDTO;
 import br.com.hanrry.inventory.dto.product.ProductResponseDTO;
 import br.com.hanrry.inventory.dto.product.UpdateProdcutRequestDTO;
@@ -15,7 +16,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/products")
-public class ProductController {
+public class ProductController implements ProductControllerDocs {
 
     private final ProductService productService;
 
