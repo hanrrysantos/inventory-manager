@@ -32,7 +32,7 @@ public interface UserControllerDocs {
     ResponseEntity<List<UserResponseDTO>> findAllUsers();
 
     @Operation(summary = "Atualiza perfil de usuário",
-            description = "Permite alterar roles, e dados de contato.")
+            description = "Permite alterar a senha.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Perfil atualizado com sucesso"),
             @ApiResponse(responseCode = "400", description = "E-mail já está em uso por outro usuário"),
