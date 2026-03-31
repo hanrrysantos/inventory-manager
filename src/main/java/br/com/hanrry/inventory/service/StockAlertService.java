@@ -9,13 +9,13 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class StockAlertManager {
+public class StockAlertService {
 
     private final ProductService productService;
     private final PdfService pdfService;
     private final EmailService emailService;
 
-    @Scheduled(cron = "0/30 * * * * *")
+    @Scheduled(fixedRate = 36000000)
     public void checkInventoryAndNotify() {
         List<ProductResponseDTO> lowStockProducts = productService.getLowStockProducts();
 
