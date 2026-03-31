@@ -9,8 +9,6 @@ import br.com.hanrry.inventory.exception.category.CategoryNotFoundException;
 import br.com.hanrry.inventory.mapper.CategoryMapper;
 import br.com.hanrry.inventory.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

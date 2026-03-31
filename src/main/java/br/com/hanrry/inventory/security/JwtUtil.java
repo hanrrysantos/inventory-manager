@@ -1,6 +1,5 @@
 package br.com.hanrry.inventory.security;
 
-import br.com.hanrry.inventory.exception.security.InvalidTokenException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;

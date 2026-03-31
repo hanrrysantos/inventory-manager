@@ -1,7 +1,6 @@
 package br.com.hanrry.inventory.repository;
 
 import br.com.hanrry.inventory.entity.Batch;
-import br.com.hanrry.inventory.entity.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDate;

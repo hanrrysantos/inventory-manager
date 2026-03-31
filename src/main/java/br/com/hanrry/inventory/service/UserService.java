@@ -10,8 +10,6 @@ import br.com.hanrry.inventory.exception.user.UserNotFoundException;
 import br.com.hanrry.inventory.mapper.UserMapper;
 import br.com.hanrry.inventory.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 

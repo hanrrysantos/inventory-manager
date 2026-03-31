@@ -4,7 +4,6 @@ import br.com.hanrry.inventory.dto.batch.AddStockBatchRequestDTO;
 import br.com.hanrry.inventory.dto.batch.BatchRequestDTO;
 import br.com.hanrry.inventory.dto.batch.BatchResponseDTO;
 import br.com.hanrry.inventory.dto.batch.ConsumeBatchRequestDTO;
-import br.com.hanrry.inventory.dto.product.ProductResponseDTO;
 import br.com.hanrry.inventory.entity.Batch;
 import br.com.hanrry.inventory.entity.LogType;
 import br.com.hanrry.inventory.entity.Product;

@@ -5,9 +5,6 @@ import br.com.hanrry.inventory.dto.user.UpdateUserRequestDTO;
 import br.com.hanrry.inventory.dto.user.UserResponseDTO;
 import br.com.hanrry.inventory.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
