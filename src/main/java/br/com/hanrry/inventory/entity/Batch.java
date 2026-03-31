@@ -13,7 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "batch")
+@Table(name = "tb_batches")
 public class Batch {
 
     @Id
