@@ -21,7 +21,7 @@ import java.net.URI;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping(value = "api/v1/auth")
+@RequestMapping(value = "/api/v1/auth")
 public class AuthController implements AuthControllerDocs {
 
     private final UserService userService;
