@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Size;
 
 public record UserRequestDTO (
 
+        @Schema(example = "user1")
         @NotBlank
         String name,
 
