@@ -2,6 +2,9 @@ spring:
   application:
     name: inventory-manager
 
+  profiles:
+    active: prod
+
   datasource:
     driver-class-name: org.postgresql.Driver
     url: ${DB_URL}
@@ -34,3 +37,7 @@ spring:
 jwt:
   secret: ${JWT_SECRET}
   expiration: ${JWT_EXPIRATION}
+
+springdoc:
+  swagger-ui:
+    operations-sorter: alpha
