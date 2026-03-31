@@ -82,28 +82,28 @@ public class    BatchService {
         List<Batch> batches = batchRepository.
                 findByProductIdAndQuantityGreaterThanOrderByExpiryDateAsc(request.productId(), 0L);
 
-        long oQuantoAindaFaltaPegar = request.quantityToConsume();
+        long howMuchNeedGet = request.quantityToConsume();
 
         for (Batch batch : batches) {
-            if (oQuantoAindaFaltaPegar <= 0) break;
+            if (howMuchNeedGet <= 0) break;
 
-            long estoqueDisponivelNoLoteAtual = batch.getQuantity();
-            long unidadesRetiradasDesteLote;
+            long stockAvaliableInTheCurrentPack = batch.getQuantity();
+            long unitsRemovedFromTheBatch;
 
-            if (estoqueDisponivelNoLoteAtual <= oQuantoAindaFaltaPegar) {
-                unidadesRetiradasDesteLote = estoqueDisponivelNoLoteAtual;
-                oQuantoAindaFaltaPegar -= unidadesRetiradasDesteLote;
+            if (stockAvaliableInTheCurrentPack <= howMuchNeedGet) {
+                unitsRemovedFromTheBatch = stockAvaliableInTheCurrentPack;
+                howMuchNeedGet -= unitsRemovedFromTheBatch;
                 batch.setQuantity(0L);
             } else {
-                unidadesRetiradasDesteLote = oQuantoAindaFaltaPegar;
-                batch.setQuantity(estoqueDisponivelNoLoteAtual - oQuantoAindaFaltaPegar);
-                oQuantoAindaFaltaPegar = 0;
+                unitsRemovedFromTheBatch = howMuchNeedGet;
+                batch.setQuantity(stockAvaliableInTheCurrentPack - howMuchNeedGet);
+                howMuchNeedGet = 0;
             }
 
-            inventoryLogService.createLog(batch, unidadesRetiradasDesteLote, LogType.OUTPUT);
+            inventoryLogService.createLog(batch, unitsRemovedFromTheBatch, LogType.OUTPUT);
         }
 
-        if (oQuantoAindaFaltaPegar > 0) {
+        if (howMuchNeedGet > 0) {
             throw new InsufficientStockException("Insufficient Stock");
         }
 
