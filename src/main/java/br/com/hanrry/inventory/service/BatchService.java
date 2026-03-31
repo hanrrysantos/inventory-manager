@@ -107,7 +107,7 @@ public class    BatchService {
             throw new InsufficientStockException("Insufficient Stock");
         }
 
-        this.stockAlertManager.checkLowStockAndNotify(request.productId());
+        this.stockAlertManager.checkInventoryAndNotify();
     }
 
     public List<BatchResponseDTO> findExpiredBatches() {
