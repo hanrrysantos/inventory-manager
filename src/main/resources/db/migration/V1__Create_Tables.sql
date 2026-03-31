@@ -1,0 +1,45 @@
+CREATE TABLE tb_categories (
+id BIGSERIAL PRIMARY KEY,
+name VARCHAR(100) NOT NULL UNIQUE,
+description TEXT
+);
+
+CREATE TABLE tb_products (
+id BIGSERIAL PRIMARY KEY,
+name VARCHAR(255) NOT NULL,
+sku VARCHAR(50) NOT NULL UNIQUE,
+min_stock BIGINT NOT NULL DEFAULT 0,
+category_id BIGINT NOT NULL,
+CONSTRAINT fk_product_category FOREIGN KEY (category_id) REFERENCES tb_categories(id)
+);
+
+CREATE TABLE tb_batches (
+id BIGSERIAL PRIMARY KEY,
+batch_number VARCHAR(100) NOT NULL UNIQUE,
+quantity BIGINT NOT NULL CHECK (quantity >= 0),
+manufacturing_date DATE,
+expiry_date DATE,
+price NUMERIC(38,2) NOT NULL DEFAULT 0,
+product_id BIGINT NOT NULL,
+CONSTRAINT fk_batch_product FOREIGN KEY (product_id) REFERENCES tb_products(id)
+);
+
+CREATE TABLE tb_inventory_logs (
+id BIGSERIAL PRIMARY KEY,
+type VARCHAR(20) NOT NULL,
+quantity BIGINT NOT NULL,
+timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+batch_id BIGINT,
+product_id BIGINT NOT NULL,
+CONSTRAINT fk_log_batch FOREIGN KEY (batch_id) REFERENCES tb_batches(id) ON DELETE SET NULL,
+CONSTRAINT fk_log_product FOREIGN KEY (product_id) REFERENCES tb_products(id)
+);
+
+CREATE TABLE tb_users(
+id BIGSERIAL PRIMARY KEY,
+name VARCHAR(100) NOT NULL,
+email VARCHAR(250) NOT NULL,
+password VARCHAR(250) NOT NULL,
+role VARCHAR(50) NOT NULL,
+created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
