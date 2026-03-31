@@ -1,5 +1,6 @@
 package br.com.hanrry.inventory.entity;
 
+import br.com.hanrry.inventory.entity.enums.LogType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;

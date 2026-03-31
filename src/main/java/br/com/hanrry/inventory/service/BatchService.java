@@ -5,7 +5,7 @@ import br.com.hanrry.inventory.dto.batch.BatchRequestDTO;
 import br.com.hanrry.inventory.dto.batch.BatchResponseDTO;
 import br.com.hanrry.inventory.dto.batch.ConsumeBatchRequestDTO;
 import br.com.hanrry.inventory.entity.Batch;
-import br.com.hanrry.inventory.entity.LogType;
+import br.com.hanrry.inventory.entity.enums.LogType;
 import br.com.hanrry.inventory.entity.Product;
 import br.com.hanrry.inventory.exception.batch.BatchAlreadyExists;
 import br.com.hanrry.inventory.exception.batch.BatchNotFound;
@@ -30,7 +30,7 @@ public class    BatchService {
     private final BatchRepository batchRepository;
     private final InventoryLogService inventoryLogService;
     private final ProductRepository productRepository;
-    private final StockAlertManager stockAlertManager;
+    private final StockAlertService stockAlertService;
 
     @Transactional
     public BatchResponseDTO createBatch(BatchRequestDTO request) {
@@ -106,7 +106,7 @@ public class    BatchService {
             throw new InsufficientStockException("Insufficient Stock");
         }
 
-        this.stockAlertManager.checkInventoryAndNotify();
+        this.stockAlertService.checkInventoryAndNotify();
     }
 
     public List<BatchResponseDTO> findExpiredBatches() {

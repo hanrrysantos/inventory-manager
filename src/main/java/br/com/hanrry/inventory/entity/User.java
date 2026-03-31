@@ -1,5 +1,6 @@
 package br.com.hanrry.inventory.entity;
 
+import br.com.hanrry.inventory.entity.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

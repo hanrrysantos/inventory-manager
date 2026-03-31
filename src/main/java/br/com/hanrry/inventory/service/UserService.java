@@ -4,7 +4,7 @@ import br.com.hanrry.inventory.dto.user.UpdateUserRequestDTO;
 import br.com.hanrry.inventory.dto.user.UserRequestDTO;
 import br.com.hanrry.inventory.dto.user.UserResponseDTO;
 import br.com.hanrry.inventory.entity.User;
-import br.com.hanrry.inventory.entity.UserRole;
+import br.com.hanrry.inventory.entity.enums.UserRole;
 import br.com.hanrry.inventory.exception.user.EmailAlreadyExistsException;
 import br.com.hanrry.inventory.exception.user.UserNotFoundException;
 import br.com.hanrry.inventory.mapper.UserMapper;
