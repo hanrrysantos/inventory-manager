@@ -1,11 +1,8 @@
 package br.com.hanrry.inventory.service;
 
 import br.com.hanrry.inventory.dto.product.ProductResponseDTO;
-import br.com.hanrry.inventory.entity.Batch;
-import br.com.hanrry.inventory.entity.Product;
-import br.com.hanrry.inventory.exception.product.ProductNotFoundException;
-import br.com.hanrry.inventory.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,26 +11,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class StockAlertManager {
 
-    private final ProductRepository productRepository;
     private final ProductService productService;
     private final PdfService pdfService;
     private final EmailService emailService;
 
-    public void checkLowStockAndNotify(Long productId) {
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new ProductNotFoundException("Product not found with id: " + productId));
-
-        long currentStock = product.getBatches().stream()
-                .mapToLong(Batch::getQuantity)
-                .sum();
-
-        if (currentStock <= product.getMinStock()) {
-            this.sendNotificationWithReport(product.getName());
-        }
-    }
-
-    private void sendNotificationWithReport(String productName) {
-
+    @Scheduled(cron = "0/30 * * * * *")
+    public void checkInventoryAndNotify() {
         List<ProductResponseDTO> lowStockProducts = productService.getLowStockProducts();
 
         if (!lowStockProducts.isEmpty()) {
@@ -44,6 +27,8 @@ public class StockAlertManager {
             byte[] pdfReport = pdfService.generateLowStockReport(lowStockProducts);
 
             emailService.sendLowStockAlert(allProductNames, pdfReport);
+
+            System.out.println("Alerta de estoque enviado!");
         }
     }
 }
