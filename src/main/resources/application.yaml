@@ -41,4 +41,5 @@ jwt:
 springdoc:
   swagger-ui:
     tags-sorter: alpha
-    operations-sorter: method
+    operation-sorter: alpha
+    displayOperationId: false

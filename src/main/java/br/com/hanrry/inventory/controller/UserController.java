@@ -17,6 +17,14 @@ public class UserController implements UserControllerDocs {
 
     private final UserService userService;
 
+    @GetMapping
+    public ResponseEntity<List<UserResponseDTO>> findAllUsers(
+    ){
+        List<UserResponseDTO> users = userService.findAllUsers();
+
+        return ResponseEntity.ok().body(users);
+    }
+
     @GetMapping(value = "/{id}")
     public ResponseEntity<UserResponseDTO> findUserById(
             @PathVariable Long id
@@ -24,14 +32,6 @@ public class UserController implements UserControllerDocs {
         UserResponseDTO user = userService.findUserById(id);
 
         return ResponseEntity.ok().body(user);
-    }
-
-    @GetMapping
-    public ResponseEntity<List<UserResponseDTO>> findAllUsers(
-    ){
-        List<UserResponseDTO> users = userService.findAllUsers();
-
-        return ResponseEntity.ok().body(users);
     }
 
     @PutMapping(value = "/{id}")

@@ -21,6 +21,13 @@ public class BatchController implements BatchControllerDocs {
 
     private final BatchService batchService;
 
+    @GetMapping("/expired")
+    public ResponseEntity<List<BatchResponseDTO>> listExpired(
+    ){
+        List<BatchResponseDTO> batchesList = batchService.findExpiredBatches();
+        return ResponseEntity.ok().body(batchesList);
+    }
+
     @PostMapping
     public ResponseEntity<BatchResponseDTO> createBatch(
             @RequestBody BatchRequestDTO request
@@ -46,12 +53,5 @@ public class BatchController implements BatchControllerDocs {
     ){
         batchService.consumeStock(request);
         return ResponseEntity.noContent().build();
-    }
-
-    @GetMapping("/expired")
-    public ResponseEntity<List<BatchResponseDTO>> listExpired(
-    ){
-        List<BatchResponseDTO> batchesList = batchService.findExpiredBatches();
-        return ResponseEntity.ok().body(batchesList);
     }
 }

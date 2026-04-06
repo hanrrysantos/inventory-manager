@@ -19,14 +19,11 @@ public class CategoryController implements CategoryControllerDocs {
 
     private final CategoryService categoryService;
 
-    @PostMapping
-    public ResponseEntity<CategoryResponseDTO> createCategory(
-            @RequestBody CategoryRequestDTO request
-    ){
-        CategoryResponseDTO category = categoryService.createCategory(request);
-        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
-                .buildAndExpand(category.id()).toUri();
-        return ResponseEntity.created(uri).body(category);
+    @GetMapping()
+    public ResponseEntity<List<CategoryResponseDTO>> findAllCategories(){
+        List<CategoryResponseDTO> categoryList = categoryService.findAllCategories();
+
+        return ResponseEntity.ok().body(categoryList);
     }
 
     @GetMapping("/{id}")
@@ -38,11 +35,14 @@ public class CategoryController implements CategoryControllerDocs {
         return ResponseEntity.ok().body(category);
     }
 
-    @GetMapping()
-    public ResponseEntity<List<CategoryResponseDTO>> findAllCategories(){
-        List<CategoryResponseDTO> categoryList = categoryService.findAllCategories();
-
-        return ResponseEntity.ok().body(categoryList);
+    @PostMapping
+    public ResponseEntity<CategoryResponseDTO> createCategory(
+            @RequestBody CategoryRequestDTO request
+    ){
+        CategoryResponseDTO category = categoryService.createCategory(request);
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
+                .buildAndExpand(category.id()).toUri();
+        return ResponseEntity.created(uri).body(category);
     }
 
     @PutMapping("/{id}")

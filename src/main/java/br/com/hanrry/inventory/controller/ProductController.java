@@ -20,14 +20,11 @@ public class ProductController implements ProductControllerDocs {
 
     private final ProductService productService;
 
-    @PostMapping
-    public ResponseEntity<ProductResponseDTO> createProduct(
-            @RequestBody ProductRequestDTO request
-    ) {
-        ProductResponseDTO product = productService.createProduct(request);
-        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
-                .buildAndExpand(product.id()).toUri();
-        return ResponseEntity.created(uri).body(product);
+    @GetMapping()
+    public ResponseEntity<List<ProductResponseDTO>> findAllProducts(){
+        List<ProductResponseDTO> productList = productService.findAllProducts();
+
+        return ResponseEntity.ok().body(productList);
     }
 
     @GetMapping("/{id}")
@@ -39,18 +36,21 @@ public class ProductController implements ProductControllerDocs {
         return ResponseEntity.ok().body(product);
     }
 
-    @GetMapping()
-    public ResponseEntity<List<ProductResponseDTO>> findAllProducts(){
-        List<ProductResponseDTO> productList = productService.findAllProducts();
-
-        return ResponseEntity.ok().body(productList);
-    }
-
     @GetMapping("/low-stock")
     public ResponseEntity<List<ProductResponseDTO>> getLowStock(){
         List<ProductResponseDTO> productList = productService.getLowStockProducts();
 
         return ResponseEntity.ok().body(productList);
+    }
+
+    @PostMapping
+    public ResponseEntity<ProductResponseDTO> createProduct(
+            @RequestBody ProductRequestDTO request
+    ) {
+        ProductResponseDTO product = productService.createProduct(request);
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
+                .buildAndExpand(product.id()).toUri();
+        return ResponseEntity.created(uri).body(product);
     }
 
     @PutMapping("/{id}")

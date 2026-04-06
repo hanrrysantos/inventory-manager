@@ -28,6 +28,16 @@ public class AuthController implements AuthControllerDocs {
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
 
+    @PostMapping(value = "/login")
+    public ResponseEntity<AuthResponseDTO> loginUser(@RequestBody AuthRequestDTO request){
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(request.email(), request.password()
+                ));
+
+        String token = jwtUtil.generateToken(request.email());
+        return ResponseEntity.ok().body(new AuthResponseDTO(token));
+    }
+
     @PostMapping(value = "/register")
     public ResponseEntity<UserResponseDTO> registerUser(@RequestBody UserRequestDTO request){
         UserResponseDTO user = userService.createUser(request);
@@ -36,18 +46,4 @@ public class AuthController implements AuthControllerDocs {
 
         return ResponseEntity.created(uri).body(user);
     }
-
-    @PostMapping(value = "/login")
-    public ResponseEntity<AuthResponseDTO> loginUser(@RequestBody AuthRequestDTO request){
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.email(), request.password()
-        ));
-
-        String token = jwtUtil.generateToken(request.email());
-        return ResponseEntity.ok().body(new AuthResponseDTO(token));
-    }
-
-
-
-
 }
