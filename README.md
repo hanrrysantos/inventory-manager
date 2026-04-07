@@ -29,7 +29,7 @@ O diferencial deste sistema não está apenas no armazenamento de dados, mas na 
 
 **Alertas Automáticos**: Monitoramento proativo que identifica produtos abaixo do nível mínimo, gerando automaticamente relatórios em PDF e enviando alertas por e-mail para o gestor.
 
-**Estratégia de Consumo**: Lógica de saída de estoque que prioriza automaticamente os lotes com vencimento mais próximo, minimizando perdas e desperdícios de produtos.
+**Estratégia de Consumo**: Lógica de saída de estoque que prioriza automaticamente os lotes com vencimento mais próximo, minimizando perdas e desperdícios de produtos (FEFO).
 
 **Rastreabilidade**: Registro detalhado de todas as movimentações de inventário (entradas e saídas) através de logs, garantindo transparência no histórico de cada produto.
 
