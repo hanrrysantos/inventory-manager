@@ -1,4 +1,4 @@
-# Inventory Manager - Controle de Estoque Inteligente 
+# Inventory Manager — API Inteligente para Gestão de Estoque
 
 ![Java](https://img.shields.io/badge/java-%23ED8B00.svg?style=for-the-badge&logo=openjdk&logoColor=white)
 ![Spring](https://img.shields.io/badge/spring-%236DB33F.svg?style=for-the-badge&logo=spring&logoColor=white)
@@ -41,6 +41,32 @@ O diferencial deste sistema não está apenas no armazenamento de dados, mas na 
 
 ---
 
+## Demonstração Visual
+
+<table width="100%">
+  <tr>
+    <td align="center" width="33%">
+      <b>Documentação Swagger</b><br>
+      <img src="https://github.com/user-attachments/assets/f898032f-63af-4885-b8bd-0408406910fa" width="100%" alt="Swagger UI">
+      <p><i>Interface interativa para testes de endpoints</i></p>
+    </td>
+    <td align="center" width="33%">
+      <b>Alerta por E-mail</b><br>
+      <img src="https://github.com/user-attachments/assets/10b3b170-d52f-4a79-8ca3-6fad61722bc5" width="100%" alt="E-mail de Alerta">
+      <p><i>Notificação automática de estoque crítico</i></p>
+    </td>
+    <td align="center" width="33%">
+      <b>Relatório PDF</b><br>
+      <img src="https://github.com/user-attachments/assets/a176c88b-486a-4850-82ea-fb696d522b92" width="100%" alt="Relatório PDF">
+      <p><i>Documento detalhado para reposição</i></p>
+    </td>
+  </tr>
+</table>
+
+> O sistema utiliza tarefas agendadas (`@Scheduled`) para monitorar o inventário e disparar alertas sempre que um produto atinge o nível mínimo de segurança.
+
+---
+
 ## Tecnologias Utilizadas
 
 **Backend**
@@ -49,7 +75,7 @@ Java 21, Spring Boot 3, Spring Security, Spring Data JPA, Spring Mail, MapStruct
 
 **Banco de Dados**
 
-PostgreSQL, Flyway, Supabase
+PostgreSQL, Flyway, Supabase, Hibernate 
 
 **Infraestrutura**
 
@@ -61,19 +87,15 @@ Docker, Render, Swagger, Postman
 
 A arquitetura em camadas foi escolhida para garantir separação de responsabilidades, facilitar testes e permitir evolução futura para microserviços.
 
-1. **Controller:** Exposição dos endpoints REST (`/api/v1/products, /api/v1/categories, /api/v1/batches e /api/v1/users`).
+1. **Controller:** Exposição dos endpoints REST ((`/api/v1/products`, `/api/v1/categories`, `/api/v1/batches`, `/api/v1/users`)).
 2. **Service:** Regras de negócio, validações e cálculos.
 3. **Repository:** Camada de acesso a dados (JPA/Hibernate).
 4. **Security:** Filtros de segurança (JWT).
 5. **DTO**: Evitando a exposição direta das entidades do banco e melhorando a segurança da API.
 
-<div align="center">
-  <img width="300" height="168" alt="image" src="https://github.com/user-attachments/assets/233e0ec5-4b43-4b26-b1a1-8bc75e1d9fa0" alt="Arquitetura do StudyTracker" width="300">
-</div>
-
 ---
 
-## Teste agora mesmo:
+## Teste agora mesmo
 
 A API está online e pronta para testes através da documentação interativa: 
 https://inventory.hanrry.top/swagger-ui/index.html
@@ -85,10 +107,15 @@ https://inventory.hanrry.top/swagger-ui/index.html
 5. Cole o token no formato: Bearer {token}
 6. Agora você pode acessar os endpoints protegidos
 
-## Configuração das Variáveis de Ambiente
+---
 
-Crie um arquivo `.env` na raiz do projeto com as seguintes chaves:
+## Instalação e Execução
 
+### Pré-requisitos
+- Docker e Docker compose instalados 
+- Java 21 (se for rodar via IDE)
+- Crie um arquivo `.env` na raiz do projeto com as seguintes chaves:
+  
 | Variável | Descrição |
 | :--- | :--- |
 | **DB_URL** | URL de conexão com o banco PostgreSQL |
@@ -98,12 +125,6 @@ Crie um arquivo `.env` na raiz do projeto com as seguintes chaves:
 | **EMAIL_CODE** | Senha de app para autenticação |
 | **JWT_SECRET** | Chave secreta para assinatura dos tokens |
 | **JWT_EXPIRATION** | Tempo de expiração do token |
-
-## Instalação e Execução
-
-### Pré-requisitos
-- Docker e Docker compose instalados 
-- Java 21 (se for rodar via IDE)
 
 ### 1. Clone o repositório
 ```bash
@@ -117,9 +138,17 @@ docker-compose up -d
 
 ## Estrutura de Dados
 
+A modelagem foi desenhada para suportar alta integridade de dados e rastreabilidade total das movimentações de estoque. O banco de dados utiliza restrições de integridade (Constraints), chaves estrangeiras (FK) e índices únicos para evitar inconsistências.
+
 <div align="center">
-<img width="857" height="667" alt="image" src="https://github.com/user-attachments/assets/c12bc591-4048-4fee-9542-3d4f419cc480" alt="Arquitetura do StudyTracker" width="300">
+<img width="500" height="500" alt="image" src="https://github.com/user-attachments/assets/c12bc591-4048-4fee-9542-3d4f419cc480">
 </div>
+
+**Rastreabilidade**: A tabela tb_inventory_logs mantém um histórico imutável de todas as entradas e saídas, vinculando cada movimentação a um produto e, opcionalmente, a um lote específico.
+
+**Gestão por Lotes**: A relação entre tb_products e tb_batches permite o controle de validade e custo médio, essencial para a estratégia de consumo FEFO implementada.
+
+**Normalização**: Separação clara entre categorias e produtos para facilitar a escalabilidade e filtros de busca.
 
 ---
 
