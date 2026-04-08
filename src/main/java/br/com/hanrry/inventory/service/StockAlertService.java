@@ -15,7 +15,7 @@ public class StockAlertService {
     private final PdfService pdfService;
     private final EmailService emailService;
 
-    @Scheduled(fixedRate = 36000000)
+    @Scheduled(initialDelay = 10000, fixedRate = 36000000)
     public void checkInventoryAndNotify() {
         List<ProductResponseDTO> lowStockProducts = productService.getLowStockProducts();
 
