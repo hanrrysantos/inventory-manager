@@ -24,7 +24,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class    BatchService {
+public class BatchService {
 
     private final BatchMapper batchMapper;
     private final BatchRepository batchRepository;
