@@ -3,7 +3,7 @@ spring:
     name: inventory-manager
 
   profiles:
-    active:
+    active: prod
 
   datasource:
     driver-class-name: org.postgresql.Driver
@@ -32,7 +32,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
     show-sql: true
     open-in-view: false
     properties:
