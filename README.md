@@ -10,6 +10,9 @@
 ![Apache Maven](https://img.shields.io/badge/Apache%20Maven-C71A36?style=for-the-badge&logo=Apache%20Maven&logoColor=white)
 ![Hibernate](https://img.shields.io/badge/Hibernate-59666C?style=for-the-badge&logo=Hibernate&logoColor=white)
 ![Postman](https://img.shields.io/badge/Postman-FF6C37?style=for-the-badge&logo=postman&logoColor=white)
+![JUnit5](https://img.shields.io/badge/JUnit5-25A162?style=for-the-badge&logo=junit5&logoColor=white)
+![Mockito](https://img.shields.io/badge/Mockito-78A641?style=for-the-badge)
+![k6](https://img.shields.io/badge/k6-7D64FF?style=for-the-badge&logo=k6&logoColor=white)
 
 ---
 
@@ -38,6 +41,23 @@ O diferencial deste sistema não está apenas no armazenamento de dados, mas na 
 **Infraestrutura**: Aplicação totalmente conteinerizada com Docker utilizando multi-stage builds para imagens leves, além de versionamento de banco de dados via Flyway.
 
 **Segurança**: Senhas criptografadas (BCrypt) e uso de Constraints (Unique e Foreign Keys) para vincular corretamente movimentações de estoque, lotes e produtos.
+
+---
+
+## Principais Endpoints
+
+| Recurso | Método | Endpoint | Descrição |
+| :--- | :---: | :--- | :--- |
+| Auth | POST | `/api/v1/auth/login` | Autentica usuário e retorna token JWT |
+| Auth | POST | `/api/v1/auth/register` | Registra novo usuário |
+| Produtos | GET | `/api/v1/products` | Lista produtos cadastrados |
+| Produtos | GET | `/api/v1/products/low-stock` | Lista produtos com estoque baixo |
+| Categorias | GET | `/api/v1/categories` | Lista categorias |
+| Lotes | POST | `/api/v1/batches` | Cadastra novo lote |
+| Lotes | PATCH | `/api/v1/batches/{id}/add` | Adiciona estoque a um lote |
+| Lotes | POST | `/api/v1/batches/consume` | Consome estoque aplicando FEFO |
+| Lotes | GET | `/api/v1/batches/expired` | Lista lotes vencidos |
+| Usuários | GET | `/api/v1/users` | Lista usuários cadastrados |
 
 ---
 
@@ -92,6 +112,53 @@ A arquitetura em camadas foi escolhida para garantir separação de responsabili
 3. **Repository:** Camada de acesso a dados (JPA/Hibernate).
 4. **Security:** Filtros de segurança (JWT).
 5. **DTO**: Evitando a exposição direta das entidades do banco e melhorando a segurança da API.
+
+---
+
+## Testes, Qualidade e Performance
+
+O projeto conta com uma suíte de testes automatizados para validar regras de negócio, endpoints REST, mapeamentos entre camadas e cenários críticos de estoque.
+
+### Cobertura de Testes
+
+Foram implementados testes com **JUnit 5**, **Mockito**, **MockMvc** e **JaCoCo**, cobrindo as principais camadas da aplicação:
+
+| Camada | Cobertura |
+| :--- | :---: |
+| Services | 97% |
+| Controllers | 100% |
+| Mappers | 92% |
+| Cobertura geral | 70% |
+
+Os testes contemplam fluxos como:
+
+- criação, atualização, listagem e exclusão de produtos, categorias, usuários e lotes;
+- movimentação de estoque com entrada e saída de produtos;
+- aplicação da regra FEFO para consumo de lotes próximos ao vencimento;
+- geração de logs de inventário;
+- envio de alertas de estoque baixo;
+- geração de relatórios em PDF;
+- autenticação, autorização e validação dos endpoints REST.
+
+### Testes de Carga com k6
+
+Além dos testes unitários e de controller, a API também foi validada com testes de carga utilizando **k6**, simulando um cenário de carga constante nos endpoints REST.
+
+Resultado obtido no cenário testado:
+
+| Métrica | Resultado |
+| :--- | :---: |
+| Throughput | ~149 RPS |
+| Latência p95 | 9,9ms |
+| Falhas HTTP | 0% |
+
+Esses testes ajudaram a validar a estabilidade da API sob carga e comprovar a capacidade dos endpoints em manter baixa latência durante múltiplas requisições simultâneas.
+
+### Comandos úteis
+
+Para executar os testes automatizados e gerar o relatório de cobertura:
+
+./mvnw clean test
 
 ---
 
