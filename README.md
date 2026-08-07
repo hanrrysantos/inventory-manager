@@ -1,237 +1,254 @@
-# Inventory Manager — API Inteligente para Gestão de Estoque
+# Inventory Manager
 
-![Java](https://img.shields.io/badge/java-%23ED8B00.svg?style=for-the-badge&logo=openjdk&logoColor=white)
-![Spring](https://img.shields.io/badge/spring-%236DB33F.svg?style=for-the-badge&logo=spring&logoColor=white)
-![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)
-![Postgres](https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white)
-![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)
-![Swagger](https://img.shields.io/badge/-Swagger-%23Clojure?style=for-the-badge&logo=swagger&logoColor=white)
-![Render](https://img.shields.io/badge/Render-%46E3B7.svg?style=for-the-badge&logo=render&logoColor=white)
-![Apache Maven](https://img.shields.io/badge/Apache%20Maven-C71A36?style=for-the-badge&logo=Apache%20Maven&logoColor=white)
-![Hibernate](https://img.shields.io/badge/Hibernate-59666C?style=for-the-badge&logo=Hibernate&logoColor=white)
-![Postman](https://img.shields.io/badge/Postman-FF6C37?style=for-the-badge&logo=postman&logoColor=white)
-![JUnit5](https://img.shields.io/badge/JUnit5-25A162?style=for-the-badge&logo=junit5&logoColor=white)
-![Mockito](https://img.shields.io/badge/Mockito-78A641?style=for-the-badge)
-![k6](https://img.shields.io/badge/k6-7D64FF?style=for-the-badge&logo=k6&logoColor=white)
+API REST para gestão inteligente de estoque e lotes, com autenticação JWT, consumo FEFO, alertas automáticos e documentação interativa.
 
----
+[![Java](https://img.shields.io/badge/Java_21-ED8B00?style=flat-square&logo=openjdk&logoColor=white)](https://openjdk.org/)
+[![Spring Boot](https://img.shields.io/badge/Spring_Boot_3-6DB33F?style=flat-square&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=flat-square&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=flat-square&logo=supabase&logoColor=white)](https://supabase.com/)
+[![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white)](https://www.docker.com/)
+[![Render](https://img.shields.io/badge/Render-46E3B7?style=flat-square&logo=render&logoColor=white)](https://render.com/)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue?style=flat-square)](LICENSE)
+[![Version](https://img.shields.io/badge/version-v2.0-green?style=flat-square)](#)
+[![Status](https://img.shields.io/badge/status-concluído-brightgreen?style=flat-square)](#)
 
-##  Visão Geral
-
-O **Inventory Manager** é uma solução robusta para controle inteligente de estoque e gestão de lotes. Mais do que um simples registro de entradas e saídas, a API foi projetada para automatizar processos críticos, reduzir riscos operacionais e auxiliar gestores na tomada de decisão estratégica.
-
-O diferencial deste sistema não está apenas no armazenamento de dados, mas na forma como ele processa a informação para mitigar falhas humanas comuns no controle de inventário. Através de algoritmos de monitoramento e integração de serviços de comunicação, a API transforma dados brutos em ações preventivas.
+**Demo online:** [Swagger UI](https://inventory.hanrry.top/swagger-ui/index.html) · `https://inventory.hanrry.top/swagger-ui/index.html`
 
 ---
 
-##  Funcionalidades Principais
+## Sumário
 
-**Autenticação e Autorização**: Sistema de Login e Registro de usuários com JWT, utilizando segurança stateless e controle de acesso baseado em roles - ADMIN e USER.
-
-**Gestão Inteligente de Lotes**: Controle preciso de produtos organizado por lotes, incluindo datas de fabricação, validade e preços unitários.
-
-**Alertas Automáticos**: Monitoramento proativo que identifica produtos abaixo do nível mínimo, gerando automaticamente relatórios em PDF e enviando alertas por e-mail para o gestor.
-
-**Estratégia de Consumo**: Lógica de saída de estoque que prioriza automaticamente os lotes com vencimento mais próximo, minimizando perdas e desperdícios de produtos (FEFO).
-
-**Rastreabilidade**: Registro detalhado de todas as movimentações de inventário (entradas e saídas) através de logs, garantindo transparência no histórico de cada produto.
-
-**Documentação Interativa**: Interface OpenAPI 3.0 configurada com exemplos reais, permitindo o teste imediato de todos os endpoints e facilitando a integração com o front-end.
-
-**Infraestrutura**: Aplicação totalmente conteinerizada com Docker utilizando multi-stage builds para imagens leves, além de versionamento de banco de dados via Flyway.
-
-**Segurança**: Senhas criptografadas (BCrypt) e uso de Constraints (Unique e Foreign Keys) para vincular corretamente movimentações de estoque, lotes e produtos.
+- [Visão geral](#visão-geral)
+- [Funcionalidades](#funcionalidades)
+- [Demonstração](#demonstração)
+- [Como testar online](#como-testar-online)
+- [Tecnologias](#tecnologias)
+- [Arquitetura](#arquitetura)
+- [Principais endpoints](#principais-endpoints)
+- [Modelo de dados](#modelo-de-dados)
+- [Testes e performance](#testes-e-performance)
+- [Rodando localmente](#rodando-localmente)
+- [Autor](#autor)
+- [Licença](#licença)
 
 ---
 
-## Principais Endpoints
+## Visão geral
 
-| Recurso | Método | Endpoint | Descrição |
-| :--- | :---: | :--- | :--- |
-| Auth | POST | `/api/v1/auth/login` | Autentica usuário e retorna token JWT |
-| Auth | POST | `/api/v1/auth/register` | Registra novo usuário |
-| Produtos | GET | `/api/v1/products` | Lista produtos cadastrados |
-| Produtos | GET | `/api/v1/products/low-stock` | Lista produtos com estoque baixo |
-| Categorias | GET | `/api/v1/categories` | Lista categorias |
-| Lotes | POST | `/api/v1/batches` | Cadastra novo lote |
-| Lotes | PATCH | `/api/v1/batches/{id}/add` | Adiciona estoque a um lote |
-| Lotes | POST | `/api/v1/batches/consume` | Consome estoque aplicando FEFO |
-| Lotes | GET | `/api/v1/batches/expired` | Lista lotes vencidos |
-| Usuários | GET | `/api/v1/users` | Lista usuários cadastrados |
+O **Inventory Manager** não é só um CRUD de estoque. A API automatiza decisões operacionais críticas: prioriza lotes próximos do vencimento (**FEFO**), registra cada movimentação e dispara alertas quando o estoque fica abaixo do mínimo.
+
+| Problema comum | Como a API ajuda |
+| :--- | :--- |
+| Produtos vencendo no fundo do estoque | Consumo FEFO (primeiro a vencer, primeiro a sair) |
+| Estoque crítico sem aviso | Monitoramento agendado + e-mail com PDF |
+| Falta de histórico | Logs imutáveis de entrada e saída |
+| Acesso sem controle | JWT + roles `ADMIN` e `USER` |
+
+**Deploy:** backend no [Render](https://render.com/) · banco PostgreSQL no [Supabase](https://supabase.com/) · domínio via Hostinger (`inventory.hanrry.top`).
 
 ---
 
-## Demonstração Visual
+## Funcionalidades
+
+- **Autenticação e autorização** - login/registro com JWT, sessão stateless e controle por roles (`ADMIN` / `USER`)
+- **Gestão de lotes** - fabricação, validade, preço unitário e quantidade por lote
+- **Consumo FEFO** - saída de estoque priorizando o lote que vence primeiro
+- **Alertas automáticos** - `@Scheduled` detecta estoque baixo, gera PDF e envia e-mail
+- **Rastreabilidade** - histórico de movimentações (entradas e saídas) em logs
+- **Documentação OpenAPI 3.0** - Swagger UI pronto para testar e integrar com front-end
+- **Infraestrutura** - Docker (multi-stage), Flyway para versionamento do banco
+- **Segurança de dados** - senhas com BCrypt; constraints e FKs no PostgreSQL
+
+---
+
+## Demonstração
 
 <table width="100%">
   <tr>
     <td align="center" width="33%">
-      <b>Documentação Swagger</b><br>
+      <b>Swagger UI</b><br>
       <img src="https://github.com/user-attachments/assets/f898032f-63af-4885-b8bd-0408406910fa" width="100%" alt="Swagger UI">
-      <p><i>Interface interativa para testes de endpoints</i></p>
+      <p><i>Documentação interativa dos endpoints</i></p>
     </td>
     <td align="center" width="33%">
-      <b>Alerta por E-mail</b><br>
-      <img src="https://github.com/user-attachments/assets/10b3b170-d52f-4a79-8ca3-6fad61722bc5" width="100%" alt="E-mail de Alerta">
-      <p><i>Notificação automática de estoque crítico</i></p>
+      <b>Alerta por e-mail</b><br>
+      <img src="https://github.com/user-attachments/assets/10b3b170-d52f-4a79-8ca3-6fad61722bc5" width="100%" alt="E-mail de alerta">
+      <p><i>Notificação de estoque crítico</i></p>
     </td>
     <td align="center" width="33%">
       <b>Relatório PDF</b><br>
       <img src="https://github.com/user-attachments/assets/a176c88b-486a-4850-82ea-fb696d522b92" width="100%" alt="Relatório PDF">
-      <p><i>Documento detalhado para reposição</i></p>
+      <p><i>Anexo para reposição de estoque</i></p>
     </td>
   </tr>
 </table>
 
-> O sistema utiliza tarefas agendadas (`@Scheduled`) para monitorar o inventário e disparar alertas sempre que um produto atinge o nível mínimo de segurança.
+---
+
+## Como testar online
+
+1. Abra: [https://inventory.hanrry.top/swagger-ui/index.html](https://inventory.hanrry.top/swagger-ui/index.html)
+2. Faça login em `POST /api/v1/auth/login` com o body:
+
+```json
+{
+  "email": "admin@email.com",
+  "password": "admin123"
+}
+```
+
+3. Copie o token JWT da resposta
+4. Clique em **Authorize** no Swagger
+5. Informe: `Bearer {seu_token}`
+6. Teste os endpoints protegidos
+
+URL alternativa (Render): [https://inventory-manager-3l2o.onrender.com/swagger-ui/index.html](https://inventory-manager-3l2o.onrender.com/swagger-ui/index.html)
+
+> No plano free do Render, a primeira requisição após inatividade pode demorar alguns segundos (cold start).
 
 ---
 
-## Tecnologias Utilizadas
+## Tecnologias
 
-**Backend**
-
-Java 21, Spring Boot 3, Spring Security, Spring Data JPA, Spring Mail, MapStruct, Lombok, OpenPDF, JWT, Maven
-
-**Banco de Dados**
-
-PostgreSQL, Flyway, Supabase, Hibernate 
-
-**Infraestrutura**
-
-Docker, Render, Swagger, Postman
+| Camada | Stack |
+| :--- | :--- |
+| **Backend** | Java 21, Spring Boot 3, Spring Security, Spring Data JPA, Spring Mail, MapStruct, Lombok, OpenPDF, JWT, Maven |
+| **Banco** | PostgreSQL, Flyway, Hibernate, Supabase |
+| **Docs & qualidade** | SpringDoc OpenAPI (Swagger), JUnit 5, Mockito, MockMvc, JaCoCo, k6, Postman |
+| **Infra** | Docker, Render, Hostinger (DNS) |
 
 ---
 
 ## Arquitetura
 
-A arquitetura em camadas foi escolhida para garantir separação de responsabilidades, facilitar testes e permitir evolução futura para microserviços.
+Arquitetura em camadas para separar responsabilidades, facilitar testes e evoluir com segurança.
 
-1. **Controller:** Exposição dos endpoints REST ((`/api/v1/products`, `/api/v1/categories`, `/api/v1/batches`, `/api/v1/users`)).
-2. **Service:** Regras de negócio, validações e cálculos.
-3. **Repository:** Camada de acesso a dados (JPA/Hibernate).
-4. **Security:** Filtros de segurança (JWT).
-5. **DTO**: Evitando a exposição direta das entidades do banco e melhorando a segurança da API.
+| Camada | Responsabilidade |
+| :--- | :--- |
+| **Controller** | Endpoints REST (`/api/v1/...`) |
+| **Service** | Regras de negócio, validações e orquestração |
+| **Repository** | Acesso a dados (JPA / Hibernate) |
+| **Security** | Filtro JWT e autorização por role |
+| **DTO + Mapper** | Contrato da API sem expor entidades do banco |
 
 ---
 
-## Testes, Qualidade e Performance
+## Principais endpoints
 
-O projeto conta com uma suíte de testes automatizados para validar regras de negócio, endpoints REST, mapeamentos entre camadas e cenários críticos de estoque.
+| Recurso | Método | Endpoint | Descrição |
+| :--- | :---: | :--- | :--- |
+| Auth | `POST` | `/api/v1/auth/login` | Autentica e retorna JWT |
+| Auth | `POST` | `/api/v1/auth/register` | Registra novo usuário |
+| Produtos | `GET` | `/api/v1/products` | Lista produtos |
+| Produtos | `GET` | `/api/v1/products/low-stock` | Produtos com estoque baixo |
+| Categorias | `GET` | `/api/v1/categories` | Lista categorias |
+| Lotes | `POST` | `/api/v1/batches` | Cadastra lote |
+| Lotes | `PATCH` | `/api/v1/batches/{id}/add` | Adiciona quantidade ao lote |
+| Lotes | `POST` | `/api/v1/batches/consume` | Consome estoque (FEFO) |
+| Lotes | `GET` | `/api/v1/batches/expired` | Lista lotes vencidos |
+| Usuários | `GET` | `/api/v1/users` | Lista usuários (`ADMIN`) |
 
-### Cobertura de Testes
+A lista completa está no Swagger.
 
-Foram implementados testes com **JUnit 5**, **Mockito**, **MockMvc** e **JaCoCo**, cobrindo as principais camadas da aplicação:
+---
+
+## Modelo de dados
+
+A modelagem prioriza integridade e rastreabilidade: constraints, FKs e índices únicos evitam inconsistências.
+
+<div align="center">
+  <img width="500" alt="Diagrama do banco de dados" src="https://github.com/user-attachments/assets/c12bc591-4048-4fee-9542-3d4f419cc480">
+</div>
+
+- **Rastreabilidade** - `tb_inventory_logs` guarda o histórico de entradas e saídas, ligado ao produto e (quando houver) ao lote
+- **Gestão por lotes** - `tb_products` ↔ `tb_batches` permite validade e custo, base do FEFO
+- **Normalização** - categorias e produtos separados para filtros e escala
+
+---
+
+## Testes e performance
+
+### Cobertura (JaCoCo)
 
 | Camada | Cobertura |
 | :--- | :---: |
 | Services | 97% |
 | Controllers | 100% |
 | Mappers | 92% |
-| Cobertura geral | 70% |
+| **Geral** | **70%** |
 
-Os testes contemplam fluxos como:
+**Ferramentas:** JUnit 5, Mockito, MockMvc, JaCoCo.
 
-- criação, atualização, listagem e exclusão de produtos, categorias, usuários e lotes;
-- movimentação de estoque com entrada e saída de produtos;
-- aplicação da regra FEFO para consumo de lotes próximos ao vencimento;
-- geração de logs de inventário;
-- envio de alertas de estoque baixo;
-- geração de relatórios em PDF;
-- autenticação, autorização e validação dos endpoints REST.
+**Cenários cobertos:** CRUD de produtos, categorias, usuários e lotes; entrada/saída de estoque; FEFO; logs; alertas; PDF; autenticação e autorização.
 
-### Testes de Carga com k6
-
-Além dos testes unitários e de controller, a API também foi validada com testes de carga utilizando **k6**, simulando um cenário de carga constante nos endpoints REST.
-
-Resultado obtido no cenário testado:
+### Carga (k6)
 
 | Métrica | Resultado |
 | :--- | :---: |
 | Throughput | ~149 RPS |
-| Latência p95 | 9,9ms |
+| Latência p95 | 9,9 ms |
 | Falhas HTTP | 0% |
 
-Esses testes ajudaram a validar a estabilidade da API sob carga e comprovar a capacidade dos endpoints em manter baixa latência durante múltiplas requisições simultâneas.
+### Comando
 
-### Comandos úteis
-
-Para executar os testes automatizados e gerar o relatório de cobertura:
-
+```bash
 ./mvnw clean test
+```
 
 ---
 
-## Teste agora mesmo
-
-A API está online e pronta para testes através da documentação interativa: 
-https://inventory.hanrry.top/swagger-ui/index.html
-
-1. Acesse o Swagger
-2. Utilize o endpoint /auth/login com um usuário existente
-3. Copie o token JWT retornado
-4. Clique no botão "Authorize" no Swagger
-5. Cole o token no formato: Bearer {token}
-6. Agora você pode acessar os endpoints protegidos
-
----
-
-## Instalação e Execução
+## Rodando localmente
 
 ### Pré-requisitos
-- Docker e Docker compose instalados 
-- Java 21 (se for rodar via IDE)
-- Crie um arquivo `.env` na raiz do projeto com as seguintes chaves:
-  
+
+- Java 21
+- Docker (opcional)
+- PostgreSQL acessível (local ou Supabase)
+- Arquivo `.env` na raiz do projeto:
+
 | Variável | Descrição |
 | :--- | :--- |
-| **DB_URL** | URL de conexão com o banco PostgreSQL |
-| **DB_USERNAME** | Usuário do banco de dados |
-| **DB_PASSWORD** | Senha do banco de dados |
-| **EMAIL_USER** | E-mail de origem para os alertas |
-| **EMAIL_CODE** | Senha de app para autenticação |
-| **JWT_SECRET** | Chave secreta para assinatura dos tokens |
-| **JWT_EXPIRATION** | Tempo de expiração do token |
+| `DB_URL` | URL JDBC do PostgreSQL |
+| `DB_USERNAME` | Usuário do banco |
+| `DB_PASSWORD` | Senha do banco |
+| `EMAIL_USER` | E-mail remetente dos alertas |
+| `EMAIL_CODE` | Senha de app do e-mail |
+| `JWT_SECRET` | Segredo para assinar o JWT |
+| `JWT_EXPIRATION` | Expiração do token (ms) |
 
-### 1. Clone o repositório
+### 1. Clone
+
 ```bash
 git clone https://github.com/hanrrysantos/Inventory-Manager
-cd inventory-manager
+cd Inventory-Manager
 ```
-### 2. Execute via Docker
+
+### 2. Com Maven
+
 ```bash
-docker-compose up -d
+./mvnw spring-boot:run
 ```
 
-## Estrutura de Dados
+### 3. Com Docker
 
-A modelagem foi desenhada para suportar alta integridade de dados e rastreabilidade total das movimentações de estoque. O banco de dados utiliza restrições de integridade (Constraints), chaves estrangeiras (FK) e índices únicos para evitar inconsistências.
+```bash
+docker build -t inventory-manager .
+docker run --env-file .env -p 8080:8080 inventory-manager
+```
 
-<div align="center">
-<img width="500" height="500" alt="image" src="https://github.com/user-attachments/assets/c12bc591-4048-4fee-9542-3d4f419cc480">
-</div>
-
-**Rastreabilidade**: A tabela tb_inventory_logs mantém um histórico imutável de todas as entradas e saídas, vinculando cada movimentação a um produto e, opcionalmente, a um lote específico.
-
-**Gestão por Lotes**: A relação entre tb_products e tb_batches permite o controle de validade e custo médio, essencial para a estratégia de consumo FEFO implementada.
-
-**Normalização**: Separação clara entre categorias e produtos para facilitar a escalabilidade e filtros de busca.
+Swagger local: [http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html)
 
 ---
 
 ## Autor
 
-**Hanrry** Desenvolvedor Backend Java em formação | Foco em Spring Boot e Arquitetura de Software
+**Hanrry Santos** - Desenvolvedor Backend Java | Spring Boot e arquitetura de software
 
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/hanrrysantos)
-[![GitHub](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/hanrrysantos)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0A66C2?style=flat-square&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/hanrrysantos)
+[![GitHub](https://img.shields.io/badge/GitHub-181717?style=flat-square&logo=github&logoColor=white)](https://github.com/hanrrysantos)
 
 ---
 
-## 📜 Licença
+## Licença
 
-Este projeto é licenciado sob a Apache License 2.0.
-
-![Licença](https://img.shields.io/badge/license-Apache%202.0-blue?style=for-the-badge)
-![Versão](https://img.shields.io/badge/version-v2.0-green?style=for-the-badge)
-![Status](https://img.shields.io/badge/status-conclu%C3%ADdo-brightgreen?style=for-the-badge)
+Distribuído sob a [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0).
