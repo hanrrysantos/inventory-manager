@@ -1,6 +1,6 @@
 package br.com.hanrry.inventory.service;
 
-import br.com.hanrry.inventory.dto.product.ProductResponseDTO;
+import br.com.hanrry.inventory.product.dto.product.ProductResponseDTO;
 import br.com.hanrry.inventory.exception.pdf.WritePdfException;
 import com.lowagie.text.*;
 import com.lowagie.text.pdf.PdfPTable;
