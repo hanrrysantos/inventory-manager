@@ -1,5 +1,6 @@
 package br.com.hanrry.inventory.entity;
 
+import br.com.hanrry.inventory.product.entity.Product;
 import jakarta.persistence.*;
 import lombok.*;
 
