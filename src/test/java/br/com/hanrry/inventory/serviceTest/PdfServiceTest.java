@@ -1,6 +1,6 @@
 package br.com.hanrry.inventory.serviceTest;
 
-import br.com.hanrry.inventory.dto.product.ProductResponseDTO;
+import br.com.hanrry.inventory.product.dto.product.ProductResponseDTO;
 import br.com.hanrry.inventory.service.PdfService;
 import com.lowagie.text.pdf.PdfReader;
 import com.lowagie.text.pdf.parser.PdfTextExtractor;
