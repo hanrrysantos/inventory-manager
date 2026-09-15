@@ -1,6 +1,7 @@
 package br.com.hanrry.inventory.service;
 
-import br.com.hanrry.inventory.dto.product.ProductResponseDTO;
+import br.com.hanrry.inventory.product.dto.product.ProductResponseDTO;
+import br.com.hanrry.inventory.product.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
