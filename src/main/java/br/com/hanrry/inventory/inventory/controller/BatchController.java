@@ -1,11 +1,11 @@
-package br.com.hanrry.inventory.controller;
+package br.com.hanrry.inventory.inventory.controller;
 
-import br.com.hanrry.inventory.controller.docs.BatchControllerDocs;
-import br.com.hanrry.inventory.dto.batch.AddStockBatchRequestDTO;
-import br.com.hanrry.inventory.dto.batch.BatchRequestDTO;
-import br.com.hanrry.inventory.dto.batch.BatchResponseDTO;
-import br.com.hanrry.inventory.dto.batch.ConsumeBatchRequestDTO;
-import br.com.hanrry.inventory.service.BatchService;
+import br.com.hanrry.inventory.inventory.controller.docs.BatchControllerDocs;
+import br.com.hanrry.inventory.inventory.dto.batch.AddStockBatchRequestDTO;
+import br.com.hanrry.inventory.inventory.dto.batch.BatchRequestDTO;
+import br.com.hanrry.inventory.inventory.dto.batch.BatchResponseDTO;
+import br.com.hanrry.inventory.inventory.dto.batch.ConsumeBatchRequestDTO;
+import br.com.hanrry.inventory.inventory.service.BatchService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
