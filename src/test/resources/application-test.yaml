@@ -1,0 +1,23 @@
+spring:
+  task:
+    scheduling:
+      enabled: false
+  datasource:
+    driver-class-name: org.postgresql.Driver
+  flyway:
+    enabled: true
+  jpa:
+    hibernate:
+      ddl-auto: none
+    open-in-view: false
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  mail:
+    username: test@example.com
+    password: test-password
+
+jwt:
+  secret: test-secret-test-secret-test-secret-test-secret
+  expiration: 3600000
