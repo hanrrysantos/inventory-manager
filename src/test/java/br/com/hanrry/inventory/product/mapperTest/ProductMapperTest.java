@@ -2,7 +2,7 @@ package br.com.hanrry.inventory.product.mapperTest;
 
 import br.com.hanrry.inventory.product.dto.product.ProductRequestDTO;
 import br.com.hanrry.inventory.product.dto.product.ProductResponseDTO;
-import br.com.hanrry.inventory.entity.Batch;
+import br.com.hanrry.inventory.inventory.batch.Batch;
 import br.com.hanrry.inventory.product.entity.Category;
 import br.com.hanrry.inventory.product.entity.Product;
 import br.com.hanrry.inventory.product.mapper.ProductMapper;
