@@ -1,0 +1,76 @@
+package br.com.hanrry.inventory.user.service;
+
+import br.com.hanrry.inventory.user.dto.UpdateUserRequestDTO;
+import br.com.hanrry.inventory.user.dto.UserRequestDTO;
+import br.com.hanrry.inventory.user.dto.UserResponseDTO;
+import br.com.hanrry.inventory.user.entity.User;
+import br.com.hanrry.inventory.user.entity.enums.UserRole;
+import br.com.hanrry.inventory.user.exception.EmailAlreadyExistsException;
+import br.com.hanrry.inventory.user.exception.UserNotFoundException;
+import br.com.hanrry.inventory.user.mapper.UserMapper;
+import br.com.hanrry.inventory.user.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class UserService {
+
+    private final UserRepository userRepository;
+    private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
+
+    public UserResponseDTO createUser(UserRequestDTO request){
+
+        if(userRepository.existsByEmail(request.email())){
+            throw new EmailAlreadyExistsException("Email already exists");
+        }
+
+        User user = userMapper.toEntity(request);
+
+        user.setPassword(passwordEncoder.encode(request.password()));
+        user.setRole(UserRole.USER);
+        user.setCreatedAt(LocalDateTime.now());
+
+        User savedUser = userRepository.save(user);
+
+        return userMapper.toDTO(savedUser);
+    }
+
+    public UserResponseDTO findUserById(Long id){
+        User user =  userRepository.findById(id).orElseThrow(
+                () -> new UserNotFoundException("User not found with this id: " + id)
+        );
+
+        return userMapper.toDTO(user);
+    }
+
+    public List<UserResponseDTO> findAllUsers(){
+        List<User> users = userRepository.findAll();
+
+        return userMapper.toDTOList(users);
+    }
+
+    public UserResponseDTO updateUser(Long id, UpdateUserRequestDTO request){
+        User user =  userRepository.findById(id).orElseThrow(
+                () -> new UserNotFoundException("User not found with this id: " + id)
+        );
+        if(request.password() != null && !request.password().isBlank()){
+
+            user.setPassword(request.password());
+        }
+
+        User savedUser = userRepository.save(user);
+
+        return userMapper.toDTO(savedUser);
+    }
+
+    public void deleteUserById(Long id){
+        findUserById(id);
+        userRepository.deleteById(id);
+    }
+}
