@@ -1,6 +1,6 @@
-package br.com.hanrry.inventory.repository;
+package br.com.hanrry.inventory.inventory.repository;
 
-import br.com.hanrry.inventory.entity.InventoryLog;
+import br.com.hanrry.inventory.inventory.movement.InventoryLog;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
