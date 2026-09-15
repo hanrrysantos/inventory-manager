@@ -1,9 +1,9 @@
 package br.com.hanrry.inventory.serviceTest;
 
-import br.com.hanrry.inventory.dto.product.ProductResponseDTO;
+import br.com.hanrry.inventory.product.dto.product.ProductResponseDTO;
 import br.com.hanrry.inventory.service.EmailService;
 import br.com.hanrry.inventory.service.PdfService;
-import br.com.hanrry.inventory.service.ProductService;
+import br.com.hanrry.inventory.product.service.ProductService;
 import br.com.hanrry.inventory.service.StockAlertService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
