@@ -1,7 +1,7 @@
-package br.com.hanrry.inventory.mapper;
+package br.com.hanrry.inventory.inventory.mapper;
 
-import br.com.hanrry.inventory.dto.invetoryLog.InventoryLogResponseDTO;
-import br.com.hanrry.inventory.entity.InventoryLog;
+import br.com.hanrry.inventory.inventory.dto.invetoryLog.InventoryLogResponseDTO;
+import br.com.hanrry.inventory.inventory.movement.InventoryLog;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
