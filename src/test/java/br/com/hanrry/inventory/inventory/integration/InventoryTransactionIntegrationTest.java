@@ -1,13 +1,13 @@
-package br.com.hanrry.inventory.integration;
+package br.com.hanrry.inventory.inventory.integration;
 
-import br.com.hanrry.inventory.dto.batch.BatchRequestDTO;
-import br.com.hanrry.inventory.dto.batch.BatchResponseDTO;
-import br.com.hanrry.inventory.dto.batch.ConsumeBatchRequestDTO;
-import br.com.hanrry.inventory.entity.Batch;
-import br.com.hanrry.inventory.entity.enums.LogType;
-import br.com.hanrry.inventory.exception.batch.InsufficientStockException;
-import br.com.hanrry.inventory.repository.BatchRepository;
-import br.com.hanrry.inventory.service.BatchService;
+import br.com.hanrry.inventory.inventory.dto.batch.BatchRequestDTO;
+import br.com.hanrry.inventory.inventory.dto.batch.BatchResponseDTO;
+import br.com.hanrry.inventory.inventory.dto.batch.ConsumeBatchRequestDTO;
+import br.com.hanrry.inventory.inventory.batch.Batch;
+import br.com.hanrry.inventory.inventory.movement.LogType;
+import br.com.hanrry.inventory.inventory.exception.batch.InsufficientStockException;
+import br.com.hanrry.inventory.inventory.repository.BatchRepository;
+import br.com.hanrry.inventory.inventory.service.BatchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
