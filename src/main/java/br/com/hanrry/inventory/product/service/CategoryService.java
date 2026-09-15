@@ -1,0 +1,84 @@
+package br.com.hanrry.inventory.product.service;
+
+import br.com.hanrry.inventory.product.dto.category.CategoryRequestDTO;
+import br.com.hanrry.inventory.product.dto.category.CategoryResponseDTO;
+import br.com.hanrry.inventory.product.entity.Category;
+import br.com.hanrry.inventory.product.exception.category.CascadeCategoryException;
+import br.com.hanrry.inventory.product.exception.category.CategoryAlreadyExistsException;
+import br.com.hanrry.inventory.product.exception.category.CategoryNotFoundException;
+import br.com.hanrry.inventory.product.mapper.CategoryMapper;
+import br.com.hanrry.inventory.product.repository.CategoryRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
+public class CategoryService {
+
+    private final CategoryRepository categoryRepository;
+    private final CategoryMapper categoryMapper;
+
+    @Transactional
+    public CategoryResponseDTO createCategory(CategoryRequestDTO request){
+
+        categoryRepository.findByNameIgnoreCase(request.name()).ifPresent(
+                c -> {
+                    throw new CategoryAlreadyExistsException("Category already exists");
+                });
+
+        Category category = categoryMapper.toEntity(request);
+
+        Category savedCategory = categoryRepository.save(category);
+
+        return categoryMapper.toDTO(savedCategory);
+    }
+
+    public List<CategoryResponseDTO> findAllCategories(){
+        List<Category> categories = categoryRepository.findAll();
+
+        return categoryMapper.toDTOList(categories);
+    }
+
+    public CategoryResponseDTO findCategoryById(Long id){
+        Category category = categoryRepository.findById(id).orElseThrow(
+                () -> new CategoryNotFoundException("Category not found with this id: " + id)
+        );
+
+        return categoryMapper.toDTO(category);
+    }
+
+    @Transactional
+    public CategoryResponseDTO updateCategory(Long id, CategoryRequestDTO request) {
+        Category category = categoryRepository.findById(id).orElseThrow(
+                () -> new CategoryNotFoundException("Category not found with this id: " + id)
+        );
+
+            if (request.description() != null && !request.description().isBlank()) {
+                category.setDescription(request.description());
+            }
+
+            if (request.name() != null && !request.name().isBlank()) {
+                category.setName(request.name());
+            }
+
+        Category savedCategory = categoryRepository.save(category);
+
+        return categoryMapper.toDTO(savedCategory);
+    }
+
+    @Transactional
+    public void deleteCategoryById(Long id){
+        Category category = categoryRepository.findById(id).orElseThrow(
+                () -> new CategoryNotFoundException("Category not found with this id: " + id)
+        );
+
+        if (!category.getProducts().isEmpty()) {
+            throw new CascadeCategoryException("This category cannot be deleted because it contains products");
+        }
+        categoryRepository.deleteById(id);
+    }
+}
