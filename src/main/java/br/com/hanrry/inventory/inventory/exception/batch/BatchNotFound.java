@@ -1,4 +1,4 @@
-package br.com.hanrry.inventory.exception.batch;
+package br.com.hanrry.inventory.inventory.exception.batch;
 
 public class BatchNotFound extends RuntimeException {
     public BatchNotFound(String message) {
