@@ -1,6 +1,6 @@
-package br.com.hanrry.inventory.entity;
+package br.com.hanrry.inventory.inventory.movement;
 
-import br.com.hanrry.inventory.entity.enums.LogType;
+import br.com.hanrry.inventory.inventory.batch.Batch;
 import br.com.hanrry.inventory.product.entity.Product;
 import jakarta.persistence.*;
 import lombok.*;
