@@ -1,4 +1,4 @@
-package br.com.hanrry.inventory.exception.batch;
+package br.com.hanrry.inventory.inventory.exception.batch;
 
 public class InsufficientStockException extends RuntimeException {
     public InsufficientStockException(String message) {
