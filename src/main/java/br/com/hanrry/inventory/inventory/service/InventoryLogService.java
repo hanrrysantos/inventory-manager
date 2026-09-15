@@ -1,9 +1,9 @@
-package br.com.hanrry.inventory.service;
+package br.com.hanrry.inventory.inventory.service;
 
-import br.com.hanrry.inventory.entity.Batch;
-import br.com.hanrry.inventory.entity.InventoryLog;
-import br.com.hanrry.inventory.entity.enums.LogType;
-import br.com.hanrry.inventory.repository.InventoryLogRepository;
+import br.com.hanrry.inventory.inventory.batch.Batch;
+import br.com.hanrry.inventory.inventory.movement.InventoryLog;
+import br.com.hanrry.inventory.inventory.movement.LogType;
+import br.com.hanrry.inventory.inventory.repository.InventoryLogRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
