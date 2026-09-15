@@ -1,11 +1,11 @@
-package br.com.hanrry.inventory.controllerTest;
+package br.com.hanrry.inventory.inventory.controllerTest;
 
-import br.com.hanrry.inventory.controller.BatchController;
-import br.com.hanrry.inventory.dto.batch.AddStockBatchRequestDTO;
-import br.com.hanrry.inventory.dto.batch.BatchRequestDTO;
-import br.com.hanrry.inventory.dto.batch.BatchResponseDTO;
-import br.com.hanrry.inventory.dto.batch.ConsumeBatchRequestDTO;
-import br.com.hanrry.inventory.service.BatchService;
+import br.com.hanrry.inventory.inventory.controller.BatchController;
+import br.com.hanrry.inventory.inventory.dto.batch.AddStockBatchRequestDTO;
+import br.com.hanrry.inventory.inventory.dto.batch.BatchRequestDTO;
+import br.com.hanrry.inventory.inventory.dto.batch.BatchResponseDTO;
+import br.com.hanrry.inventory.inventory.dto.batch.ConsumeBatchRequestDTO;
+import br.com.hanrry.inventory.inventory.service.BatchService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
