@@ -1,11 +1,11 @@
-package br.com.hanrry.inventory.serviceTest;
+package br.com.hanrry.inventory.inventory.serviceTest;
 
-import br.com.hanrry.inventory.entity.Batch;
-import br.com.hanrry.inventory.entity.InventoryLog;
+import br.com.hanrry.inventory.inventory.batch.Batch;
+import br.com.hanrry.inventory.inventory.movement.InventoryLog;
 import br.com.hanrry.inventory.product.entity.Product;
-import br.com.hanrry.inventory.entity.enums.LogType;
-import br.com.hanrry.inventory.repository.InventoryLogRepository;
-import br.com.hanrry.inventory.service.InventoryLogService;
+import br.com.hanrry.inventory.inventory.movement.LogType;
+import br.com.hanrry.inventory.inventory.repository.InventoryLogRepository;
+import br.com.hanrry.inventory.inventory.service.InventoryLogService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
