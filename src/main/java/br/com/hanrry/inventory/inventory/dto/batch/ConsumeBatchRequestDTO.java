@@ -1,4 +1,4 @@
-package br.com.hanrry.inventory.dto.batch;
+package br.com.hanrry.inventory.inventory.dto.batch;
 
 public record ConsumeBatchRequestDTO (
         Long productId,
