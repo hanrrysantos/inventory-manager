@@ -1,8 +1,8 @@
 package br.com.hanrry.inventory.exception.handler;
 
 import br.com.hanrry.inventory.exception.StandardError;
-import br.com.hanrry.inventory.exception.batch.InsufficientStockException;
-import br.com.hanrry.inventory.exception.batch.InvalidQuantityException;
+import br.com.hanrry.inventory.inventory.exception.batch.InsufficientStockException;
+import br.com.hanrry.inventory.inventory.exception.batch.InvalidQuantityException;
 import br.com.hanrry.inventory.product.exception.category.CascadeCategoryException;
 import br.com.hanrry.inventory.product.exception.category.CategoryAlreadyExistsException;
 import br.com.hanrry.inventory.product.exception.category.CategoryNotFoundException;
