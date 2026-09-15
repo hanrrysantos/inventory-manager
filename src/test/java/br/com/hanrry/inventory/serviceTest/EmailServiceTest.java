@@ -3,7 +3,9 @@ package br.com.hanrry.inventory.serviceTest;
 import br.com.hanrry.inventory.service.EmailService;
 import jakarta.mail.Message;
 import jakarta.mail.Session;
+import jakarta.mail.BodyPart;
 import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimeMultipart;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -51,6 +53,19 @@ class EmailServiceTest {
                 "sheinhanrry@gmail.com",
                 mimeMessage.getRecipients(Message.RecipientType.TO)[0].toString()
         );
+
+        MimeMultipart multipart = (MimeMultipart) mimeMessage.getContent();
+        assertEquals(2, multipart.getCount());
+        MimeMultipart textPart = (MimeMultipart) multipart.getBodyPart(0).getContent();
+        assertEquals(
+                "Olá,\n\nOs seguintes produtos atingiram o nível crítico de estoque:\nNotebook, Mouse.\n\n"
+                        + "Segue em anexo o relatório detalhado de reposição para todos os itens em falta.",
+                textPart.getBodyPart(0).getContent()
+        );
+
+        BodyPart attachment = multipart.getBodyPart(1);
+        assertEquals("relatorio_reposicao.pdf", attachment.getFileName());
+        assertArrayEquals(pdfAttachment, attachment.getInputStream().readAllBytes());
     }
 
     @Test
