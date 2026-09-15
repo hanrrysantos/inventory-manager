@@ -1,12 +1,39 @@
+# Generated Spring help file
 HELP.md
-target/
-.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
-.env
 
-### IntelliJ IDEA ###
-.idea
+# Build output
+target/
+*.class
+
+# Maven wrapper cache
+.mvn/wrapper/maven-wrapper.jar
+
+# Coverage and test reports
+*.exec
+coverage/
+
+# Environment files and local secrets
+.env
+.env.*
+!.env.example
+*.local
+
+# Logs and temporary files
+*.log
+logs/
+*.swp
+*.swo
+*~
+
+# IntelliJ IDEA
+.idea/
 *.iws
 *.iml
 *.ipr
+
+# Visual Studio Code
+.vscode/
+
+# Operating system files
+.DS_Store
+Thumbs.db
