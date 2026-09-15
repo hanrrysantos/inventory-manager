@@ -1,9 +1,9 @@
-package br.com.hanrry.inventory.controller.docs;
+package br.com.hanrry.inventory.inventory.controller.docs;
 
-import br.com.hanrry.inventory.dto.batch.AddStockBatchRequestDTO;
-import br.com.hanrry.inventory.dto.batch.BatchRequestDTO;
-import br.com.hanrry.inventory.dto.batch.BatchResponseDTO;
-import br.com.hanrry.inventory.dto.batch.ConsumeBatchRequestDTO;
+import br.com.hanrry.inventory.inventory.dto.batch.AddStockBatchRequestDTO;
+import br.com.hanrry.inventory.inventory.dto.batch.BatchRequestDTO;
+import br.com.hanrry.inventory.inventory.dto.batch.BatchResponseDTO;
+import br.com.hanrry.inventory.inventory.dto.batch.ConsumeBatchRequestDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
