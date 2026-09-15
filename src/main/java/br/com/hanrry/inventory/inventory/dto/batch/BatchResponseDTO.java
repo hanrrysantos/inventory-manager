@@ -1,4 +1,4 @@
-package br.com.hanrry.inventory.dto.batch;
+package br.com.hanrry.inventory.inventory.dto.batch;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
