@@ -2,7 +2,7 @@ package br.com.hanrry.inventory.product.mapper;
 
 import br.com.hanrry.inventory.product.dto.product.ProductRequestDTO;
 import br.com.hanrry.inventory.product.dto.product.ProductResponseDTO;
-import br.com.hanrry.inventory.entity.Batch;
+import br.com.hanrry.inventory.inventory.batch.Batch;
 import br.com.hanrry.inventory.product.entity.Product;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
