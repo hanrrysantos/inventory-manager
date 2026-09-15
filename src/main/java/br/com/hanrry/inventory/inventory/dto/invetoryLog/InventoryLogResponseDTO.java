@@ -1,6 +1,6 @@
-package br.com.hanrry.inventory.dto.invetoryLog;
+package br.com.hanrry.inventory.inventory.dto.invetoryLog;
 
-import br.com.hanrry.inventory.entity.enums.LogType;
+import br.com.hanrry.inventory.inventory.movement.LogType;
 
 import java.time.LocalDateTime;
 
