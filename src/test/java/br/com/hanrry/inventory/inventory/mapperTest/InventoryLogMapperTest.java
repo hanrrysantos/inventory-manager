@@ -1,11 +1,11 @@
-package br.com.hanrry.inventory.mapperTest;
+package br.com.hanrry.inventory.inventory.mapperTest;
 
-import br.com.hanrry.inventory.dto.invetoryLog.InventoryLogResponseDTO;
-import br.com.hanrry.inventory.entity.Batch;
-import br.com.hanrry.inventory.entity.InventoryLog;
+import br.com.hanrry.inventory.inventory.dto.invetoryLog.InventoryLogResponseDTO;
+import br.com.hanrry.inventory.inventory.batch.Batch;
+import br.com.hanrry.inventory.inventory.movement.InventoryLog;
 import br.com.hanrry.inventory.product.entity.Product;
-import br.com.hanrry.inventory.entity.enums.LogType;
-import br.com.hanrry.inventory.mapper.InventoryLogMapper;
+import br.com.hanrry.inventory.inventory.movement.LogType;
+import br.com.hanrry.inventory.inventory.mapper.InventoryLogMapper;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 
