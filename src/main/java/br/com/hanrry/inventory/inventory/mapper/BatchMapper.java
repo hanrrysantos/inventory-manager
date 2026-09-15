@@ -1,8 +1,8 @@
-package br.com.hanrry.inventory.mapper;
+package br.com.hanrry.inventory.inventory.mapper;
 
-import br.com.hanrry.inventory.dto.batch.BatchRequestDTO;
-import br.com.hanrry.inventory.dto.batch.BatchResponseDTO;
-import br.com.hanrry.inventory.entity.Batch;
+import br.com.hanrry.inventory.inventory.dto.batch.BatchRequestDTO;
+import br.com.hanrry.inventory.inventory.dto.batch.BatchResponseDTO;
+import br.com.hanrry.inventory.inventory.batch.Batch;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
