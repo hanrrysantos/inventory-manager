@@ -2,7 +2,7 @@ package br.com.hanrry.inventory.serviceTest;
 
 import br.com.hanrry.inventory.entity.Batch;
 import br.com.hanrry.inventory.entity.InventoryLog;
-import br.com.hanrry.inventory.entity.Product;
+import br.com.hanrry.inventory.product.entity.Product;
 import br.com.hanrry.inventory.entity.enums.LogType;
 import br.com.hanrry.inventory.repository.InventoryLogRepository;
 import br.com.hanrry.inventory.service.InventoryLogService;
