@@ -1,7 +1,7 @@
 package br.com.hanrry.inventory.notification.service;
 
 import br.com.hanrry.inventory.notification.document.PdfService;
-import br.com.hanrry.inventory.notification.email.EmailService;
+import br.com.hanrry.inventory.notification.email.EmailSender;
 import br.com.hanrry.inventory.product.dto.product.ProductResponseDTO;
 import br.com.hanrry.inventory.product.service.ProductService;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +16,7 @@ public class StockAlertService {
 
     private final ProductService productService;
     private final PdfService pdfService;
-    private final EmailService emailService;
+    private final EmailSender emailSender;
 
     @Scheduled(initialDelay = 10000, fixedRate = 36000000)
     public void checkInventoryAndNotify() {
@@ -29,7 +29,7 @@ public class StockAlertService {
 
             byte[] pdfReport = pdfService.generateLowStockReport(lowStockProducts);
 
-            emailService.sendLowStockAlert(allProductNames, pdfReport);
+            emailSender.sendLowStockAlert(allProductNames, pdfReport);
 
             System.out.println("Alerta de estoque enviado!");
         }
