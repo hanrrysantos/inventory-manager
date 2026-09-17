@@ -5,12 +5,14 @@ import br.com.hanrry.inventory.notification.email.EmailSender;
 import br.com.hanrry.inventory.product.dto.product.ProductResponseDTO;
 import br.com.hanrry.inventory.product.service.ProductService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class StockAlertService {
 
@@ -31,7 +33,7 @@ public class StockAlertService {
 
             emailSender.sendLowStockAlert(allProductNames, pdfReport);
 
-            System.out.println("Alerta de estoque enviado!");
+            log.info("Alerta de estoque enviado para {} produto(s)", allProductNames.size());
         }
     }
 }
