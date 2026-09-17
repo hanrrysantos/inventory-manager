@@ -28,8 +28,9 @@ services:
       DB_PASSWORD: ${POSTGRES_PASSWORD:-inventory}
       JWT_SECRET: ${JWT_SECRET:-change-me-in-production-with-a-long-random-secret}
       JWT_EXPIRATION: ${JWT_EXPIRATION:-3600000}
-      EMAIL_USER: ${EMAIL_USER:-}
-      EMAIL_CODE: ${EMAIL_CODE:-}
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+      RESEND_FROM: ${RESEND_FROM:-}
+      RESEND_TO: ${RESEND_TO:-}
     depends_on:
       db:
         condition: service_healthy
