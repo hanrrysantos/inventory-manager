@@ -1,7 +1,7 @@
 package br.com.hanrry.inventory.notification.serviceTest;
 
 import br.com.hanrry.inventory.product.dto.product.ProductResponseDTO;
-import br.com.hanrry.inventory.notification.email.EmailService;
+import br.com.hanrry.inventory.notification.email.EmailSender;
 import br.com.hanrry.inventory.notification.document.PdfService;
 import br.com.hanrry.inventory.product.service.ProductService;
 import br.com.hanrry.inventory.notification.service.StockAlertService;
@@ -25,7 +25,7 @@ class StockAlertServiceTest {
     private PdfService pdfService;
 
     @Mock
-    private EmailService emailService;
+    private EmailSender emailSender;
 
     @InjectMocks
     private StockAlertService stockAlertService;
@@ -59,7 +59,7 @@ class StockAlertServiceTest {
 
         verify(pdfService).generateLowStockReport(lowStockProducts);
 
-        verify(emailService).sendLowStockAlert(
+        verify(emailSender).sendLowStockAlert(
                 List.of("Notebook"),
                 pdfReport
         );
@@ -74,6 +74,6 @@ class StockAlertServiceTest {
 
         verify(productService).getLowStockProducts();
         verifyNoInteractions(pdfService);
-        verifyNoInteractions(emailService);
+        verifyNoInteractions(emailSender);
     }
 }
