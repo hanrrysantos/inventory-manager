@@ -21,19 +21,6 @@ spring:
       max-lifetime: 30000
       connection-timeout: 30000
 
-  mail:
-    host: smtp.gmail.com
-    port: 587
-    username: ${EMAIL_USER}
-    password: ${EMAIL_CODE}
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
-            required: true
-
   jpa:
     hibernate:
       ddl-auto: none
@@ -47,6 +34,11 @@ spring:
 jwt:
   secret: ${JWT_SECRET}
   expiration: ${JWT_EXPIRATION}
+
+resend:
+  api-key: ${RESEND_API_KEY:}
+  from: ${RESEND_FROM:}
+  to: ${RESEND_TO:}
 
 springdoc:
   swagger-ui:
