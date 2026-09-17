@@ -7,15 +7,15 @@ import br.com.hanrry.inventory.inventory.dto.batch.ConsumeBatchRequestDTO;
 import br.com.hanrry.inventory.inventory.batch.Batch;
 import br.com.hanrry.inventory.inventory.movement.LogType;
 import br.com.hanrry.inventory.product.entity.Product;
-import br.com.hanrry.inventory.inventory.exception.batch.BatchAlreadyExists;
-import br.com.hanrry.inventory.inventory.exception.batch.BatchNotFound;
-import br.com.hanrry.inventory.inventory.exception.batch.InvalidQuantityException;
-import br.com.hanrry.inventory.inventory.exception.batch.InsufficientStockException;
-import br.com.hanrry.inventory.product.exception.product.ProductNotFoundException;
+import br.com.hanrry.inventory.shared.exception.inventory.batch.BatchAlreadyExists;
+import br.com.hanrry.inventory.shared.exception.inventory.batch.BatchNotFound;
+import br.com.hanrry.inventory.shared.exception.inventory.batch.InvalidQuantityException;
+import br.com.hanrry.inventory.shared.exception.inventory.batch.InsufficientStockException;
+import br.com.hanrry.inventory.shared.exception.product.product.ProductNotFoundException;
 import br.com.hanrry.inventory.inventory.mapper.BatchMapper;
 import br.com.hanrry.inventory.inventory.repository.BatchRepository;
 import br.com.hanrry.inventory.product.repository.ProductRepository;
-import br.com.hanrry.inventory.service.StockAlertService;
+import br.com.hanrry.inventory.notification.service.StockAlertService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -57,7 +57,7 @@ public class BatchService {
 
     @Transactional
     public BatchResponseDTO addStock(Long id, AddStockBatchRequestDTO request) {
-        Batch batch = batchRepository.findById(id)
+        Batch batch = batchRepository.findByIdForUpdate(id)
                 .orElseThrow(() -> new BatchNotFound
                         ("Batch not found with this id: " + id));
 
@@ -80,7 +80,8 @@ public class BatchService {
     public void consumeStock(ConsumeBatchRequestDTO request) {
 
         List<Batch> batches = batchRepository.
-                findByProductIdAndQuantityGreaterThanOrderByExpiryDateAsc(request.productId(), 0L);
+                findByProductIdAndQuantityGreaterThanAndExpiryDateGreaterThanEqualOrderByExpiryDateAscIdAsc(
+                        request.productId(), 0L, LocalDate.now());
 
         long howMuchNeedGet = request.quantityToConsume();
 
