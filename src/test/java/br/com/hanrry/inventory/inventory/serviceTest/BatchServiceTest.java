@@ -7,17 +7,17 @@ import br.com.hanrry.inventory.inventory.dto.batch.ConsumeBatchRequestDTO;
 import br.com.hanrry.inventory.inventory.batch.Batch;
 import br.com.hanrry.inventory.product.entity.Product;
 import br.com.hanrry.inventory.inventory.movement.LogType;
-import br.com.hanrry.inventory.inventory.exception.batch.BatchAlreadyExists;
-import br.com.hanrry.inventory.inventory.exception.batch.BatchNotFound;
-import br.com.hanrry.inventory.inventory.exception.batch.InsufficientStockException;
-import br.com.hanrry.inventory.inventory.exception.batch.InvalidQuantityException;
-import br.com.hanrry.inventory.product.exception.product.ProductNotFoundException;
+import br.com.hanrry.inventory.shared.exception.inventory.batch.BatchAlreadyExists;
+import br.com.hanrry.inventory.shared.exception.inventory.batch.BatchNotFound;
+import br.com.hanrry.inventory.shared.exception.inventory.batch.InsufficientStockException;
+import br.com.hanrry.inventory.shared.exception.inventory.batch.InvalidQuantityException;
+import br.com.hanrry.inventory.shared.exception.product.product.ProductNotFoundException;
 import br.com.hanrry.inventory.inventory.mapper.BatchMapper;
 import br.com.hanrry.inventory.inventory.repository.BatchRepository;
 import br.com.hanrry.inventory.product.repository.ProductRepository;
 import br.com.hanrry.inventory.inventory.service.BatchService;
 import br.com.hanrry.inventory.inventory.service.InventoryLogService;
-import br.com.hanrry.inventory.service.StockAlertService;
+import br.com.hanrry.inventory.notification.service.StockAlertService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -205,7 +205,7 @@ class BatchServiceTest {
                 "Notebook"
         );
 
-        when(batchRepository.findById(1L))
+        when(batchRepository.findByIdForUpdate(1L))
                 .thenReturn(Optional.of(batch));
 
         when(batchRepository.save(batch))
@@ -220,7 +220,7 @@ class BatchServiceTest {
         assertEquals(15L, result.quantity());
         assertEquals(15L, batch.getQuantity());
 
-        verify(batchRepository).findById(1L);
+        verify(batchRepository).findByIdForUpdate(1L);
         verify(batchRepository).save(batch);
         verify(inventoryLogService).createLog(savedBatch, 5L, LogType.INPUT);
         verify(batchMapper).toDTO(savedBatch);
@@ -230,7 +230,7 @@ class BatchServiceTest {
     void shouldThrowExceptionWhenBatchNotFoundOnAddStock() {
         AddStockBatchRequestDTO request = new AddStockBatchRequestDTO(5L);
 
-        when(batchRepository.findById(99L))
+        when(batchRepository.findByIdForUpdate(99L))
                 .thenReturn(Optional.empty());
 
         assertThrows(
@@ -238,7 +238,7 @@ class BatchServiceTest {
                 () -> batchService.addStock(99L, request)
         );
 
-        verify(batchRepository).findById(99L);
+        verify(batchRepository).findByIdForUpdate(99L);
         verify(batchRepository, never()).save(any());
         verifyNoInteractions(inventoryLogService);
     }
@@ -251,7 +251,7 @@ class BatchServiceTest {
         batch.setId(1L);
         batch.setQuantity(10L);
 
-        when(batchRepository.findById(1L))
+        when(batchRepository.findByIdForUpdate(1L))
                 .thenReturn(Optional.of(batch));
 
         assertThrows(
@@ -259,7 +259,7 @@ class BatchServiceTest {
                 () -> batchService.addStock(1L, request)
         );
 
-        verify(batchRepository).findById(1L);
+        verify(batchRepository).findByIdForUpdate(1L);
         verify(batchRepository, never()).save(any());
         verifyNoInteractions(inventoryLogService);
     }
@@ -276,7 +276,8 @@ class BatchServiceTest {
         batch.setQuantity(10L);
         batch.setExpiryDate(LocalDate.now().plusDays(10));
 
-        when(batchRepository.findByProductIdAndQuantityGreaterThanOrderByExpiryDateAsc(1L, 0L))
+        when(batchRepository.findByProductIdAndQuantityGreaterThanAndExpiryDateGreaterThanEqualOrderByExpiryDateAscIdAsc(
+                1L, 0L, LocalDate.now()))
                 .thenReturn(List.of(batch));
 
         batchService.consumeStock(request);
@@ -284,7 +285,8 @@ class BatchServiceTest {
         assertEquals(5L, batch.getQuantity());
 
         verify(batchRepository)
-                .findByProductIdAndQuantityGreaterThanOrderByExpiryDateAsc(1L, 0L);
+                .findByProductIdAndQuantityGreaterThanAndExpiryDateGreaterThanEqualOrderByExpiryDateAscIdAsc(
+                        1L, 0L, LocalDate.now());
 
         verify(inventoryLogService)
                 .createLog(batch, 5L, LogType.OUTPUT);
@@ -310,7 +312,8 @@ class BatchServiceTest {
         secondBatch.setQuantity(10L);
         secondBatch.setExpiryDate(LocalDate.now().plusDays(20));
 
-        when(batchRepository.findByProductIdAndQuantityGreaterThanOrderByExpiryDateAsc(1L, 0L))
+        when(batchRepository.findByProductIdAndQuantityGreaterThanAndExpiryDateGreaterThanEqualOrderByExpiryDateAscIdAsc(
+                1L, 0L, LocalDate.now()))
                 .thenReturn(List.of(firstBatch, secondBatch));
 
         batchService.consumeStock(request);
@@ -329,6 +332,102 @@ class BatchServiceTest {
     }
 
     @Test
+    void shouldNotConsumeStockFromExpiredBatch() {
+        ConsumeBatchRequestDTO request = new ConsumeBatchRequestDTO(
+                1L,
+                1L
+        );
+
+        when(batchRepository.findByProductIdAndQuantityGreaterThanAndExpiryDateGreaterThanEqualOrderByExpiryDateAscIdAsc(
+                1L, 0L, LocalDate.now()))
+                .thenReturn(List.of());
+
+        assertThrows(
+                InsufficientStockException.class,
+                () -> batchService.consumeStock(request)
+        );
+
+        verifyNoInteractions(inventoryLogService);
+        verifyNoInteractions(stockAlertService);
+    }
+
+    @Test
+    void shouldConsumeFromOneOfBatchesWithSameExpiryDateWithoutCharacterizingTieOrder() {
+        ConsumeBatchRequestDTO request = new ConsumeBatchRequestDTO(
+                1L,
+                1L
+        );
+
+        Batch firstBatch = new Batch();
+        firstBatch.setId(1L);
+        firstBatch.setQuantity(5L);
+        firstBatch.setExpiryDate(LocalDate.of(2027, 1, 1));
+
+        Batch secondBatch = new Batch();
+        secondBatch.setId(2L);
+        secondBatch.setQuantity(5L);
+        secondBatch.setExpiryDate(LocalDate.of(2027, 1, 1));
+
+        when(batchRepository.findByProductIdAndQuantityGreaterThanAndExpiryDateGreaterThanEqualOrderByExpiryDateAscIdAsc(
+                1L, 0L, LocalDate.now()))
+                .thenReturn(List.of(firstBatch, secondBatch));
+
+        batchService.consumeStock(request);
+
+        assertEquals(9L, firstBatch.getQuantity() + secondBatch.getQuantity());
+        verify(inventoryLogService, times(1))
+                .createLog(any(Batch.class), eq(1L), eq(LogType.OUTPUT));
+        verify(stockAlertService)
+                .checkInventoryAndNotify();
+    }
+
+    @Test
+    void shouldKeepCurrentNoOpBehaviorWhenConsumptionQuantityIsZero() {
+        ConsumeBatchRequestDTO request = new ConsumeBatchRequestDTO(
+                1L,
+                0L
+        );
+
+        Batch batch = new Batch();
+        batch.setId(1L);
+        batch.setQuantity(5L);
+
+        when(batchRepository.findByProductIdAndQuantityGreaterThanAndExpiryDateGreaterThanEqualOrderByExpiryDateAscIdAsc(
+                1L, 0L, LocalDate.now()))
+                .thenReturn(List.of(batch));
+
+        batchService.consumeStock(request);
+
+        assertEquals(5L, batch.getQuantity());
+        verifyNoInteractions(inventoryLogService);
+        verify(stockAlertService)
+                .checkInventoryAndNotify();
+    }
+
+    @Test
+    void shouldKeepCurrentNoOpBehaviorWhenConsumptionQuantityIsNegative() {
+        ConsumeBatchRequestDTO request = new ConsumeBatchRequestDTO(
+                1L,
+                -1L
+        );
+
+        Batch batch = new Batch();
+        batch.setId(1L);
+        batch.setQuantity(5L);
+
+        when(batchRepository.findByProductIdAndQuantityGreaterThanAndExpiryDateGreaterThanEqualOrderByExpiryDateAscIdAsc(
+                1L, 0L, LocalDate.now()))
+                .thenReturn(List.of(batch));
+
+        batchService.consumeStock(request);
+
+        assertEquals(5L, batch.getQuantity());
+        verifyNoInteractions(inventoryLogService);
+        verify(stockAlertService)
+                .checkInventoryAndNotify();
+    }
+
+    @Test
     void shouldThrowExceptionWhenStockIsInsufficient() {
         ConsumeBatchRequestDTO request = new ConsumeBatchRequestDTO(
                 1L,
@@ -339,7 +438,8 @@ class BatchServiceTest {
         batch.setId(1L);
         batch.setQuantity(5L);
 
-        when(batchRepository.findByProductIdAndQuantityGreaterThanOrderByExpiryDateAsc(1L, 0L))
+        when(batchRepository.findByProductIdAndQuantityGreaterThanAndExpiryDateGreaterThanEqualOrderByExpiryDateAscIdAsc(
+                1L, 0L, LocalDate.now()))
                 .thenReturn(List.of(batch));
 
         assertThrows(
