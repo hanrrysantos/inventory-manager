@@ -112,7 +112,7 @@ URL alternativa (Render): [https://inventory-manager-3l2o.onrender.com/swagger-u
 
 | Camada | Stack |
 | :--- | :--- |
-| **Backend** | Java 21, Spring Boot 3, Spring Security, Spring Data JPA, Spring Mail, MapStruct, Lombok, OpenPDF, JWT, Maven |
+| **Backend** | Java 21, Spring Boot 3, Spring Security, Spring Data JPA, Resend, MapStruct, Lombok, OpenPDF, JWT, Maven |
 | **Banco** | PostgreSQL, Flyway, Hibernate, Supabase |
 | **Docs & qualidade** | SpringDoc OpenAPI (Swagger), JUnit 5, Mockito, MockMvc, JaCoCo, k6, Postman |
 | **Infra** | Docker, Render, Hostinger (DNS) |
@@ -211,8 +211,9 @@ A modelagem prioriza integridade e rastreabilidade: constraints, FKs e índices 
 | `DB_URL` | URL JDBC do PostgreSQL |
 | `DB_USERNAME` | Usuário do banco |
 | `DB_PASSWORD` | Senha do banco |
-| `EMAIL_USER` | E-mail remetente dos alertas |
-| `EMAIL_CODE` | Senha de app do e-mail |
+| `RESEND_API_KEY` | Chave da API do Resend |
+| `RESEND_FROM` | E-mail remetente autorizado pelo Resend |
+| `RESEND_TO` | E-mail destinatário dos alertas |
 | `JWT_SECRET` | Segredo para assinar o JWT |
 | `JWT_EXPIRATION` | Expiração do token (ms) |
 
