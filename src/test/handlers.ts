@@ -63,6 +63,26 @@ export const dashboardFixture = {
 }
 
 export const handlers = [
+  http.post('*/api/v1/auth/register', async ({ request }) => {
+    const input = (await request.json()) as {
+      name: string
+      email: string
+      password: string
+    }
+    return HttpResponse.json(
+      {
+        id: 2,
+        name: input.name,
+        email: input.email,
+        role: 'USER',
+        createdAt: '2026-09-18T12:00:00',
+      },
+      {
+        status: 201,
+        headers: { Location: '/api/v1/auth/register/2' },
+      },
+    )
+  }),
   http.post('*/api/v1/auth/login', async ({ request }) => {
     const credentials = (await request.json()) as {
       email: string
