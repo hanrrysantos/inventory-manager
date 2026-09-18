@@ -116,7 +116,7 @@
 - Produces: `formatRole(role: string): string`
 - Produces: `cn(...inputs: ClassValue[]): string`
 
-- [ ] **Step 1: Inicializar o manifesto e instalar dependências**
+- [x] **Step 1: Inicializar o manifesto e instalar dependências**
 
 Run:
 
@@ -128,7 +128,7 @@ npm install -D typescript vite @vitejs/plugin-react @types/react @types/react-do
 
 Expected: `package-lock.json` is created and npm reports no failed install.
 
-- [ ] **Step 2: Criar configuração mínima do Vite, TypeScript, Tailwind e testes**
+- [x] **Step 2: Criar configuração mínima do Vite, TypeScript, Tailwind e testes**
 
 Configure `package.json` scripts exactly as:
 
@@ -193,7 +193,7 @@ input {
 }
 ```
 
-- [ ] **Step 3: Escrever teste falhando para a regra visual de status**
+- [x] **Step 3: Escrever teste falhando para a regra visual de status**
 
 Create `src/features/products/product-status.test.ts`:
 
@@ -213,13 +213,13 @@ describe('getProductStatus', () => {
 })
 ```
 
-- [ ] **Step 4: Executar o teste e confirmar RED**
+- [x] **Step 4: Executar o teste e confirmar RED**
 
 Run: `npm test -- src/features/products/product-status.test.ts`
 
 Expected: FAIL because `product-status.ts` does not exist.
 
-- [ ] **Step 5: Implementar o mínimo e montar a aplicação**
+- [x] **Step 5: Implementar o mínimo e montar a aplicação**
 
 Create `product-status.ts`:
 
@@ -238,7 +238,7 @@ builds. Implement `formatCurrency` with `Intl.NumberFormat('pt-BR', {
 style: 'currency', currency: 'BRL' })`, and `formatRole` mapping `ADMIN` to
 `Administradora` and `USER` to `Usuária` while returning unknown values intact.
 
-- [ ] **Step 6: Validar a fundação**
+- [x] **Step 6: Validar a fundação**
 
 Run:
 
@@ -250,7 +250,7 @@ npm run build
 
 Expected: all commands exit 0 and `dist/` is generated.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add package.json package-lock.json vite.config.ts tsconfig*.json eslint.config.js index.html .gitignore .env.example src
