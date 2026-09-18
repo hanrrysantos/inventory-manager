@@ -5,6 +5,12 @@ import { AppLayout } from '../../components/layout/AppLayout'
 import { ProtectedRoute } from '../../features/auth/ProtectedRoute'
 import { useAuth } from '../../features/auth/use-auth'
 
+const LandingPage = lazy(() =>
+  import('../../features/landing/LandingPage').then(({ LandingPage }) => ({
+    default: LandingPage,
+  })),
+)
+
 const LoginPage = lazy(() =>
   import('../../features/auth/LoginPage').then(({ LoginPage }) => ({
     default: LoginPage,
@@ -29,6 +35,7 @@ export function AppRouter() {
   return (
     <Suspense fallback={<PageLoader label="Carregando página..." />}>
       <Routes>
+        <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route element={<ProtectedRoute />}>
           <Route element={<AppLayout />}>
@@ -38,7 +45,7 @@ export function AppRouter() {
         </Route>
         <Route
           path="*"
-          element={<Navigate to={user ? '/dashboard' : '/login'} replace />}
+          element={<Navigate to={user ? '/dashboard' : '/'} replace />}
         />
       </Routes>
     </Suspense>
