@@ -398,7 +398,7 @@ git commit -m "implementa autenticacao do frontend"
 - Produces: `StatusBadge({ status }: { status: InventoryStatus })`
 - Consumes: `useAuth()` and formatting utilities from Tasks 1 and 2.
 
-- [ ] **Step 1: Escrever teste falhando do shell**
+- [x] **Step 1: Escrever teste falhando do shell**
 
 Cover:
 
@@ -411,13 +411,13 @@ it('opens and closes mobile navigation with accessible controls')
 
 Explicitly assert that Suppliers, Reports, Settings, and Movements are absent.
 
-- [ ] **Step 2: Confirmar RED**
+- [x] **Step 2: Confirmar RED**
 
 Run: `npm test -- src/components/layout/AppLayout.test.tsx`
 
 Expected: FAIL because `AppLayout` does not exist.
 
-- [ ] **Step 3: Implementar shell e tokens visuais**
+- [x] **Step 3: Implementar shell e tokens visuais**
 
 Use a 260px persistent sidebar at desktop widths, a top header, and a mobile
 drawer controlled by a button with `aria-expanded` and `aria-controls`.
@@ -428,12 +428,12 @@ Add reusable CSS theme values for canvas, surface, border, primary, success,
 warning, danger, muted text, card radius, and shadow. Preserve focus rings and
 avoid color-only state communication.
 
-- [ ] **Step 4: Conectar rotas privadas ao layout**
+- [x] **Step 4: Conectar rotas privadas ao layout**
 
 Nest `/dashboard` and `/products` under `AppLayout`. Ensure route changes close
 the mobile drawer and update the page title displayed by the header.
 
-- [ ] **Step 5: Confirmar GREEN**
+- [x] **Step 5: Confirmar GREEN**
 
 Run:
 
@@ -445,7 +445,7 @@ npm run lint
 
 Expected: all commands pass.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src
