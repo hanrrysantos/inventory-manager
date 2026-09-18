@@ -108,13 +108,16 @@ describe('authentication flow', () => {
     expect(screen.getByRole('button', { name: 'Mostrar senha' })).toHaveClass('size-11')
 
     const createAccount = screen.getByRole('button', { name: 'Criar conta' })
-    expect(createAccount).toHaveClass('min-h-11', 'min-w-11')
+    expect(createAccount).toHaveClass('min-h-11', 'min-w-11', 'text-[#107842]')
+    expect(screen.getByRole('button', { name: 'Entrar' })).toHaveClass('bg-[#107842]')
+    expect(screen.getByRole('tab', { name: 'Criar conta' })).toHaveClass('text-[#617168]')
     await user.click(createAccount)
     expect(screen.getByLabelText('Nome')).toBeVisible()
     expect(screen.getByRole('button', { name: 'Mostrar senha' })).toHaveClass('size-11')
 
     const returnToLogin = screen.getByRole('button', { name: 'Entrar' })
-    expect(returnToLogin).toHaveClass('min-h-11', 'min-w-11')
+    expect(returnToLogin).toHaveClass('min-h-11', 'min-w-11', 'text-[#107842]')
+    expect(screen.getByRole('button', { name: 'Criar minha conta' })).toHaveClass('bg-[#107842]')
     await user.click(returnToLogin)
     expect(screen.queryByLabelText('Nome')).not.toBeInTheDocument()
     expect(screen.getByRole('tab', { name: 'Entrar' })).toHaveAttribute('aria-selected', 'true')
@@ -157,6 +160,54 @@ describe('authentication flow', () => {
     expect(window.location.pathname).toBe('/login')
     await user.click(screen.getByRole('tab', { name: 'Entrar' }))
     expect(screen.queryByLabelText('Nome')).not.toBeInTheDocument()
+  })
+
+  it('supports roving focus and arrow, Home, and End keys across access tabs', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    const loginTab = await screen.findByRole('tab', { name: 'Entrar' })
+    const registerTab = screen.getByRole('tab', { name: 'Criar conta' })
+
+    expect(loginTab).toHaveAttribute('tabindex', '0')
+    expect(registerTab).toHaveAttribute('tabindex', '-1')
+
+    loginTab.focus()
+    await user.keyboard('{ArrowRight}')
+    expect(registerTab).toHaveFocus()
+    expect(registerTab).toHaveAttribute('aria-selected', 'true')
+    expect(registerTab).toHaveAttribute('tabindex', '0')
+    expect(loginTab).toHaveAttribute('tabindex', '-1')
+
+    await user.keyboard('{ArrowLeft}')
+    expect(loginTab).toHaveFocus()
+    expect(loginTab).toHaveAttribute('aria-selected', 'true')
+
+    await user.keyboard('{End}')
+    expect(registerTab).toHaveFocus()
+    expect(registerTab).toHaveAttribute('aria-selected', 'true')
+
+    await user.keyboard('{Home}')
+    expect(loginTab).toHaveFocus()
+    expect(loginTab).toHaveAttribute('aria-selected', 'true')
+  })
+
+  it('clears the registration password and stale feedback after changing modes', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(await screen.findByRole('tab', { name: 'Criar conta' }))
+    await user.type(screen.getByLabelText('Senha'), '123')
+    await user.click(screen.getByRole('button', { name: 'Criar minha conta' }))
+    expect(
+      await screen.findByText('A senha deve ter pelo menos 6 caracteres'),
+    ).toBeVisible()
+
+    await user.click(screen.getByRole('tab', { name: 'Entrar' }))
+    await user.click(screen.getByRole('tab', { name: 'Criar conta' }))
+
+    expect(screen.getByLabelText('Senha')).toHaveValue('')
+    expect(
+      screen.queryByText('A senha deve ter pelo menos 6 caracteres'),
+    ).not.toBeInTheDocument()
   })
 
   it('validates registration without sending invalid data', async () => {

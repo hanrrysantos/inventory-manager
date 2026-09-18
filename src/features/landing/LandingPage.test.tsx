@@ -1,7 +1,9 @@
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { http, HttpResponse } from 'msw'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { App } from '../../app/App'
+import { server } from '../../test/server'
 
 describe('EstoqueHub landing page', () => {
   beforeEach(() => {
@@ -86,5 +88,42 @@ describe('EstoqueHub landing page', () => {
       await screen.findByRole('heading', { name: /painel de estoque/i }),
     ).toBeVisible()
     expect(window.location.pathname).toBe('/dashboard')
+  })
+
+  it('renders the public landing page while a stored session is still restoring', async () => {
+    localStorage.setItem('inventory-manager.token', 'valid-token')
+    let releaseSessionRequest: () => void = () => undefined
+    const sessionRequestHeld = new Promise<void>((resolve) => {
+      releaseSessionRequest = resolve
+    })
+    let markSessionRequestStarted: () => void = () => undefined
+    const sessionRequestStarted = new Promise<void>((resolve) => {
+      markSessionRequestStarted = resolve
+    })
+    server.use(
+      http.get('*/api/v1/users/me', async () => {
+        markSessionRequestStarted()
+        await sessionRequestHeld
+        return HttpResponse.json({
+          id: 1,
+          name: 'Ana Souza',
+          email: 'ana@email.com',
+          role: 'ADMIN',
+          createdAt: '2026-09-17T12:00:00',
+        })
+      }),
+    )
+
+    render(<App />)
+    await sessionRequestStarted
+
+    expect(
+      await screen.findByRole('heading', {
+        name: /controle seu estoque sem perder tempo/i,
+      }),
+    ).toBeVisible()
+    expect(screen.queryByText(/carregando sessão/i)).not.toBeInTheDocument()
+
+    releaseSessionRequest()
   })
 })

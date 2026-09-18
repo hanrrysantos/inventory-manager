@@ -57,13 +57,13 @@ export function LoginForm({ initialEmail, onCreateAccount, onGoogleUnavailable }
       </div>
       <PasswordField id="login-password" autoComplete="current-password" error={errors.password?.message} registration={register('password')} />
       {apiError && <p className="rounded-xl bg-red-50 p-3 text-sm text-red-700" role="alert">{apiError}</p>}
-      <button className="h-12 w-full rounded-xl bg-[#168f50] font-medium text-white transition hover:bg-[#107842] disabled:cursor-not-allowed disabled:opacity-60" type="submit" disabled={isSubmitting}>
+      <button className="h-12 w-full rounded-xl bg-[#107842] font-medium text-white transition hover:bg-[#0c6236] disabled:cursor-not-allowed disabled:opacity-60" type="submit" disabled={isSubmitting}>
         {isSubmitting ? 'Entrando...' : 'Entrar'}
       </button>
-      <div className="flex items-center gap-3" aria-hidden="true"><span className="h-px flex-1 bg-[#dce8df]" /><span className="text-xs font-medium uppercase tracking-[0.15em] text-[#7a8980]">ou</span><span className="h-px flex-1 bg-[#dce8df]" /></div>
+      <div className="flex items-center gap-3" aria-hidden="true"><span className="h-px flex-1 bg-[#dce8df]" /><span className="text-xs font-medium uppercase tracking-[0.15em] text-[#52655a]">ou</span><span className="h-px flex-1 bg-[#dce8df]" /></div>
       <button className="flex h-12 w-full items-center justify-center gap-3 rounded-xl bg-[#151a17] font-medium text-white hover:bg-black" type="button" onClick={onGoogleUnavailable}><span className="grid size-6 place-items-center rounded-full bg-white font-bold text-[#4285f4]" aria-hidden="true">G</span>Entrar com Google</button>
-      <p className="text-center text-sm text-[#68786f]">Ainda não tem uma conta? <button className="inline-flex min-h-11 min-w-11 items-center justify-center font-semibold text-[#168f50]" type="button" onClick={onCreateAccount}>Criar conta</button></p>
-      <p className="text-center text-xs leading-5 text-[#718177]">O primeiro acesso pode levar até um minuto enquanto o servidor inicia.</p>
+      <p className="text-center text-sm text-[#617168]">Ainda não tem uma conta? <button className="inline-flex min-h-11 min-w-11 items-center justify-center font-semibold text-[#107842]" type="button" onClick={onCreateAccount}>Criar conta</button></p>
+      <p className="text-center text-xs leading-5 text-[#52655a]">O primeiro acesso pode levar até um minuto enquanto o servidor inicia.</p>
     </form>
   )
 }

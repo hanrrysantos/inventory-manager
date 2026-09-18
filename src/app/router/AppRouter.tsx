@@ -29,13 +29,17 @@ const ProductsPage = lazy(() =>
   })),
 )
 
-export function AppRouter() {
+function UnknownRouteRedirect() {
   const { user, isRestoring } = useAuth()
 
   if (isRestoring) {
     return <PageLoader label="Carregando sessão..." />
   }
 
+  return <Navigate to={user ? '/dashboard' : '/'} replace />
+}
+
+export function AppRouter() {
   return (
     <Suspense fallback={<PageLoader label="Carregando página..." />}>
       <Routes>
@@ -47,10 +51,7 @@ export function AppRouter() {
             <Route path="/products" element={<ProductsPage />} />
           </Route>
         </Route>
-        <Route
-          path="*"
-          element={<Navigate to={user ? '/dashboard' : '/'} replace />}
-        />
+        <Route path="*" element={<UnknownRouteRedirect />} />
       </Routes>
     </Suspense>
   )

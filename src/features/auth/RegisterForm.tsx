@@ -71,10 +71,10 @@ export function RegisterForm({ onBack, onSuccess }: RegisterFormProps) {
       </div>
       <PasswordField id="register-password" autoComplete="new-password" error={errors.password?.message} registration={register('password')} />
       {apiError && <p className="rounded-xl bg-red-50 p-3 text-sm text-red-700" role="alert">{apiError}</p>}
-      <button className="h-12 w-full rounded-xl bg-[#168f50] font-medium text-white transition hover:bg-[#107842] disabled:cursor-not-allowed disabled:opacity-60" type="submit" disabled={isSubmitting}>
+      <button className="h-12 w-full rounded-xl bg-[#107842] font-medium text-white transition hover:bg-[#0c6236] disabled:cursor-not-allowed disabled:opacity-60" type="submit" disabled={isSubmitting}>
         {isSubmitting ? 'Criando conta...' : 'Criar minha conta'}
       </button>
-      <p className="text-center text-sm text-[#68786f]">Já tem uma conta? <button className="inline-flex min-h-11 min-w-11 items-center justify-center font-semibold text-[#168f50]" type="button" onClick={onBack}>Entrar</button></p>
+      <p className="text-center text-sm text-[#617168]">Já tem uma conta? <button className="inline-flex min-h-11 min-w-11 items-center justify-center font-semibold text-[#107842]" type="button" onClick={onBack}>Entrar</button></p>
     </form>
   )
 }
