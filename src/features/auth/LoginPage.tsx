@@ -30,7 +30,7 @@ export function LoginPage() {
   return (
     <main className="grid min-h-screen place-items-center bg-[#f4fbf6] bg-[linear-gradient(rgba(34,120,65,0.055)_1px,transparent_1px),linear-gradient(90deg,rgba(34,120,65,0.055)_1px,transparent_1px)] bg-[size:48px_48px] px-5 py-10 text-[#18281e]">
       <div className="w-full max-w-md">
-        <Link className="mb-6 inline-flex items-center gap-2 text-sm font-medium text-[#52655a] hover:text-[#168f50]" to="/">
+        <Link className="mb-6 inline-flex min-h-11 min-w-11 items-center gap-2 text-sm font-medium text-[#52655a] hover:text-[#168f50]" to="/">
           <ArrowLeft className="size-4" aria-hidden="true" />Voltar ao início
         </Link>
         <section className="rounded-[28px] border border-[#dce8df] bg-white p-6 shadow-[0_18px_50px_rgba(39,79,52,0.10)] sm:p-8">

@@ -62,7 +62,7 @@ export function LoginForm({ initialEmail, onCreateAccount, onGoogleUnavailable }
       </button>
       <div className="flex items-center gap-3" aria-hidden="true"><span className="h-px flex-1 bg-[#dce8df]" /><span className="text-xs font-medium uppercase tracking-[0.15em] text-[#7a8980]">ou</span><span className="h-px flex-1 bg-[#dce8df]" /></div>
       <button className="flex h-12 w-full items-center justify-center gap-3 rounded-xl bg-[#151a17] font-medium text-white hover:bg-black" type="button" onClick={onGoogleUnavailable}><span className="grid size-6 place-items-center rounded-full bg-white font-bold text-[#4285f4]" aria-hidden="true">G</span>Entrar com Google</button>
-      <p className="text-center text-sm text-[#68786f]">Ainda não tem uma conta? <button className="font-semibold text-[#168f50]" type="button" onClick={onCreateAccount}>Criar conta</button></p>
+      <p className="text-center text-sm text-[#68786f]">Ainda não tem uma conta? <button className="inline-flex min-h-11 min-w-11 items-center justify-center font-semibold text-[#168f50]" type="button" onClick={onCreateAccount}>Criar conta</button></p>
       <p className="text-center text-xs leading-5 text-[#718177]">O primeiro acesso pode levar até um minuto enquanto o servidor inicia.</p>
     </form>
   )

@@ -74,7 +74,7 @@ export function RegisterForm({ onBack, onSuccess }: RegisterFormProps) {
       <button className="h-12 w-full rounded-xl bg-[#168f50] font-medium text-white transition hover:bg-[#107842] disabled:cursor-not-allowed disabled:opacity-60" type="submit" disabled={isSubmitting}>
         {isSubmitting ? 'Criando conta...' : 'Criar minha conta'}
       </button>
-      <p className="text-center text-sm text-[#68786f]">Já tem uma conta? <button className="font-semibold text-[#168f50]" type="button" onClick={onBack}>Entrar</button></p>
+      <p className="text-center text-sm text-[#68786f]">Já tem uma conta? <button className="inline-flex min-h-11 min-w-11 items-center justify-center font-semibold text-[#168f50]" type="button" onClick={onBack}>Entrar</button></p>
     </form>
   )
 }

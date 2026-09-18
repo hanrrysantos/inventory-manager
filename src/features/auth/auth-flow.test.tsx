@@ -98,6 +98,28 @@ describe('authentication flow', () => {
     expect(password).toHaveAttribute('type', 'password')
   })
 
+  it('provides 44px touch targets for password, inline mode actions, and the home link', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+
+    const backLink = await screen.findByRole('link', { name: 'Voltar ao início' })
+    expect(backLink).toHaveClass('min-h-11', 'min-w-11')
+    expect(backLink).toHaveAttribute('href', '/')
+    expect(screen.getByRole('button', { name: 'Mostrar senha' })).toHaveClass('size-11')
+
+    const createAccount = screen.getByRole('button', { name: 'Criar conta' })
+    expect(createAccount).toHaveClass('min-h-11', 'min-w-11')
+    await user.click(createAccount)
+    expect(screen.getByLabelText('Nome')).toBeVisible()
+    expect(screen.getByRole('button', { name: 'Mostrar senha' })).toHaveClass('size-11')
+
+    const returnToLogin = screen.getByRole('button', { name: 'Entrar' })
+    expect(returnToLogin).toHaveClass('min-h-11', 'min-w-11')
+    await user.click(returnToLogin)
+    expect(screen.queryByLabelText('Nome')).not.toBeInTheDocument()
+    expect(screen.getByRole('tab', { name: 'Entrar' })).toHaveAttribute('aria-selected', 'true')
+  })
+
   it('shows and hides the registration password accessibly', async () => {
     const user = userEvent.setup()
     render(<App />)
