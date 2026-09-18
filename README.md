@@ -1,102 +1,87 @@
 # Inventory Manager Frontend
 
-Interface web do sistema de estoque inteligente Inventory Manager. Este MVP
-oferece autenticação, restauração de sessão, dashboard de indicadores e
-consulta de produtos com busca e filtros de situação do estoque.
+Interface web para acompanhamento de estoque, com autenticação, indicadores e
+consulta de produtos. Frontend e API são mantidos em repositórios separados.
+
+[Acessar aplicação](https://controledeestoque.hanrry.top) ·
+[Documentação da API](https://inventory.hanrry.top/swagger-ui/index.html) ·
+[Repositório do backend](https://github.com/hanrrysantos/inventory-manager)
+
+## Funcionalidades
+
+| Tela | Recursos |
+| --- | --- |
+| Login (`/login`) | Autenticação JWT e restauração de sessão |
+| Dashboard (`/dashboard`) | Indicadores de estoque e itens que precisam de atenção |
+| Produtos (`/products`) | Consulta com busca por nome ou SKU e filtros de estoque |
+
+Interface responsiva com estados de carregamento, erro e lista vazia.
+Cadastro e edição de produtos, movimentações, fornecedores, relatórios e
+configurações ainda não estão disponíveis nesta versão.
 
 ## Tecnologias
 
-- React, TypeScript e Vite
-- React Router e TanStack Query
-- Axios, React Hook Form e Zod
-- Tailwind CSS e Lucide React
-- Vitest, Testing Library e MSW
+React, TypeScript e Vite; Tailwind CSS e Lucide React; React Router,
+TanStack Query e Axios; React Hook Form e Zod. Testes com Vitest,
+Testing Library e MSW.
 
-## Pré-requisitos
+## Executar localmente
 
-- Node.js 22.12 LTS, 24 LTS ou uma versão par mais recente
-- npm 10 ou superior
-- API do Inventory Manager disponível
-
-## Configuração
-
-Instale as dependências:
+Requisitos: Node.js 22.12+ da linha 22 ou Node.js 24, npm e acesso à API.
 
 ```bash
-npm install
-```
-
-Crie o arquivo local de ambiente a partir do exemplo:
-
-```bash
+git clone https://github.com/hanrrysantos/inventory-manager-frontend.git
+cd inventory-manager-frontend
+npm ci
 cp .env.example .env
+npm run dev
 ```
 
-A variável `VITE_API_URL` deve conter a URL base da API, sem a barra final. O
-valor de exemplo aponta para o backend publicado:
+Acesse o endereço informado pelo Vite, normalmente `http://localhost:5173`.
+O `.env` define a URL base do backend, sem barra final:
 
 ```dotenv
 VITE_API_URL=https://inventory.hanrry.top
 ```
 
-O backend precisa liberar via CORS a origem em que o frontend estiver sendo
-executado, como `http://localhost:5173` durante o desenvolvimento.
+Para usar a API local, altere o valor para `http://localhost:8080` e reinicie
+o Vite. O backend precisa permitir a origem do frontend em `FRONTEND_ORIGINS`.
 
-Como a API publicada pode entrar em modo de espera, a primeira autenticação
-pode levar até um minuto. O cliente aguarda até 90 segundos e diferencia erros
-de timeout, conexão e respostas retornadas pela API.
+Entre com uma conta cadastrada na API. O JWT fica no `localStorage` e é enviado
+como `Bearer` nas requisições; respostas HTTP 401 encerram a sessão.
+A API publicada pode demorar a responder após inatividade; o cliente aguarda
+até 90 segundos por requisição.
 
-## Desenvolvimento
+## Comandos
 
-Inicie o servidor local:
+| Comando | Finalidade |
+| --- | --- |
+| `npm run dev` | Iniciar o ambiente de desenvolvimento |
+| `npm test` | Executar os testes |
+| `npm run test:watch` | Executar testes em modo contínuo |
+| `npm run lint` | Verificar o código com ESLint |
+| `npm run typecheck` | Verificar tipos TypeScript |
+| `npm run build` | Verificar tipos e gerar o build em `dist/` |
 
-```bash
-npm run dev
+## Publicação
+
+O frontend é hospedado na Vercel, em
+[controledeestoque.hanrry.top](https://controledeestoque.hanrry.top).
+Configuração do projeto:
+
+- Framework: **Vite**; build: `npm run build`; saída: `dist`.
+- Variável: `VITE_API_URL=https://inventory.hanrry.top`.
+- Rotas: o [vercel.json](vercel.json) direciona acessos da SPA para `index.html`.
+
+Configure `VITE_API_URL` nos ambientes usados na Vercel e faça um novo deploy
+quando alterar o valor, pois ele é incorporado ao build. Variáveis `VITE_*`
+são públicas: não use senhas ou secrets nelas.
+
+No **backend**, libere as origens necessárias via CORS, separadas por vírgula:
+
+```dotenv
+FRONTEND_ORIGINS=http://localhost:5173,https://controledeestoque.hanrry.top
 ```
 
-As rotas disponíveis no MVP são:
-
-- `/login`: autenticação do usuário;
-- `/dashboard`: resumo do estoque e itens que precisam de atenção;
-- `/products`: catálogo com busca por nome ou SKU e filtros por situação.
-
-Cadastro e edição de produtos, movimentações, fornecedores, relatórios e
-configurações não fazem parte desta primeira versão.
-
-## Qualidade e build
-
-```bash
-npm test
-npm run lint
-npm run typecheck
-npm run build
-```
-
-O build de produção é gerado em `dist/`. Para executar os testes continuamente
-durante o desenvolvimento, use `npm run test:watch`.
-
-## Autenticação
-
-Após o login, o token JWT é armazenado no `localStorage` com a chave
-`inventory-manager.token` e enviado nas chamadas autenticadas. Uma resposta
-HTTP 401 encerra a sessão local e direciona o usuário de volta ao login.
-
-## Publicação na Vercel
-
-O arquivo `vercel.json` configura o fallback das rotas da SPA para
-`index.html`. O ambiente de produção está disponível no domínio oficial:
-
-https://controledeestoque.hanrry.top
-
-Para configurar a URL da API nos próximos deploys e publicar pela CLI:
-
-```bash
-npx vercel login
-npx vercel env add VITE_API_URL production,preview,development \
-  --value https://inventory.hanrry.top --no-sensitive --yes
-npx vercel --prod --yes
-```
-
-O backend deve incluir `https://controledeestoque.hanrry.top` na variável
-`FRONTEND_ORIGINS` para liberar as chamadas via CORS. Se houver outras origens,
-os valores devem ser separados por vírgula.
+URLs de Preview têm origens diferentes e precisam de liberação própria para
+acessar a API pelo navegador. Arquivos `.env` locais não devem ser versionados.
