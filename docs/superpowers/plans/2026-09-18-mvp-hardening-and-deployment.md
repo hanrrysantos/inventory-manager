@@ -171,14 +171,12 @@ Usar `npm run build`, diretório `dist`, variável `VITE_API_URL=https://invento
 Validar HTTP 200 para `/`, `/login`, `/dashboard` e `/products`, testar login real e registrar a URL no README.
 
 Partial result: deploy publicado em `https://controledeestoque.hanrry.top` e
-as quatro rotas responderam HTTP 200. O teste de login aguarda a liberação do
-CORS no backend.
+as quatro rotas responderam HTTP 200. O CORS foi liberado; o teste de login
+real pelo navegador permanece como validação manual final.
 
-- [ ] **Step 4: Atualizar CORS do backend se necessário**
+- [x] **Step 4: Atualizar CORS do backend se necessário**
 
 Adicionar somente a origem final do frontend em `FRONTEND_ORIGINS` na hospedagem do backend. Se o ambiente externo não estiver acessível, reportar exatamente a variável e o valor pendentes.
 
-Pending external configuration: o preflight retornou HTTP 403. Configurar na
-hospedagem do backend `FRONTEND_ORIGINS=https://controledeestoque.hanrry.top`
-(ou acrescentar essa origem à lista atual, separada por vírgula) e reiniciar o
-serviço.
+Result: após configurar a hospedagem do backend, o preflight retornou HTTP 200
+com `Access-Control-Allow-Origin: https://controledeestoque.hanrry.top`.
