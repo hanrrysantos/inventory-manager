@@ -1,108 +1,78 @@
-import { zodResolver } from '@hookform/resolvers/zod'
-import { Leaf, LockKeyhole, Mail } from 'lucide-react'
+import { ArrowLeft } from 'lucide-react'
 import { useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { Navigate, useNavigate } from 'react-router-dom'
-import { getApiErrorMessage } from '../../services/api-error'
-import { loginSchema, type LoginFormData } from './login-schema'
+import { Link, Navigate } from 'react-router-dom'
+import { BrandMark } from '../../components/ui/BrandMark'
+import { LoginForm } from './LoginForm'
+import { RegisterForm } from './RegisterForm'
 import { useAuth } from './use-auth'
 
+type AccessMode = 'login' | 'register'
+
 export function LoginPage() {
-  const navigate = useNavigate()
-  const { user, login } = useAuth()
-  const [apiError, setApiError] = useState<string | null>(null)
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<LoginFormData>({ resolver: zodResolver(loginSchema) })
+  const { user } = useAuth()
+  const [mode, setMode] = useState<AccessMode>('login')
+  const [initialEmail, setInitialEmail] = useState('')
+  const [notice, setNotice] = useState<string | null>(null)
 
   if (user) return <Navigate to="/dashboard" replace />
 
-  const onSubmit = handleSubmit(async (data) => {
-    setApiError(null)
-    try {
-      await login(data)
-      navigate('/dashboard', { replace: true })
-    } catch (error) {
-      setApiError(getApiErrorMessage(error, 'Não foi possível entrar.'))
-    }
-  })
+  function selectMode(nextMode: AccessMode) {
+    setNotice(null)
+    setMode(nextMode)
+  }
+
+  function handleRegistered(email: string) {
+    setInitialEmail(email)
+    setMode('login')
+    setNotice('Conta criada com sucesso. Entre para continuar.')
+  }
 
   return (
-    <main className="grid min-h-screen place-items-center bg-[#f4fbf6] px-5 py-10">
-      <section className="w-full max-w-md rounded-[28px] border border-[#dce8df] bg-white p-8 shadow-[0_18px_50px_rgba(39,79,52,0.10)]">
-        <div className="mb-8 flex items-center gap-3">
-          <span className="grid size-12 place-items-center rounded-2xl bg-[#5cbd79] text-white">
-            <Leaf aria-hidden="true" />
-          </span>
-          <div>
-            <p className="text-xl font-semibold">Verdejar</p>
-            <p className="text-sm text-[#6b7d71]">Controle de estoque</p>
-          </div>
-        </div>
-
-        <h1 className="text-2xl font-semibold">Acesse sua conta</h1>
-        <p className="mt-2 text-sm text-[#6b7d71]">
-          Entre para acompanhar o estoque da sua empresa.
-        </p>
-
-        <form className="mt-8 space-y-5" onSubmit={onSubmit} noValidate>
-          <div>
-            <label className="mb-2 block text-sm font-medium" htmlFor="email">
-              E-mail
-            </label>
-            <div className="relative">
-              <Mail className="absolute left-3 top-3.5 size-5 text-[#7b8e81]" aria-hidden="true" />
-              <input
-                id="email"
-                type="email"
-                autoComplete="email"
-                className="h-12 w-full rounded-xl border border-[#cfddd3] pl-11 pr-3 focus:border-[#58b978] focus:outline-none focus:ring-2 focus:ring-[#58b978]/20"
-                aria-invalid={Boolean(errors.email)}
-                {...register('email')}
-              />
-            </div>
-            {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>}
-          </div>
-
-          <div>
-            <label className="mb-2 block text-sm font-medium" htmlFor="password">
-              Senha
-            </label>
-            <div className="relative">
-              <LockKeyhole className="absolute left-3 top-3.5 size-5 text-[#7b8e81]" aria-hidden="true" />
-              <input
-                id="password"
-                type="password"
-                autoComplete="current-password"
-                className="h-12 w-full rounded-xl border border-[#cfddd3] pl-11 pr-3 focus:border-[#58b978] focus:outline-none focus:ring-2 focus:ring-[#58b978]/20"
-                aria-invalid={Boolean(errors.password)}
-                {...register('password')}
-              />
-            </div>
-            {errors.password && <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>}
-          </div>
-
-          {apiError && (
-            <p className="rounded-xl bg-red-50 p-3 text-sm text-red-700" role="alert">
-              {apiError}
-            </p>
-          )}
-
-          <button
-            className="h-12 w-full rounded-xl bg-[#58b978] font-medium text-white transition hover:bg-[#46a967] disabled:cursor-not-allowed disabled:opacity-60"
-            type="submit"
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? 'Entrando...' : 'Entrar'}
-          </button>
-
-          <p className="text-center text-xs leading-5 text-[#718177]">
-            O primeiro acesso pode levar até um minuto enquanto o servidor inicia.
+    <main className="grid min-h-screen place-items-center bg-[#f4fbf6] bg-[linear-gradient(rgba(34,120,65,0.055)_1px,transparent_1px),linear-gradient(90deg,rgba(34,120,65,0.055)_1px,transparent_1px)] bg-[size:48px_48px] px-5 py-10 text-[#18281e]">
+      <div className="w-full max-w-md">
+        <Link className="mb-6 inline-flex items-center gap-2 text-sm font-medium text-[#52655a] hover:text-[#168f50]" to="/">
+          <ArrowLeft className="size-4" aria-hidden="true" />Voltar ao início
+        </Link>
+        <section className="rounded-[28px] border border-[#dce8df] bg-white p-6 shadow-[0_18px_50px_rgba(39,79,52,0.10)] sm:p-8">
+          <div className="mb-8"><BrandMark /></div>
+          <h1 className="text-2xl font-semibold">{mode === 'login' ? 'Acesse sua conta' : 'Crie sua conta'}</h1>
+          <p className="mt-2 text-sm text-[#6b7d71]">
+            {mode === 'login' ? 'Entre para acompanhar o estoque da sua empresa.' : 'Comece a organizar o estoque da sua empresa.'}
           </p>
-        </form>
-      </section>
+          <div className="mt-6 grid grid-cols-2 rounded-xl bg-[#eef5f0] p-1" role="tablist" aria-label="Forma de acesso">
+            {(['login', 'register'] as const).map((item) => {
+              const selected = mode === item
+              const label = item === 'login' ? 'Entrar' : 'Criar conta'
+              return (
+                <button
+                  key={item}
+                  id={`${item}-tab`}
+                  type="button"
+                  role="tab"
+                  aria-selected={selected}
+                  aria-controls="access-panel"
+                  className={selected ? 'min-h-11 rounded-lg bg-white font-semibold text-[#173b27] shadow-sm' : 'min-h-11 rounded-lg font-medium text-[#6b7d71]'}
+                  onClick={() => selectMode(item)}
+                >
+                  {label}
+                </button>
+              )
+            })}
+          </div>
+          {notice && <p className="mt-5 rounded-xl bg-[#eef7f0] p-3 text-sm text-[#173b27]" role="status">{notice}</p>}
+          <div className="mt-6" id="access-panel" role="tabpanel" aria-labelledby={`${mode}-tab`}>
+            {mode === 'login' ? (
+              <LoginForm
+                initialEmail={initialEmail}
+                onCreateAccount={() => selectMode('register')}
+                onGoogleUnavailable={() => setNotice('O login com Google estará disponível em breve.')}
+              />
+            ) : (
+              <RegisterForm onBack={() => selectMode('login')} onSuccess={handleRegistered} />
+            )}
+          </div>
+        </section>
+      </div>
     </main>
   )
 }

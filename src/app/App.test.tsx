@@ -13,8 +13,8 @@ it('supports login, dashboard, products, search, and logout as one flow', async 
   ).toBeVisible()
 
   await user.type(screen.getByLabelText(/e-mail/i), 'admin@email.com')
-  await user.type(screen.getByLabelText(/senha/i), 'admin123')
-  await user.click(screen.getByRole('button', { name: /entrar/i }))
+  await user.type(screen.getByLabelText('Senha'), 'admin123')
+  await user.click(screen.getByRole('button', { name: 'Entrar' }))
 
   expect(
     await screen.findByRole('heading', { name: /painel de estoque/i }),
