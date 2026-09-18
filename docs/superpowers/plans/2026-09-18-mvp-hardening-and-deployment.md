@@ -143,9 +143,12 @@ Revisar o diff completo contra `main`. Em caso de finding bloqueante, parar ante
 Result: `APPROVED_WITH_NOTES`, sem findings bloqueantes. A transição entre
 breakpoints com o drawer já aberto permanece como cenário visual não automatizado.
 
-- [ ] **Step 3: Commitar e publicar a branch**
+- [x] **Step 3: Commitar e publicar a branch**
 
 Criar commit focado, executar `git push -u origin feat/frontend-mvp` e abrir PR contra `main`, sem fazer merge.
+
+Result: branch publicada e PR aberto contra `main` em
+`https://github.com/hanrrysantos/inventory-manager-frontend/pull/1`.
 
 ---
 
@@ -155,11 +158,11 @@ Criar commit focado, executar `git push -u origin feat/frontend-mvp` e abrir PR 
 - Create or Modify: configuração mínima exigida pela plataforma escolhida
 - Modify: `README.md`
 
-- [ ] **Step 1: Selecionar plataforma autenticada**
+- [x] **Step 1: Selecionar plataforma autenticada**
 
 Preferir Vercel; usar Cloudflare Pages se for a integração já disponível. Se nenhuma conta estiver autenticada, preparar toda a configuração e solicitar somente a autenticação ao usuário.
 
-- [ ] **Step 2: Configurar build e fallback SPA**
+- [x] **Step 2: Configurar build e fallback SPA**
 
 Usar `npm run build`, diretório `dist`, variável `VITE_API_URL=https://inventory.hanrry.top` e fallback de `/dashboard` e `/products` para `index.html`.
 
@@ -167,6 +170,15 @@ Usar `npm run build`, diretório `dist`, variável `VITE_API_URL=https://invento
 
 Validar HTTP 200 para `/`, `/login`, `/dashboard` e `/products`, testar login real e registrar a URL no README.
 
+Partial result: deploy publicado em `https://frontend-mvp-beta.vercel.app` e
+as quatro rotas responderam HTTP 200. O teste de login aguarda a liberação do
+CORS no backend.
+
 - [ ] **Step 4: Atualizar CORS do backend se necessário**
 
 Adicionar somente a origem final do frontend em `FRONTEND_ORIGINS` na hospedagem do backend. Se o ambiente externo não estiver acessível, reportar exatamente a variável e o valor pendentes.
+
+Pending external configuration: o preflight retornou HTTP 403. Configurar na
+hospedagem do backend `FRONTEND_ORIGINS=https://frontend-mvp-beta.vercel.app`
+(ou acrescentar essa origem à lista atual, separada por vírgula) e reiniciar o
+serviço.
