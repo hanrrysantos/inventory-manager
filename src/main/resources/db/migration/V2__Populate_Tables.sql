@@ -37,7 +37,7 @@ INSERT INTO tb_batches (batch_number, quantity, manufacturing_date, expiry_date,
 ('DET-AGO-29', 15, '2023-02-01', '2029-08-01', 4.50, 12);
 
 INSERT INTO tb_inventory_logs (type, quantity, product_id, batch_id) VALUES
-('ENTRY', 40, 1, 3),
-('ENTRY', 20, 8, 5);
+('INPUT', 40, 1, 3),
+('INPUT', 20, 8, 5);
 
 UPDATE tb_batches SET quantity = 2 WHERE batch_number = 'SUCO-JUN-27';

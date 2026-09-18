@@ -3,11 +3,11 @@ package br.com.hanrry.inventory.product.entity;
 import br.com.hanrry.inventory.inventory.batch.Batch;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.Hibernate;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@EqualsAndHashCode
 @Getter
 @Setter
 @NoArgsConstructor
@@ -30,9 +30,22 @@ public class Product {
     private Long minStock;
 
     @ManyToOne
-    @JoinColumn(name = "category_id")
+    @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     private List<Batch> batches = new ArrayList<>();
+
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) return true;
+        if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false;
+        Product product = (Product) other;
+        return id != null && id.equals(product.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Hibernate.getClass(this).hashCode();
+    }
 }

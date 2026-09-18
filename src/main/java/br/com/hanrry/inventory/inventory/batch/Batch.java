@@ -4,12 +4,12 @@ import br.com.hanrry.inventory.product.entity.Product;
 import br.com.hanrry.inventory.inventory.movement.InventoryLog;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.Hibernate;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
-@EqualsAndHashCode
 @Getter
 @Setter
 @NoArgsConstructor
@@ -22,7 +22,7 @@ public class Batch {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "batch_number", nullable = false)
+    @Column(name = "batch_number", nullable = false, unique = true)
     private String batchNumber;
 
     @Column(nullable = false)
@@ -38,9 +38,22 @@ public class Batch {
     private BigDecimal price;
 
     @ManyToOne
-    @JoinColumn(name = "product_id")
+    @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
     @OneToMany(mappedBy = "batch")
     private List<InventoryLog> inventoryLogList;
+
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) return true;
+        if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false;
+        Batch batch = (Batch) other;
+        return id != null && id.equals(batch.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Hibernate.getClass(this).hashCode();
+    }
 }

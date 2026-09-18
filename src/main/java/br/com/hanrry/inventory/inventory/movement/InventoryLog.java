@@ -4,11 +4,11 @@ import br.com.hanrry.inventory.inventory.batch.Batch;
 import br.com.hanrry.inventory.product.entity.Product;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.Hibernate;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
-@EqualsAndHashCode
 @Getter
 @Setter
 @NoArgsConstructor
@@ -29,6 +29,7 @@ public class InventoryLog {
     private Long quantity;
 
     @CreationTimestamp
+    @Column(nullable = false)
     private LocalDateTime timestamp;
 
     @ManyToOne
@@ -38,5 +39,18 @@ public class InventoryLog {
     @ManyToOne
     @JoinColumn(name = "batch_id")
     private Batch batch;
+
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) return true;
+        if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false;
+        InventoryLog inventoryLog = (InventoryLog) other;
+        return id != null && id.equals(inventoryLog.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Hibernate.getClass(this).hashCode();
+    }
 
 }

@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -28,6 +29,9 @@ class PostgresIntegrationTest {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    private ApplicationContext applicationContext;
 
     @DynamicPropertySource
     static void configureDataSource(DynamicPropertyRegistry registry) {
@@ -58,6 +62,8 @@ class PostgresIntegrationTest {
         assertEquals(13, countRows("tb_products"));
         assertEquals(14, countRows("tb_batches"));
         assertEquals(2, countRows("tb_inventory_logs"));
+        assertEquals("INPUT", jdbcTemplate.queryForObject(
+                "SELECT type FROM tb_inventory_logs ORDER BY id LIMIT 1", String.class));
     }
 
     @Test
@@ -78,6 +84,18 @@ class PostgresIntegrationTest {
                 "INSERT INTO tb_batches "
                         + "(batch_number, quantity, manufacturing_date, expiry_date, price, product_id) "
                         + "VALUES (?, ?, ?, ?, ?, ?)",
+                "NULL-DATES-001", 1L, null, null, 1.00, 1L
+        ));
+
+        assertThrows(DataAccessException.class, () -> jdbcTemplate.update(
+                "INSERT INTO tb_inventory_logs (type, quantity, product_id) VALUES (?, ?, ?)",
+                "INPUT", -1L, 1L
+        ));
+
+        assertThrows(DataAccessException.class, () -> jdbcTemplate.update(
+                "INSERT INTO tb_batches "
+                        + "(batch_number, quantity, manufacturing_date, expiry_date, price, product_id) "
+                        + "VALUES (?, ?, ?, ?, ?, ?)",
                 "INVALID-PRODUCT-001", 1L, "2026-01-01", "2027-01-01", 1.00, 999999L
         ));
 
@@ -85,6 +103,12 @@ class PostgresIntegrationTest {
                 "INSERT INTO tb_products (name, sku, min_stock, category_id) VALUES (?, ?, ?, ?)",
                 "Invalid category", "INVALID-CATEGORY-001", 0L, 999999L
         ));
+    }
+
+    @Test
+    void shouldNotRegisterScheduledTasksInTestProfile() {
+        assertEquals(0, applicationContext.getBeansOfType(
+                org.springframework.scheduling.config.ScheduledTaskHolder.class).size());
     }
 
     private int countRows(String tableName) {
