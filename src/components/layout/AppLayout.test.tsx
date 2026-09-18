@@ -15,6 +15,8 @@ describe('authenticated application shell', () => {
     const navigation = await screen.findByRole('navigation', {
       name: /navegação principal/i,
     })
+    expect(screen.getAllByText('EstoqueHub').length).toBeGreaterThan(0)
+    expect(screen.queryByText('Verdejar')).not.toBeInTheDocument()
     expect(within(navigation).getByRole('link', { name: /painel/i })).toBeVisible()
     expect(within(navigation).getByRole('link', { name: /produtos/i })).toBeVisible()
     expect(screen.queryByText(/fornecedores/i)).not.toBeInTheDocument()

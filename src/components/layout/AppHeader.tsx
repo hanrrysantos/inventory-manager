@@ -26,7 +26,7 @@ function getInitials(name: string): string {
 export function AppHeader({ menuOpen, onOpenMenu }: AppHeaderProps) {
   const { pathname } = useLocation()
   const { user, logout } = useAuth()
-  const title = pageTitles[pathname] ?? 'Inventory Manager'
+  const title = pageTitles[pathname] ?? 'EstoqueHub'
   const firstName = user?.name.split(' ')[0] ?? ''
 
   return (
