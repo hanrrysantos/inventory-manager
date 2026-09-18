@@ -9,6 +9,10 @@
   text-rendering: optimizeLegibility;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -28,4 +32,15 @@ button,
 a,
 input {
   outline-color: #58b978;
+}
+
+::selection {
+  color: #102d1e;
+  background: #caff6a;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }

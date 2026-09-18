@@ -1,7 +1,7 @@
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { http, HttpResponse } from 'msw'
-import { beforeEach, describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { App } from '../../app/App'
 import { server } from '../../test/server'
 
@@ -15,7 +15,7 @@ describe('EstoqueHub landing page', () => {
 
     expect(
       await screen.findByRole('heading', {
-        name: /controle seu estoque sem perder tempo/i,
+        name: /seu estoque no ritmo do seu negócio/i,
       }),
     ).toBeVisible()
     expect(
@@ -58,12 +58,53 @@ describe('EstoqueHub landing page', () => {
     render(<App />)
 
     await screen.findByRole('heading', {
-      name: /controle seu estoque sem perder tempo/i,
+      name: /seu estoque no ritmo do seu negócio/i,
     })
 
     for (const link of screen.getAllByRole('link')) {
       expect(link).toHaveClass('min-h-11')
     }
+  })
+
+  it('scrolls smoothly to a landing section without teleporting', async () => {
+    const user = userEvent.setup()
+    const scrollIntoView = vi.fn()
+    const originalScrollIntoView = Element.prototype.scrollIntoView
+    Element.prototype.scrollIntoView = scrollIntoView
+
+    try {
+      render(<App />)
+
+      const header = await screen.findByRole('banner')
+      await user.click(within(header).getByRole('link', { name: 'Problema' }))
+
+      expect(scrollIntoView).toHaveBeenCalledWith({
+        behavior: 'smooth',
+        block: 'start',
+      })
+      expect(window.location.hash).toBe('#problema')
+      expect(document.querySelector('#problema')).toHaveFocus()
+    } finally {
+      if (originalScrollIntoView) {
+        Element.prototype.scrollIntoView = originalScrollIntoView
+      } else {
+        delete (Element.prototype as Partial<Element>).scrollIntoView
+      }
+    }
+  })
+
+  it('presents a distinctive inventory workflow in the hero preview', async () => {
+    render(<App />)
+
+    expect(
+      await screen.findByRole('heading', {
+        name: /seu estoque no ritmo do seu negócio/i,
+      }),
+    ).toBeVisible()
+    expect(screen.getByText('Café especial 500g')).toBeInTheDocument()
+    expect(screen.getByText('Repor hoje')).toBeInTheDocument()
+    expect(screen.getByText('Tudo sob controle')).toBeInTheDocument()
+    expect(screen.queryByText(/movimentos/i)).not.toBeInTheDocument()
   })
 
   it('sends an unknown anonymous route back to the landing page', async () => {
@@ -72,7 +113,7 @@ describe('EstoqueHub landing page', () => {
 
     expect(
       await screen.findByRole('heading', {
-        name: /controle seu estoque sem perder tempo/i,
+        name: /seu estoque no ritmo do seu negócio/i,
       }),
     ).toBeVisible()
     expect(window.location.pathname).toBe('/')
@@ -119,7 +160,7 @@ describe('EstoqueHub landing page', () => {
 
     expect(
       await screen.findByRole('heading', {
-        name: /controle seu estoque sem perder tempo/i,
+        name: /seu estoque no ritmo do seu negócio/i,
       }),
     ).toBeVisible()
     expect(screen.queryByText(/carregando sessão/i)).not.toBeInTheDocument()

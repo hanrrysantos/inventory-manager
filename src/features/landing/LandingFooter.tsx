@@ -1,8 +1,10 @@
 import { BrandMark } from '../../components/ui/BrandMark'
+import { SmoothAnchor } from './SmoothAnchor'
 
 export function LandingFooter() {
   return (
-    <footer className="bg-[#0e1b13] text-white">
+    <footer className="relative overflow-hidden bg-[#082317] text-white">
+      <div className="pointer-events-none absolute -right-24 -top-24 size-72 rounded-full border-[48px] border-[#77e69b]/5" />
       <div className="mx-auto grid max-w-7xl gap-10 px-5 py-14 md:grid-cols-[1.5fr_1fr] md:px-8">
         <div className="max-w-sm">
           <BrandMark inverse />
@@ -16,15 +18,18 @@ export function LandingFooter() {
             Navegação
           </p>
           <div className="mt-4 flex flex-col gap-3 text-sm text-white/70">
-            <a className="inline-flex min-h-11 items-center" href="#problema">
+            <SmoothAnchor
+              className="inline-flex min-h-11 items-center transition-colors hover:text-[#8df2ac]"
+              href="#problema"
+            >
               Problema
-            </a>
-            <a
-              className="inline-flex min-h-11 items-center"
+            </SmoothAnchor>
+            <SmoothAnchor
+              className="inline-flex min-h-11 items-center transition-colors hover:text-[#8df2ac]"
               href="#funcionalidades"
             >
               Funcionalidades
-            </a>
+            </SmoothAnchor>
           </div>
         </nav>
       </div>
