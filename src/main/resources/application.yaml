@@ -2,6 +2,9 @@ server:
   port: ${PORT:8080}
   address: 0.0.0.0
 
+frontend:
+  origins: ${FRONTEND_ORIGINS:http://localhost:5173}
+
 spring:
   application:
     name: inventory-manager

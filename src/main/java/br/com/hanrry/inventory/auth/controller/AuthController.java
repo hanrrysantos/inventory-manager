@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import jakarta.validation.Valid;
 
 import java.net.URI;
 
@@ -29,7 +30,7 @@ public class AuthController implements AuthControllerDocs {
     private final JwtUtil jwtUtil;
 
     @PostMapping(value = "/login")
-    public ResponseEntity<AuthResponseDTO> loginUser(@RequestBody AuthRequestDTO request){
+    public ResponseEntity<AuthResponseDTO> loginUser(@Valid @RequestBody AuthRequestDTO request){
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.email(), request.password()
                 ));
@@ -39,7 +40,7 @@ public class AuthController implements AuthControllerDocs {
     }
 
     @PostMapping(value = "/register")
-    public ResponseEntity<UserResponseDTO> registerUser(@RequestBody UserRequestDTO request){
+    public ResponseEntity<UserResponseDTO> registerUser(@Valid @RequestBody UserRequestDTO request){
         UserResponseDTO user = userService.createUser(request);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(user.id()).toUri();

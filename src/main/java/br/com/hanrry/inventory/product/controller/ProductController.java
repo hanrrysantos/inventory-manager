@@ -8,6 +8,7 @@ import br.com.hanrry.inventory.product.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
@@ -45,7 +46,7 @@ public class ProductController implements ProductControllerDocs {
 
     @PostMapping
     public ResponseEntity<ProductResponseDTO> createProduct(
-            @RequestBody ProductRequestDTO request
+            @Valid @RequestBody ProductRequestDTO request
     ) {
         ProductResponseDTO product = productService.createProduct(request);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
@@ -56,7 +57,7 @@ public class ProductController implements ProductControllerDocs {
     @PutMapping("/{id}")
     public ResponseEntity<ProductResponseDTO> updateProduct(
             @PathVariable Long id,
-            @RequestBody UpdateProdcutRequestDTO request
+            @Valid @RequestBody UpdateProdcutRequestDTO request
     ){
         ProductResponseDTO product = productService.updateProduct(id, request);
         return ResponseEntity.ok().body(product);

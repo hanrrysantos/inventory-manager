@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import jakarta.validation.Valid;
 
 import java.net.URI;
 import java.util.List;
@@ -30,7 +31,7 @@ public class BatchController implements BatchControllerDocs {
 
     @PostMapping
     public ResponseEntity<BatchResponseDTO> createBatch(
-            @RequestBody BatchRequestDTO request
+            @Valid @RequestBody BatchRequestDTO request
     ){
         BatchResponseDTO batch = batchService.createBatch(request);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
@@ -41,7 +42,7 @@ public class BatchController implements BatchControllerDocs {
     @PatchMapping("/{id}/add")
     public ResponseEntity<BatchResponseDTO> addStock(
             @PathVariable Long id,
-            @RequestBody AddStockBatchRequestDTO request
+            @Valid @RequestBody AddStockBatchRequestDTO request
     ){
         BatchResponseDTO batch = batchService.addStock(id, request);
         return ResponseEntity.ok().body(batch);
@@ -49,7 +50,7 @@ public class BatchController implements BatchControllerDocs {
 
     @PostMapping("/consume")
     public ResponseEntity<Void> consume(
-            @RequestBody ConsumeBatchRequestDTO request
+            @Valid @RequestBody ConsumeBatchRequestDTO request
     ){
         batchService.consumeStock(request);
         return ResponseEntity.noContent().build();

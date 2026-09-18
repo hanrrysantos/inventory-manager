@@ -31,6 +31,15 @@ public interface UserControllerDocs {
     })
     ResponseEntity<List<UserResponseDTO>> findAllUsers();
 
+    @Operation(summary = "Busca o usuário autenticado",
+            description = "Retorna os dados do usuário identificado pelo token JWT atual.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Usuário autenticado retornado com sucesso"),
+            @ApiResponse(responseCode = "401", description = "Token ausente ou inválido"),
+            @ApiResponse(responseCode = "404", description = "Usuário não encontrado")
+    })
+    ResponseEntity<UserResponseDTO> findCurrentUser(org.springframework.security.core.Authentication authentication);
+
     @Operation(summary = "Atualiza perfil de usuário",
             description = "Permite alterar a senha.")
     @ApiResponses(value = {

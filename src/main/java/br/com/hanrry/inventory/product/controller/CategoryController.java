@@ -7,6 +7,7 @@ import br.com.hanrry.inventory.product.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
@@ -37,7 +38,7 @@ public class CategoryController implements CategoryControllerDocs {
 
     @PostMapping
     public ResponseEntity<CategoryResponseDTO> createCategory(
-            @RequestBody CategoryRequestDTO request
+            @Valid @RequestBody CategoryRequestDTO request
     ){
         CategoryResponseDTO category = categoryService.createCategory(request);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
@@ -48,7 +49,7 @@ public class CategoryController implements CategoryControllerDocs {
     @PutMapping("/{id}")
     public ResponseEntity<CategoryResponseDTO> updateCategory(
             @PathVariable Long id,
-            @RequestBody CategoryRequestDTO request
+            @Valid @RequestBody CategoryRequestDTO request
     ){
         CategoryResponseDTO category = categoryService.updateCategory(id, request);
         return ResponseEntity.ok().body(category);

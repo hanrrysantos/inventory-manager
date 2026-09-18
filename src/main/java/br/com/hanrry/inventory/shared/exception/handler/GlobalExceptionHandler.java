@@ -13,15 +13,54 @@ import br.com.hanrry.inventory.shared.exception.auth.InvalidTokenException;
 import br.com.hanrry.inventory.shared.exception.user.EmailAlreadyExistsException;
 import br.com.hanrry.inventory.shared.exception.user.UserNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.validation.FieldError;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.time.Instant;
+import java.util.stream.Collectors;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<StandardError> handleBadCredentialsException(
+            BadCredentialsException ex,
+            HttpServletRequest request) {
+        StandardError error = new StandardError(
+                Instant.now(),
+                HttpStatus.UNAUTHORIZED.value(),
+                "InvalidCredentials",
+                "Invalid email or password",
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<StandardError> handleValidationException(
+            MethodArgumentNotValidException ex,
+            HttpServletRequest request) {
+        String message = ex.getBindingResult().getFieldErrors().stream()
+                .map(this::formatFieldError)
+                .collect(Collectors.joining(", "));
+        StandardError error = new StandardError(
+                Instant.now(),
+                HttpStatus.BAD_REQUEST.value(),
+                "ValidationError",
+                message,
+                request.getRequestURI()
+        );
+        return ResponseEntity.badRequest().body(error);
+    }
+
+    private String formatFieldError(FieldError error) {
+        return error.getField() + ": " + error.getDefaultMessage();
+    }
 
     @ExceptionHandler(EmailAlreadyExistsException.class)
     public ResponseEntity<StandardError> handleEmailAlreadyExistsException(EmailAlreadyExistsException ex, HttpServletRequest request){

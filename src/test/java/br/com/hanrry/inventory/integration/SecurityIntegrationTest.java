@@ -20,9 +20,13 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import java.time.LocalDateTime;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.options;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -67,17 +71,21 @@ class SecurityIntegrationTest {
     }
 
     @Test
-    void shouldCharacterizeCurrentForbiddenResponseWithoutJwt() throws Exception {
-        // Dívida de segurança: o plano desejava 401, mas o comportamento atual é 403.
+    void shouldReturnUnauthorizedErrorWithoutJwt() throws Exception {
         mockMvc.perform(get("/api/v1/users/{id}", admin.getId()))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.status").value(401))
+                .andExpect(jsonPath("$.error").value("Unauthorized"))
+                .andExpect(jsonPath("$.path").value("/api/v1/users/" + admin.getId()));
     }
 
     @Test
     void shouldRejectUserRoleAccessingUserEndpoint() throws Exception {
         mockMvc.perform(get("/api/v1/users/{id}", admin.getId())
                         .header(AUTHORIZATION, bearerToken(user)))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.status").value(403))
+                .andExpect(jsonPath("$.error").value("Forbidden"));
     }
 
     @Test
@@ -87,6 +95,55 @@ class SecurityIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(user.getId()))
                 .andExpect(jsonPath("$.email").value(user.getEmail()));
+    }
+
+    @Test
+    void shouldReturnCurrentAuthenticatedUserWithRole() throws Exception {
+        mockMvc.perform(get("/api/v1/users/me")
+                        .header(AUTHORIZATION, bearerToken(admin)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(admin.getId()))
+                .andExpect(jsonPath("$.email").value(admin.getEmail()))
+                .andExpect(jsonPath("$.role").value("ADMIN"));
+    }
+
+    @Test
+    void shouldAllowConfiguredFrontendOriginOnPreflight() throws Exception {
+        mockMvc.perform(options("/api/v1/products")
+                        .header("Origin", "http://localhost:5173")
+                        .header("Access-Control-Request-Method", "GET"))
+                .andExpect(status().isOk())
+                .andExpect(header().string("Access-Control-Allow-Origin", "http://localhost:5173"));
+    }
+
+    @Test
+    void shouldNotAuthorizeUnknownFrontendOriginOnPreflight() throws Exception {
+        mockMvc.perform(options("/api/v1/products")
+                        .header("Origin", "https://unknown.example.com")
+                        .header("Access-Control-Request-Method", "GET"))
+                .andExpect(header().doesNotExist("Access-Control-Allow-Origin"));
+    }
+
+    @Test
+    void shouldReturnValidationErrorForInvalidRegistration() throws Exception {
+        mockMvc.perform(post("/api/v1/auth/register")
+                        .contentType(APPLICATION_JSON)
+                        .content("{\"name\":\"\",\"email\":\"invalid\",\"password\":\"123\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.error").value("ValidationError"))
+                .andExpect(jsonPath("$.path").value("/api/v1/auth/register"));
+    }
+
+    @Test
+    void shouldReturnUnauthorizedErrorForInvalidCredentials() throws Exception {
+        mockMvc.perform(post("/api/v1/auth/login")
+                        .contentType(APPLICATION_JSON)
+                        .content("{\"email\":\"security-admin@example.com\",\"password\":\"wrong-password\"}"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.status").value(401))
+                .andExpect(jsonPath("$.error").value("InvalidCredentials"))
+                .andExpect(jsonPath("$.path").value("/api/v1/auth/login"));
     }
 
     @Test

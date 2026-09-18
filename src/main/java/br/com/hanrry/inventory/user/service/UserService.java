@@ -49,6 +49,14 @@ public class UserService {
         return userMapper.toDTO(user);
     }
 
+    public UserResponseDTO findUserByEmail(String email) {
+        User user = userRepository.findByEmail(email).orElseThrow(
+                () -> new UserNotFoundException("User not found with this email: " + email)
+        );
+
+        return userMapper.toDTO(user);
+    }
+
     public List<UserResponseDTO> findAllUsers(){
         List<User> users = userRepository.findAll();
 

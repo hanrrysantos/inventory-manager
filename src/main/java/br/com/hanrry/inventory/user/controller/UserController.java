@@ -6,7 +6,9 @@ import br.com.hanrry.inventory.user.dto.UserResponseDTO;
 import br.com.hanrry.inventory.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 
 import java.util.List;
 
@@ -25,6 +27,11 @@ public class UserController implements UserControllerDocs {
         return ResponseEntity.ok().body(users);
     }
 
+    @GetMapping("/me")
+    public ResponseEntity<UserResponseDTO> findCurrentUser(Authentication authentication) {
+        return ResponseEntity.ok(userService.findUserByEmail(authentication.getName()));
+    }
+
     @GetMapping(value = "/{id}")
     public ResponseEntity<UserResponseDTO> findUserById(
             @PathVariable Long id
@@ -37,7 +44,7 @@ public class UserController implements UserControllerDocs {
     @PutMapping(value = "/{id}")
     public ResponseEntity<UserResponseDTO> updateUser(
             @PathVariable Long id,
-            @RequestBody UpdateUserRequestDTO request
+            @Valid @RequestBody UpdateUserRequestDTO request
     ){
         UserResponseDTO user = userService.updateUser(id, request);
 
