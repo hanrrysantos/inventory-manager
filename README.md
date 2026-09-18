@@ -80,3 +80,17 @@ durante o desenvolvimento, use `npm run test:watch`.
 Após o login, o token JWT é armazenado no `localStorage` com a chave
 `inventory-manager.token` e enviado nas chamadas autenticadas. Uma resposta
 HTTP 401 encerra a sessão local e direciona o usuário de volta ao login.
+
+## Publicação na Vercel
+
+O arquivo `vercel.json` configura o fallback das rotas da SPA para
+`index.html`. Para publicar pela CLI:
+
+```bash
+npx vercel login
+npx vercel --prod --yes \
+  --build-env VITE_API_URL=https://inventory.hanrry.top
+```
+
+Após a publicação, adicione a origem gerada pela Vercel à variável
+`FRONTEND_ORIGINS` do backend para liberar as chamadas via CORS.
