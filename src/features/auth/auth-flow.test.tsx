@@ -87,6 +87,26 @@ describe('authentication flow', () => {
     await waitFor(() => expect(screen.getByText('Ana Souza')).toBeVisible())
   })
 
+  it('returns to login instead of crashing when session data is invalid', async () => {
+    server.use(
+      http.get('*/api/v1/users/me', () =>
+        HttpResponse.text('<!doctype html><html></html>', {
+          headers: { 'Content-Type': 'text/html' },
+        }),
+      ),
+    )
+    localStorage.setItem('inventory-manager.token', 'invalid-response-token')
+    window.history.pushState({}, '', '/dashboard')
+
+    render(<App />)
+
+    expect(screen.getByText(/carregando sessão/i)).toBeInTheDocument()
+    expect(
+      await screen.findByRole('heading', { name: /acesse sua conta/i }),
+    ).toBeVisible()
+    expect(window.location.pathname).toBe('/login')
+  })
+
   it('shows and hides the login password accessibly', async () => {
     const user = userEvent.setup()
     render(<App />)

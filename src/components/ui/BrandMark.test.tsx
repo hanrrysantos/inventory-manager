@@ -10,7 +10,7 @@ describe('BrandMark', () => {
     expect(screen.getByText('Seu estoque, sempre sob controle')).toBeVisible()
     expect(container.querySelector('img')).toHaveAttribute(
       'src',
-      expect.stringContaining('estoquehub-logo'),
+      expect.stringContaining('estoquehub-logo.png'),
     )
   })
 
