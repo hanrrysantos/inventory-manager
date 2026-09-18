@@ -46,6 +46,7 @@ export function ProductFilters({
           <button
             key={filter.value}
             type="button"
+            aria-pressed={status === filter.value}
             onClick={() => onStatusChange(filter.value)}
             className={cn(
               'shrink-0 rounded-full px-4 py-2 text-xs font-medium transition',

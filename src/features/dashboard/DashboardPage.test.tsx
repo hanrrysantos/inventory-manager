@@ -66,5 +66,15 @@ describe('DashboardPage', () => {
       await screen.findByText(/não foi possível carregar o resumo/i, {}, { timeout: 3000 }),
     ).toBeVisible()
     expect(await screen.findByText('Chá Verde Orgânico')).toBeVisible()
+
+    const attentionRegion = screen.getByRole('region', {
+      name: /produtos que precisam de atenção/i,
+    })
+    expect(
+      within(attentionRegion).getByText(/não foi possível carregar os itens críticos/i),
+    ).toBeVisible()
+    expect(
+      within(attentionRegion).queryByText(/carregando itens críticos/i),
+    ).not.toBeInTheDocument()
   })
 })

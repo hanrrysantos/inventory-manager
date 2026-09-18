@@ -37,6 +37,14 @@ describe('authentication flow', () => {
     expect(window.location.pathname).toBe('/login')
   })
 
+  it('warns that the first access can take longer while the API starts', async () => {
+    render(<App />)
+
+    expect(
+      await screen.findByText(/primeiro acesso pode levar até um minuto/i),
+    ).toBeVisible()
+  })
+
   it('does not submit an invalid email or short password', async () => {
     let requestCount = 0
     server.use(

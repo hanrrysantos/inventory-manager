@@ -49,11 +49,18 @@ describe('ProductsPage', () => {
     render(<App />)
 
     await screen.findByText('Chá Verde Orgânico')
-    await user.click(screen.getByRole('button', { name: /^estoque baixo$/i }))
+    const allFilter = screen.getByRole('button', { name: /^todos$/i })
+    const lowStockFilter = screen.getByRole('button', { name: /^estoque baixo$/i })
+    expect(allFilter).toHaveAttribute('aria-pressed', 'true')
+    expect(lowStockFilter).toHaveAttribute('aria-pressed', 'false')
+
+    await user.click(lowStockFilter)
 
     expect(screen.getByText('Mel Silvestre 500g')).toBeVisible()
     expect(screen.queryByText('Chá Verde Orgânico')).not.toBeInTheDocument()
     expect(screen.queryByText('Sabonete Natural Lavanda')).not.toBeInTheDocument()
+    expect(allFilter).toHaveAttribute('aria-pressed', 'false')
+    expect(lowStockFilter).toHaveAttribute('aria-pressed', 'true')
     expect(window.location.search).toContain('status=LOW_STOCK')
   })
 

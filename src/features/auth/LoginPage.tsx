@@ -97,6 +97,10 @@ export function LoginPage() {
           >
             {isSubmitting ? 'Entrando...' : 'Entrar'}
           </button>
+
+          <p className="text-center text-xs leading-5 text-[#718177]">
+            O primeiro acesso pode levar até um minuto enquanto o servidor inicia.
+          </p>
         </form>
       </section>
     </main>

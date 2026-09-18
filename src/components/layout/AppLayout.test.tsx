@@ -55,4 +55,37 @@ describe('authenticated application shell', () => {
     await user.click(within(drawer).getByRole('button', { name: /fechar menu/i }))
     expect(screen.queryByRole('dialog', { name: /menu de navegação/i })).not.toBeInTheDocument()
   })
+
+  it('moves focus into the mobile drawer and closes it with Escape', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+
+    const openButton = await screen.findByRole('button', { name: /abrir menu/i })
+    await user.click(openButton)
+
+    const drawer = screen.getByRole('dialog', { name: /menu de navegação/i })
+    expect(within(drawer).getByRole('button', { name: /fechar menu/i })).toHaveFocus()
+
+    await user.keyboard('{Escape}')
+
+    expect(screen.queryByRole('dialog', { name: /menu de navegação/i })).not.toBeInTheDocument()
+    expect(openButton).toHaveFocus()
+  })
+
+  it('keeps Tab navigation inside the open mobile drawer', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+
+    await user.click(await screen.findByRole('button', { name: /abrir menu/i }))
+    const drawer = screen.getByRole('dialog', { name: /menu de navegação/i })
+    const closeButton = within(drawer).getByRole('button', { name: /fechar menu/i })
+    const links = within(drawer).getAllByRole('link')
+
+    links.at(-1)?.focus()
+    await user.tab()
+    expect(closeButton).toHaveFocus()
+
+    await user.tab({ shift: true })
+    expect(links.at(-1)).toHaveFocus()
+  })
 })

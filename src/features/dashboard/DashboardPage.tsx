@@ -97,7 +97,14 @@ export function DashboardPage() {
             role="region"
             aria-label="Produtos que precisam de atenção"
           >
-            <PageLoader label="Carregando itens críticos..." />
+            {summaryQuery.isError ? (
+              <ErrorState
+                title="Não foi possível carregar os itens críticos"
+                onRetry={() => void summaryQuery.refetch()}
+              />
+            ) : (
+              <PageLoader label="Carregando itens críticos..." />
+            )}
           </section>
         )}
       </div>

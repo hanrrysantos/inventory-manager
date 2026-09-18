@@ -42,6 +42,10 @@ VITE_API_URL=https://inventory.hanrry.top
 O backend precisa liberar via CORS a origem em que o frontend estiver sendo
 executado, como `http://localhost:5173` durante o desenvolvimento.
 
+Como a API publicada pode entrar em modo de espera, a primeira autenticação
+pode levar até um minuto. O cliente aguarda até 90 segundos e diferencia erros
+de timeout, conexão e respostas retornadas pela API.
+
 ## Desenvolvimento
 
 Inicie o servidor local:
