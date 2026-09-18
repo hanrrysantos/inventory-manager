@@ -8,6 +8,33 @@ export const authenticatedUser = {
   createdAt: '2026-09-17T12:00:00',
 }
 
+export const productFixtures = [
+  {
+    id: 1,
+    name: 'Chá Verde Orgânico',
+    sku: 'CHA-001',
+    totalQuantity: 142,
+    categoryName: 'Bebidas',
+    minStock: 40,
+  },
+  {
+    id: 2,
+    name: 'Mel Silvestre 500g',
+    sku: 'MEL-014',
+    totalQuantity: 28,
+    categoryName: 'Alimentos',
+    minStock: 30,
+  },
+  {
+    id: 3,
+    name: 'Sabonete Natural Lavanda',
+    sku: 'SAB-207',
+    totalQuantity: 0,
+    categoryName: 'Cosméticos',
+    minStock: 25,
+  },
+]
+
 export const handlers = [
   http.post('*/api/v1/auth/login', async ({ request }) => {
     const credentials = (await request.json()) as {
@@ -47,4 +74,5 @@ export const handlers = [
 
     return HttpResponse.json(authenticatedUser)
   }),
+  http.get('*/api/v1/products', () => HttpResponse.json(productFixtures)),
 ]

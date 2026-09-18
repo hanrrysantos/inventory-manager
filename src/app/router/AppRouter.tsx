@@ -3,6 +3,7 @@ import { AppLayout } from '../../components/layout/AppLayout'
 import { LoginPage } from '../../features/auth/LoginPage'
 import { ProtectedRoute } from '../../features/auth/ProtectedRoute'
 import { useAuth } from '../../features/auth/use-auth'
+import { ProductsPage } from '../../features/products/ProductsPage'
 
 function DashboardPlaceholder() {
   return (
@@ -10,10 +11,6 @@ function DashboardPlaceholder() {
       <h2 className="text-lg font-semibold">Resumo do estoque</h2>
     </main>
   )
-}
-
-function ProductsPlaceholder() {
-  return <h1>Produtos</h1>
 }
 
 export function AppRouter() {
@@ -25,7 +22,7 @@ export function AppRouter() {
       <Route element={<ProtectedRoute />}>
         <Route element={<AppLayout />}>
           <Route path="/dashboard" element={<DashboardPlaceholder />} />
-          <Route path="/products" element={<ProductsPlaceholder />} />
+          <Route path="/products" element={<ProductsPage />} />
         </Route>
       </Route>
       <Route

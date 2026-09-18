@@ -473,13 +473,13 @@ git commit -m "cria layout responsivo do painel"
 - Produces: `ProductTable({ products, compact? })`.
 - Consumes: `getProductStatus` and shared feedback components.
 
-- [ ] **Step 1: Adicionar resposta MSW de produtos**
+- [x] **Step 1: Adicionar resposta MSW de produtos**
 
 Use at least three products: one in stock, one low stock, and one out of stock.
 Every object includes `id`, `name`, `sku`, `totalQuantity`, `categoryName`, and
 `minStock` exactly as the OpenAPI schema.
 
-- [ ] **Step 2: Escrever testes falhando da página**
+- [x] **Step 2: Escrever testes falhando da página**
 
 Cover:
 
@@ -494,13 +494,13 @@ it('shows an error with a retry action when the API fails')
 
 Assert that price, updated time, and product CRUD buttons are absent.
 
-- [ ] **Step 3: Confirmar RED**
+- [x] **Step 3: Confirmar RED**
 
 Run: `npm test -- src/features/products/ProductsPage.test.tsx`
 
 Expected: FAIL because products feature components do not exist.
 
-- [ ] **Step 4: Implementar contrato, query e filtragem**
+- [x] **Step 4: Implementar contrato, query e filtragem**
 
 Use:
 
@@ -520,13 +520,13 @@ Derive filtered results with `useMemo` from normalized search text and selected
 status. Keep the filter value in the URL query parameter `status` and the search
 term in `q` so refresh and back navigation preserve the view.
 
-- [ ] **Step 5: Implementar tabela e estados**
+- [x] **Step 5: Implementar tabela e estados**
 
 Use semantic table markup with columns Product, Category, Quantity, Minimum, and
 Status. Render name and SKU together. `compact` may limit visible rows but must
 not alter cached data. Provide accessible labels for search and filter controls.
 
-- [ ] **Step 6: Confirmar GREEN**
+- [x] **Step 6: Confirmar GREEN**
 
 Run:
 
@@ -538,7 +538,7 @@ npm run lint
 
 Expected: all commands pass.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add src
