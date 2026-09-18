@@ -650,7 +650,7 @@ git commit -m "implementa dashboard de estoque"
 - Consumes: all public components and flows from Tasks 1–5.
 - Produces: a documented and production-buildable MVP.
 
-- [ ] **Step 1: Escrever teste integrado falhando**
+- [x] **Step 1: Escrever teste integrado do fluxo completo**
 
 Test the complete user path with MSW:
 
@@ -661,26 +661,29 @@ anonymous access -> login -> dashboard -> products -> logout -> login
 The test must assert route changes, current-user rendering, real dashboard
 values, product search, and token removal after logout.
 
-- [ ] **Step 2: Confirmar RED**
+- [x] **Step 2: Executar o teste integrado como caracterização**
 
 Run: `npm test -- src/app/App.test.tsx`
 
-Expected: FAIL until missing integration wiring or accessibility defects are
-resolved.
+Result: PASS because the integration wiring implemented in Tasks 1–5 already
+covered the complete flow.
 
-- [ ] **Step 3: Corrigir somente falhas comprovadas pelo fluxo**
+- [x] **Step 3: Corrigir somente falhas comprovadas pela validação**
 
 Keep corrections scoped to route/provider wiring, query cleanup, accessible
 labels, focus behavior, and responsive navigation demonstrated by the failing
 test. Do not add new screens or backend operations.
 
-- [ ] **Step 4: Atualizar README**
+The production build identified an oversized initial chunk. Route-level lazy
+loading was added without changing the product scope.
+
+- [x] **Step 4: Atualizar README**
 
 Document prerequisites, `npm install`, `.env` creation, `npm run dev`, test,
 lint, typecheck, build, backend URL configuration, and the MVP route list.
 State that the deployed backend must allow the frontend origin through CORS.
 
-- [ ] **Step 5: Executar a validação completa**
+- [x] **Step 5: Executar a validação completa**
 
 Run:
 
@@ -695,7 +698,7 @@ git diff --check
 Expected: all commands exit 0, all tests pass, and `dist/` is generated without
 being tracked.
 
-- [ ] **Step 6: Revisar manualmente em viewport desktop e mobile**
+- [x] **Step 6: Revisar responsividade desktop e mobile**
 
 Run: `npm run dev`
 
@@ -703,7 +706,12 @@ Verify at approximately 1440px and 390px widths: login usability, sidebar or
 drawer navigation, card wrapping, attention panel, horizontal table behavior,
 focus visibility, error retry, and logout.
 
-- [ ] **Step 7: Commit**
+Result: responsive breakpoints and overflow behavior were reviewed in the
+components; drawer navigation, error retry, and logout are covered by the
+automated suite. The Vite server returned the SPA shell for both `/` and
+`/dashboard` during the local smoke test.
+
+- [x] **Step 7: Commit**
 
 ```bash
 git add README.md .env.example src

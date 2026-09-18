@@ -14,7 +14,7 @@ describe('authentication flow', () => {
     const user = userEvent.setup()
     render(<App />)
 
-    await user.type(screen.getByLabelText(/e-mail/i), 'admin@email.com')
+    await user.type(await screen.findByLabelText(/e-mail/i), 'admin@email.com')
     await user.type(screen.getByLabelText(/senha/i), 'admin123')
     await user.click(screen.getByRole('button', { name: /entrar/i }))
 
@@ -29,7 +29,7 @@ describe('authentication flow', () => {
     const user = userEvent.setup()
     render(<App />)
 
-    await user.type(screen.getByLabelText(/e-mail/i), 'admin@email.com')
+    await user.type(await screen.findByLabelText(/e-mail/i), 'admin@email.com')
     await user.type(screen.getByLabelText(/senha/i), 'wrong-password')
     await user.click(screen.getByRole('button', { name: /entrar/i }))
 
@@ -48,7 +48,7 @@ describe('authentication flow', () => {
     const user = userEvent.setup()
     render(<App />)
 
-    await user.type(screen.getByLabelText(/e-mail/i), 'invalid-email')
+    await user.type(await screen.findByLabelText(/e-mail/i), 'invalid-email')
     await user.type(screen.getByLabelText(/senha/i), '123')
     await user.click(screen.getByRole('button', { name: /entrar/i }))
 
