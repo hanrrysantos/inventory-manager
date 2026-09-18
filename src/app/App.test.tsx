@@ -4,9 +4,14 @@ import { expect, it } from 'vitest'
 import { App } from './App'
 
 it('supports login, dashboard, products, search, and logout as one flow', async () => {
-  window.history.pushState({}, '', '/dashboard')
+  window.history.pushState({}, '', '/')
   const user = userEvent.setup()
   render(<App />)
+
+  await user.click(
+    await screen.findByRole('link', { name: 'Acesse a plataforma' }),
+  )
+  expect(window.location.pathname).toBe('/login')
 
   expect(
     await screen.findByRole('heading', { name: /acesse sua conta/i }),

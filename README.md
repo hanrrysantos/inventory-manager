@@ -1,23 +1,26 @@
-# Inventory Manager Frontend
+# EstoqueHub
 
 Interface web para acompanhamento de estoque, com autenticação, indicadores e
 consulta de produtos. Frontend e API são mantidos em repositórios separados.
 
-[Acessar aplicação](https://controledeestoque.hanrry.top) ·
-[Documentação da API](https://inventory.hanrry.top/swagger-ui/index.html) ·
+[Acessar aplicação](https://controle-de-estoque.hanrry.top) ·
+[Documentação da API](https://api-controle-de-estoque.hanrry.top/swagger-ui/index.html) ·
 [Repositório do backend](https://github.com/hanrrysantos/inventory-manager)
 
 ## Funcionalidades
 
 | Tela | Recursos |
 | --- | --- |
-| Login (`/login`) | Autenticação JWT e restauração de sessão |
+| Landing (`/`) | Apresentação do EstoqueHub, problema de controle manual e recursos reais de indicadores, alertas e busca de produtos |
+| Acesso (`/login`) | Login, aviso de que o acesso com Google está planejado e criação de conta |
 | Dashboard (`/dashboard`) | Indicadores de estoque e itens que precisam de atenção |
 | Produtos (`/products`) | Consulta com busca por nome ou SKU e filtros de estoque |
 
 Interface responsiva com estados de carregamento, erro e lista vazia.
-Cadastro e edição de produtos, movimentações, fornecedores, relatórios e
-configurações ainda não estão disponíveis nesta versão.
+O cadastro de conta envia `POST /api/v1/auth/register` e, após a conclusão,
+retorna ao acesso para o login regular. Cadastro e edição de produtos,
+movimentações, fornecedores, relatórios e configurações ainda não estão
+disponíveis nesta versão.
 
 ## Tecnologias
 
@@ -41,7 +44,7 @@ Acesse o endereço informado pelo Vite, normalmente `http://localhost:5173`.
 O `.env` define a URL base do backend, sem barra final:
 
 ```dotenv
-VITE_API_URL=https://inventory.hanrry.top
+VITE_API_URL=https://api-controle-de-estoque.hanrry.top
 ```
 
 Para usar a API local, altere o valor para `http://localhost:8080` e reinicie
@@ -66,11 +69,11 @@ até 90 segundos por requisição.
 ## Publicação
 
 O frontend é hospedado na Vercel, em
-[controledeestoque.hanrry.top](https://controledeestoque.hanrry.top).
+[controle-de-estoque.hanrry.top](https://controle-de-estoque.hanrry.top).
 Configuração do projeto:
 
 - Framework: **Vite**; build: `npm run build`; saída: `dist`.
-- Variável: `VITE_API_URL=https://inventory.hanrry.top`.
+- Variável: `VITE_API_URL=https://api-controle-de-estoque.hanrry.top`.
 - Rotas: o [vercel.json](vercel.json) direciona acessos da SPA para `index.html`.
 
 Configure `VITE_API_URL` nos ambientes usados na Vercel e faça um novo deploy
@@ -80,7 +83,7 @@ são públicas: não use senhas ou secrets nelas.
 No **backend**, libere as origens necessárias via CORS, separadas por vírgula:
 
 ```dotenv
-FRONTEND_ORIGINS=http://localhost:5173,https://controledeestoque.hanrry.top
+FRONTEND_ORIGINS=http://localhost:5173,https://controle-de-estoque.hanrry.top
 ```
 
 URLs de Preview têm origens diferentes e precisam de liberação própria para
