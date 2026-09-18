@@ -60,8 +60,7 @@ public class UserService {
                 () -> new UserNotFoundException("User not found with this id: " + id)
         );
         if(request.password() != null && !request.password().isBlank()){
-
-            user.setPassword(request.password());
+            user.setPassword(passwordEncoder.encode(request.password()));
         }
 
         User savedUser = userRepository.save(user);

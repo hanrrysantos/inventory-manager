@@ -158,6 +158,20 @@ class UserServiceTest {
     }
 
     @Test
+    void shouldEncodePasswordWhenUpdatingUser() {
+        UpdateUserRequestDTO request = new UpdateUserRequestDTO("newPassword");
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(passwordEncoder.encode(request.password())).thenReturn("encodedNewPassword");
+        when(userRepository.save(user)).thenReturn(user);
+        when(userMapper.toDTO(user)).thenReturn(userResponseDTO);
+
+        userService.updateUser(1L, request);
+
+        assertEquals("encodedNewPassword", user.getPassword());
+        verify(passwordEncoder).encode(request.password());
+    }
+
+    @Test
     void shouldThrowExceptionWhenUpdatingNonexistentUser() {
 
         UpdateUserRequestDTO request =
