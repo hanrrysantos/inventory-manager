@@ -12,16 +12,23 @@ export function LandingFooter() {
           </p>
         </div>
         <nav className="md:justify-self-end" aria-label="Atalhos do rodapé">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/40">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/70">
             Navegação
           </p>
           <div className="mt-4 flex flex-col gap-3 text-sm text-white/70">
-            <a href="#problema">Problema</a>
-            <a href="#funcionalidades">Funcionalidades</a>
+            <a className="inline-flex min-h-11 items-center" href="#problema">
+              Problema
+            </a>
+            <a
+              className="inline-flex min-h-11 items-center"
+              href="#funcionalidades"
+            >
+              Funcionalidades
+            </a>
           </div>
         </nav>
       </div>
-      <div className="mx-auto max-w-7xl border-t border-white/10 px-5 py-6 text-xs text-white/40 md:px-8">
+      <div className="mx-auto max-w-7xl border-t border-white/10 px-5 py-6 text-xs text-white/70 md:px-8">
         © 2026 EstoqueHub. Todos os direitos reservados.
       </div>
     </footer>

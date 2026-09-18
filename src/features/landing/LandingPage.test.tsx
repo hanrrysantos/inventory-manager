@@ -52,6 +52,18 @@ describe('EstoqueHub landing page', () => {
     ).toBeVisible()
   })
 
+  it('provides a 44px minimum touch target for every landing link', async () => {
+    render(<App />)
+
+    await screen.findByRole('heading', {
+      name: /controle seu estoque sem perder tempo/i,
+    })
+
+    for (const link of screen.getAllByRole('link')) {
+      expect(link).toHaveClass('min-h-11')
+    }
+  })
+
   it('sends an unknown anonymous route back to the landing page', async () => {
     window.history.pushState({}, '', '/nao-existe')
     render(<App />)
@@ -62,5 +74,17 @@ describe('EstoqueHub landing page', () => {
       }),
     ).toBeVisible()
     expect(window.location.pathname).toBe('/')
+  })
+
+  it('sends an unknown route to the dashboard after restoring a stored session', async () => {
+    localStorage.setItem('inventory-manager.token', 'valid-token')
+    window.history.pushState({}, '', '/nao-existe')
+    render(<App />)
+
+    expect(screen.getByText(/carregando sessão/i)).toBeInTheDocument()
+    expect(
+      await screen.findByRole('heading', { name: /painel de estoque/i }),
+    ).toBeVisible()
+    expect(window.location.pathname).toBe('/dashboard')
   })
 })

@@ -44,7 +44,7 @@ export function ProductPreview() {
               <span className="text-sm font-semibold">
                 Produtos que precisam de atenção
               </span>
-              <span className="text-xs text-[#168f50]">Ver catálogo</span>
+              <span className="text-xs text-[#107842]">Ver catálogo</span>
             </div>
             <div className="mt-5 space-y-3">
               <div className="h-3 w-full rounded-full bg-[#eef5f0]" />

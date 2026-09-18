@@ -30,7 +30,11 @@ const ProductsPage = lazy(() =>
 )
 
 export function AppRouter() {
-  const { user } = useAuth()
+  const { user, isRestoring } = useAuth()
+
+  if (isRestoring) {
+    return <PageLoader label="Carregando sessão..." />
+  }
 
   return (
     <Suspense fallback={<PageLoader label="Carregando página..." />}>

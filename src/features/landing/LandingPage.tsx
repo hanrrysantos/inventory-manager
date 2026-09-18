@@ -55,7 +55,7 @@ export function LandingPage() {
         >
           <div className="mx-auto grid min-h-[720px] max-w-7xl items-center gap-16 px-5 py-20 lg:grid-cols-[0.82fr_1.18fr] lg:px-8">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#168f50]">
+              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#107842]">
                 Controle de estoque para pequenos comércios
               </p>
               <h1 className="mt-5 max-w-xl text-5xl font-bold leading-[1.04] tracking-[-0.045em] sm:text-6xl">
@@ -80,7 +80,7 @@ export function LandingPage() {
           className="scroll-mt-24 px-5 py-24 md:px-8"
         >
           <div className="mx-auto max-w-7xl">
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#168f50]">
+            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#107842]">
               Problema
             </p>
             <h2 className="mt-4 max-w-2xl text-4xl font-bold tracking-[-0.035em]">
@@ -92,7 +92,7 @@ export function LandingPage() {
                   className="rounded-[28px] border border-[#dce8df] bg-white p-7 shadow-sm"
                   key={title}
                 >
-                  <span className="text-sm font-semibold text-[#168f50]">
+                  <span className="text-sm font-semibold text-[#107842]">
                     0{index + 1}
                   </span>
                   <h3 className="mt-8 text-xl font-semibold">{title}</h3>
@@ -109,7 +109,7 @@ export function LandingPage() {
           className="scroll-mt-24 bg-[#eef7f1] px-5 py-24 md:px-8"
         >
           <div className="mx-auto max-w-7xl">
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#168f50]">
+            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#107842]">
               Funcionalidades
             </p>
             <h2 className="mt-4 max-w-2xl text-4xl font-bold tracking-[-0.035em]">
@@ -118,7 +118,7 @@ export function LandingPage() {
             <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
               {features.map(({ title, description, icon: Icon }) => (
                 <article className="rounded-[28px] bg-white p-7" key={title}>
-                  <span className="grid size-12 place-items-center rounded-2xl bg-[#dcf2e3] text-[#168f50]">
+                  <span className="grid size-12 place-items-center rounded-2xl bg-[#dcf2e3] text-[#107842]">
                     <Icon aria-hidden="true" />
                   </span>
                   <h3 className="mt-6 text-xl font-semibold">{title}</h3>
