@@ -27,9 +27,9 @@ API REST para controle de estoque por lotes, com foco em validade, rastreabilida
 
 ## Sobre o projeto
 
-Em cenários de alto volume, falhas na gestão de estoque costumam gerar divergências no saldo por conta de movimentações concorrentes, além de prejuízos causados pelo vencimento de produtos. Para resolver esse desafio de confiabilidade, desenvolvi o Controle de Estoque: uma solução centralizada criada para garantir a integridade dos dados, automatizar a priorização de consumo por validade e manter auditoria total sobre o fluxo de mercadorias.
+Em cenários de alto volume, falhas na gestão de estoque costumam gerar divergências no saldo por conta de movimentações concorrentes, além de prejuízos causados pelo vencimento de produtos. Para resolver esse desafio de confiabilidade, desenvolvi o Controle de Estoque: uma solução centralizada criada para garantir a integridade dos dados, automatizar a priorização de consumo por validade e manter o histórico de entradas e saídas por lote.
 
-A aplicação combina uma API REST em Java 21 e Spring Boot 3 integrada ao PostgreSQL, com controle transacional rigoroso para operações simultâneas, lógica de consumo baseada no critério FEFO (First Expire, First Out) e alertas automatizados de estoque baixo com emissão de relatórios em PDF. O resultado é uma arquitetura resiliente e pronta para produção, acessível por interface web e API, validada por uma suíte de testes de integração que cobre cenários reais de concorrência e rollback.
+A aplicação combina uma API REST em Java 21 e Spring Boot 3 integrada ao PostgreSQL, com controle transacional rigoroso para operações simultâneas, lógica de consumo baseada no critério FEFO (First Expire, First Out) e alertas automatizados de estoque baixo com emissão de relatórios em PDF. O resultado é uma aplicação acessível por interface web e API, com uma suíte de testes de integração que verifica cenários de concorrência e rollback.
 
 ## Funcionalidades
 
@@ -62,7 +62,7 @@ A aplicação combina uma API REST em Java 21 e Spring Boot 3 integrada ao Postg
 
 ### 3. Automação e consolidação de alertas de estoque baixo
 
-- **Situação:** Identificar e reportar a escassez de produtos sem sobrecarregar a verificação manual ou gerar envios redundantes.
+- **Situação:** Identificar e reportar a escassez de produtos sem depender de verificação manual, reunindo os dados em um relatório por execução.
 - **Tarefa:** Automatizar a verificação de produtos abaixo do limite mínimo e consolidar os dados para reposição.
 - **Ação:** Execução agendada (`@Scheduled`) e engatada ao fluxo de consumo, gerando relatórios dinâmicos em PDF com OpenPDF e enviando via Resend API por meio do padrão `EmailSender`.
 - **Resultado:** Notificação automatizada com anexo PDF contendo o relatório de reposição.
@@ -104,7 +104,7 @@ Consulte [as decisões arquiteturais](docs/architecture.md) e [os planos de evol
 - **Situação:** A demonstração do projeto precisa integrar interface web, API REST e banco de dados em um ambiente público e acessível pela internet.
 - **Tarefa:** Disponibilizar o fluxo completo de gestão de estoque para avaliação online, distribuindo os componentes em serviços de hospedagem adequados.
 - **Ação:** Publicação do frontend na Vercel, do backend no Render e do banco PostgreSQL no Supabase, com integração ao Resend para envio de e-mails dinâmicos.
-- **Resultado:** Aplicação 100% funcional em produção, acessível via interface web e Swagger sem a necessidade de execução local.
+- **Resultado:** Aplicação publicada para demonstração, acessível via interface web e Swagger sem a necessidade de execução local.
 
 | Componente | Plataforma | Responsabilidade e acesso |
 | :--- | :--- | :--- |
@@ -130,7 +130,7 @@ flowchart LR
 Pré-requisito: Docker com Compose. Na raiz do repositório:
 
 ```bash
-git clone [https://github.com/hanrrysantos/inventory-manager.git](https://github.com/hanrrysantos/inventory-manager.git)
+git clone https://github.com/hanrrysantos/inventory-manager.git
 cd inventory-manager
 cp .env.example .env
 # Edite a .env antes de iniciar.
@@ -167,9 +167,9 @@ FRONTEND_ORIGINS=http://localhost:5173,https://meu-frontend.com
 
 ### Com Maven ou IDE
 
-Pré-requisitos: Java 21, Maven 3.9+ e uma instância do PostgreSQL acessível. 
+Pré-requisitos: Java 21 e uma instância do PostgreSQL acessível. O Maven Wrapper fornece a versão do Maven utilizada pelo projeto.
 
-Configure as variáveis da API acima.
+Configure as variáveis da API acima no ambiente do processo ou na configuração de execução da IDE. O Docker Compose lê a `.env` automaticamente; a aplicação executada via Maven ou IDE não carrega esse arquivo por conta própria.
 
 Execute:
 
