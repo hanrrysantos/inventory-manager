@@ -1,255 +1,114 @@
 # Inventory Manager
 
-API REST para gestão inteligente de estoque e lotes, com autenticação JWT, consumo FEFO, alertas automáticos e documentação interativa.
+API REST para controle de produtos, categorias e lotes, com autenticação JWT, consumo FEFO (primeiro a vencer, primeiro a sair), histórico de movimentações e alertas de reposição por e-mail com PDF.
 
 [![Java](https://img.shields.io/badge/Java_21-ED8B00?style=flat-square&logo=openjdk&logoColor=white)](https://openjdk.org/)
 [![Spring Boot](https://img.shields.io/badge/Spring_Boot_3-6DB33F?style=flat-square&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=flat-square&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
-[![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=flat-square&logo=supabase&logoColor=white)](https://supabase.com/)
 [![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white)](https://www.docker.com/)
-[![Render](https://img.shields.io/badge/Render-46E3B7?style=flat-square&logo=render&logoColor=white)](https://render.com/)
-[![License](https://img.shields.io/badge/License-Apache_2.0-blue?style=flat-square)](LICENSE)
-[![Version](https://img.shields.io/badge/version-v2.0-green?style=flat-square)](#)
-[![Status](https://img.shields.io/badge/status-concluído-brightgreen?style=flat-square)](#)
 
-**Demo online:** [Swagger UI](https://inventory.hanrry.top/swagger-ui/index.html) · `https://inventory.hanrry.top/swagger-ui/index.html`
-
----
-
-## Sumário
-
-- [Visão geral](#visão-geral)
-- [Funcionalidades](#funcionalidades)
-- [Demonstração](#demonstração)
-- [Como testar online](#como-testar-online)
-- [Tecnologias](#tecnologias)
-- [Arquitetura](#arquitetura)
-- [Principais endpoints](#principais-endpoints)
-- [Modelo de dados](#modelo-de-dados)
-- [Testes e performance](#testes-e-performance)
-- [Rodando localmente](#rodando-localmente)
-- [Autor](#autor)
-- [Licença](#licença)
-
----
-
-## Visão geral
-
-O **Inventory Manager** não é só um CRUD de estoque. A API automatiza decisões operacionais críticas: prioriza lotes próximos do vencimento (**FEFO**), registra cada movimentação e dispara alertas quando o estoque fica abaixo do mínimo.
-
-| Problema comum | Como a API ajuda |
-| :--- | :--- |
-| Produtos vencendo no fundo do estoque | Consumo FEFO (primeiro a vencer, primeiro a sair) |
-| Estoque crítico sem aviso | Monitoramento agendado + e-mail com PDF |
-| Falta de histórico | Logs imutáveis de entrada e saída |
-| Acesso sem controle | JWT + roles `ADMIN` e `USER` |
-
-**Deploy:** backend no [Render](https://render.com/) · banco PostgreSQL no [Supabase](https://supabase.com/) · domínio via Hostinger (`inventory.hanrry.top`).
-
----
+[Swagger da demonstração](https://inventory.hanrry.top/swagger-ui/index.html) · [Arquitetura](docs/architecture.md) · [Planos de evolução](docs/plans/)
 
 ## Funcionalidades
 
-- **Autenticação e autorização** - login/registro com JWT, sessão stateless e controle por roles (`ADMIN` / `USER`)
-- **Gestão de lotes** - fabricação, validade, preço unitário e quantidade por lote
-- **Consumo FEFO** - saída de estoque priorizando o lote que vence primeiro
-- **Alertas automáticos** - `@Scheduled` detecta estoque baixo, gera PDF e envia e-mail
-- **Rastreabilidade** - histórico de movimentações (entradas e saídas) em logs
-- **Documentação OpenAPI 3.0** - Swagger UI pronto para testar e integrar com front-end
-- **Infraestrutura** - Docker (multi-stage), Flyway para versionamento do banco
-- **Segurança de dados** - senhas com BCrypt; constraints e FKs no PostgreSQL
+- Cadastro de produtos, categorias, usuários e lotes com quantidade, preço e validade.
+- Entrada e consumo de estoque por FEFO, com histórico de movimentações e proteção contra consumo concorrente.
+- Consulta de estoque baixo, lotes vencidos e resumo do dashboard.
+- Autenticação JWT, permissões `ADMIN`/`USER` e consulta do usuário autenticado.
+- Verificação agendada de estoque baixo e envio de alertas via Resend com relatório PDF.
+- CORS configurável para integração com o frontend e documentação OpenAPI/Swagger.
 
----
+## Tecnologias e organização
 
-## Demonstração
+Java 21, Spring Boot 3, Spring Security, Spring Data JPA, PostgreSQL e Flyway. DTOs e mapeamento com MapStruct/Lombok; e-mails com Resend e PDFs com OpenPDF. Testes com JUnit 5, Mockito, MockMvc e Testcontainers, cobertura com JaCoCo e CI com GitHub Actions.
 
-<table width="100%">
-  <tr>
-    <td align="center" width="33%">
-      <b>Swagger UI</b><br>
-      <img src="https://github.com/user-attachments/assets/f898032f-63af-4885-b8bd-0408406910fa" width="100%" alt="Swagger UI">
-      <p><i>Documentação interativa dos endpoints</i></p>
-    </td>
-    <td align="center" width="33%">
-      <b>Alerta por e-mail</b><br>
-      <img src="https://github.com/user-attachments/assets/10b3b170-d52f-4a79-8ca3-6fad61722bc5" width="100%" alt="E-mail de alerta">
-      <p><i>Notificação de estoque crítico</i></p>
-    </td>
-    <td align="center" width="33%">
-      <b>Relatório PDF</b><br>
-      <img src="https://github.com/user-attachments/assets/a176c88b-486a-4850-82ea-fb696d522b92" width="100%" alt="Relatório PDF">
-      <p><i>Anexo para reposição de estoque</i></p>
-    </td>
-  </tr>
-</table>
+O código está organizado nos módulos `auth`, `user`, `product`, `inventory`, `dashboard`, `notification` e `shared`. A evolução é incremental: [architecture.md](docs/architecture.md) descreve a arquitetura-alvo, incluindo etapas ainda não implementadas.
 
----
+## Executando localmente
 
-## Como testar online
+### Com Docker Compose
 
-1. Abra: [https://inventory.hanrry.top/swagger-ui/index.html](https://inventory.hanrry.top/swagger-ui/index.html)
-2. Faça login em `POST /api/v1/auth/login` com o body:
+Pré-requisito: Docker com Compose. Na raiz do repositório:
 
-```json
-{
-  "email": "admin@email.com",
-  "password": "admin123"
-}
+```bash
+cp .env.example .env
+# Edite a .env antes de iniciar.
+docker compose up -d --build
 ```
 
-3. Copie o token JWT da resposta
-4. Clique em **Authorize** no Swagger
-5. Informe: `Bearer {seu_token}`
-6. Teste os endpoints protegidos
+Se já possui uma `.env`, atualize-a usando o exemplo como referência, sem sobrescrevê-la. O Compose inicia a API e o PostgreSQL, com dados persistidos em volume. As migrations Flyway são aplicadas na inicialização.
 
-URL alternativa (Render): [https://inventory-manager-3l2o.onrender.com/swagger-ui/index.html](https://inventory-manager-3l2o.onrender.com/swagger-ui/index.html)
+- Swagger: http://localhost:8080/swagger-ui/index.html
+- OpenAPI JSON: http://localhost:8080/v3/api-docs
+- Logs: `docker compose logs -f api`
+- Encerrar: `docker compose down` (preserva o volume do banco).
 
-> No plano free do Render, a primeira requisição após inatividade pode demorar alguns segundos (cold start).
+### Variáveis de ambiente
 
----
+Use [.env.example](.env.example) como referência e mantenha a `.env` fora do versionamento.
 
-## Tecnologias
-
-| Camada | Stack |
+| Variável | Uso |
 | :--- | :--- |
-| **Backend** | Java 21, Spring Boot 3, Spring Security, Spring Data JPA, Resend, MapStruct, Lombok, OpenPDF, JWT, Maven |
-| **Banco** | PostgreSQL, Flyway, Hibernate, Supabase |
-| **Docs & qualidade** | SpringDoc OpenAPI (Swagger), JUnit 5, Mockito, MockMvc, JaCoCo, k6, Postman |
-| **Infra** | Docker, Render, Hostinger (DNS) |
+| `API_PORT` | Porta da API no host pelo Compose; padrão `8080`. |
+| `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD` | Banco e credenciais do PostgreSQL no Compose. |
+| `DB_URL`, `DB_USERNAME`, `DB_PASSWORD` | Conexão JDBC ao executar fora do Compose; nele, são definidas automaticamente. |
+| `JWT_SECRET` | Segredo de assinatura; use um valor aleatório com pelo menos 32 bytes. |
+| `JWT_EXPIRATION` | Validade do token em milissegundos; exemplo: `3600000` (1 hora). |
+| `FRONTEND_ORIGINS` | Origens CORS separadas por vírgulas; padrão `http://localhost:5173`. |
+| `RESEND_API_KEY` | Chave de API para envio de e-mails. |
+| `RESEND_FROM`, `RESEND_TO` | Remetente autorizado no Resend e destinatário dos alertas. |
 
----
+Substitua os valores de exemplo de senha e JWT. Para os alertas funcionarem, configure as três variáveis do Resend com valores válidos.
 
-## Arquitetura
+Exemplo para frontend local e publicado:
 
-Arquitetura em camadas para separar responsabilidades, facilitar testes e evoluir com segurança.
-
-| Camada | Responsabilidade |
-| :--- | :--- |
-| **Controller** | Endpoints REST (`/api/v1/...`) |
-| **Service** | Regras de negócio, validações e orquestração |
-| **Repository** | Acesso a dados (JPA / Hibernate) |
-| **Security** | Filtro JWT e autorização por role |
-| **DTO + Mapper** | Contrato da API sem expor entidades do banco |
-
----
-
-## Principais endpoints
-
-| Recurso | Método | Endpoint | Descrição |
-| :--- | :---: | :--- | :--- |
-| Auth | `POST` | `/api/v1/auth/login` | Autentica e retorna JWT |
-| Auth | `POST` | `/api/v1/auth/register` | Registra novo usuário |
-| Produtos | `GET` | `/api/v1/products` | Lista produtos |
-| Produtos | `GET` | `/api/v1/products/low-stock` | Produtos com estoque baixo |
-| Categorias | `GET` | `/api/v1/categories` | Lista categorias |
-| Lotes | `POST` | `/api/v1/batches` | Cadastra lote |
-| Lotes | `PATCH` | `/api/v1/batches/{id}/add` | Adiciona quantidade ao lote |
-| Lotes | `POST` | `/api/v1/batches/consume` | Consome estoque (FEFO) |
-| Lotes | `GET` | `/api/v1/batches/expired` | Lista lotes vencidos |
-| Usuários | `GET` | `/api/v1/users` | Lista usuários (`ADMIN`) |
-
-A lista completa está no Swagger.
-
----
-
-## Modelo de dados
-
-A modelagem prioriza integridade e rastreabilidade: constraints, FKs e índices únicos evitam inconsistências.
-
-<div align="center">
-  <img width="500" alt="Diagrama do banco de dados" src="https://github.com/user-attachments/assets/c12bc591-4048-4fee-9542-3d4f419cc480">
-</div>
-
-- **Rastreabilidade** - `tb_inventory_logs` guarda o histórico de entradas e saídas, ligado ao produto e (quando houver) ao lote
-- **Gestão por lotes** - `tb_products` ↔ `tb_batches` permite validade e custo, base do FEFO
-- **Normalização** - categorias e produtos separados para filtros e escala
-
----
-
-## Testes e performance
-
-### Cobertura (JaCoCo)
-
-| Camada | Cobertura |
-| :--- | :---: |
-| Services | 97% |
-| Controllers | 100% |
-| Mappers | 92% |
-| **Geral** | **70%** |
-
-**Ferramentas:** JUnit 5, Mockito, MockMvc, JaCoCo.
-
-**Cenários cobertos:** CRUD de produtos, categorias, usuários e lotes; entrada/saída de estoque; FEFO; logs; alertas; PDF; autenticação e autorização.
-
-### Carga (k6)
-
-| Métrica | Resultado |
-| :--- | :---: |
-| Throughput | ~149 RPS |
-| Latência p95 | 9,9 ms |
-| Falhas HTTP | 0% |
-
-### Comando
-
-```bash
-./mvnw clean test
+```dotenv
+FRONTEND_ORIGINS=http://localhost:5173,https://meu-frontend.com
 ```
 
----
+O Compose lê a `.env` automaticamente. Ao executar pelo Maven ou pela IDE, configure as variáveis no ambiente do processo; a aplicação não carrega a `.env` por conta própria.
 
-## Rodando localmente
+### Com Maven ou IDE
 
-### Pré-requisitos
-
-- Java 21
-- Docker (opcional)
-- PostgreSQL acessível (local ou Supabase)
-- Arquivo `.env` na raiz do projeto:
-
-| Variável | Descrição |
-| :--- | :--- |
-| `DB_URL` | URL JDBC do PostgreSQL |
-| `DB_USERNAME` | Usuário do banco |
-| `DB_PASSWORD` | Senha do banco |
-| `RESEND_API_KEY` | Chave da API do Resend |
-| `RESEND_FROM` | E-mail remetente autorizado pelo Resend |
-| `RESEND_TO` | E-mail destinatário dos alertas |
-| `JWT_SECRET` | Segredo para assinar o JWT |
-| `JWT_EXPIRATION` | Expiração do token (ms) |
-
-### 1. Clone
+Requer Java 21 e PostgreSQL acessível. Configure as variáveis da API acima, incluindo `DB_URL` (por exemplo, `jdbc:postgresql://localhost:5432/inventory`), `DB_USERNAME` e `DB_PASSWORD`.
 
 ```bash
-git clone https://github.com/hanrrysantos/Inventory-Manager
-cd Inventory-Manager
+bash ./mvnw spring-boot:run
 ```
 
-### 2. Com Maven
+A porta padrão é `8080` e pode ser alterada com `PORT`. O PostgreSQL do Compose não publica uma porta no host; para rodar via Maven/IDE, use uma instância acessível ou configure explicitamente essa publicação.
+
+## Autenticação e endpoints
+
+No Swagger local ou da demonstração, cadastre um usuário em `POST /api/v1/auth/register` e faça login em `POST /api/v1/auth/login`. Copie o campo `token` da resposta e cole em **Authorize**, sem o prefixo `Bearer`. Em chamadas HTTP, use `Authorization: Bearer <token>`.
+
+| Método | Endpoint | Finalidade |
+| :--- | :--- | :--- |
+| `GET` | `/api/v1/users/me` | Usuário autenticado e sua role. |
+| `GET` | `/api/v1/dashboard/summary` | Resumo do estoque. |
+| `GET` | `/api/v1/products` | Lista de produtos. |
+| `GET` | `/api/v1/products/low-stock` | Produtos com estoque baixo. |
+| `GET` | `/api/v1/categories` | Lista de categorias. |
+| `POST` | `/api/v1/batches` | Cadastro de lote. |
+| `PATCH` | `/api/v1/batches/{id}/add` | Entrada de quantidade no lote. |
+| `POST` | `/api/v1/batches/consume` | Consumo de estoque por FEFO. |
+| `GET` | `/api/v1/batches/expired` | Lotes vencidos. |
+| `GET` | `/api/v1/users` | Lista de usuários (`ADMIN`). |
+
+`USER` e `ADMIN` podem consultar produtos/categorias, consumir estoque e adicionar quantidades. Gestão de usuários, alterações no catálogo e cadastro de lotes exigem `ADMIN`. Consulte o Swagger para os contratos completos.
+
+## Testes
+
+Com Java 21 e Docker disponível para os testes de integração com PostgreSQL:
 
 ```bash
-./mvnw spring-boot:run
+bash ./mvnw clean test
 ```
 
-### 3. Com Docker
+A suíte inclui testes unitários, de API e de integração, com cenários de FEFO, rollback e concorrência. O relatório de cobertura é gerado em `target/site/jacoco/index.html`.
 
-```bash
-docker build -t inventory-manager .
-docker run --env-file .env -p 8080:8080 inventory-manager
-```
+## Autor e licença
 
-Swagger local: [http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html)
+[Hanrry Santos](https://github.com/hanrrysantos) · [LinkedIn](https://www.linkedin.com/in/hanrrysantos)
 
----
-
-## Autor
-
-**Hanrry Santos** - Desenvolvedor Backend Java | Spring Boot e arquitetura de software
-
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-0A66C2?style=flat-square&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/hanrrysantos)
-[![GitHub](https://img.shields.io/badge/GitHub-181717?style=flat-square&logo=github&logoColor=white)](https://github.com/hanrrysantos)
-
----
-
-## Licença
-
-Distribuído sob a [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0).
+Licença declarada: [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0).
