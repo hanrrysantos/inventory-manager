@@ -1,19 +1,19 @@
-# Inventory Manager
+# Controle de Estoque [![CI](https://github.com/hanrrysantos/inventory-manager/actions/workflows/maven.yml/badge.svg?branch=main)](https://github.com/hanrrysantos/inventory-manager/actions/workflows/maven.yml)
+
 
 API REST para controle de estoque por lotes, com foco em validade, rastreabilidade e consistência de movimentações concorrentes. Desenvolvida em Java 21 e Spring Boot 3, com frontend e API disponíveis para demonstração.
 
-**[Acessar o site](https://controledeestoque.hanrry.top/) · [Explorar o Swagger](https://inventory.hanrry.top/swagger-ui/index.html) · [Repositório do frontend](https://github.com/hanrrysantos/inventory-manager-frontend)**
+| Recurso | Descrição | Link de Acesso |
+| :--- | :--- | :--- |
+| **Aplicação Web** | Sistema em produção | [controle-de-estoque.hanrry.top](https://controle-de-estoque.hanrry.top/) |
+| **Documentação API** | Interface Swagger UI para testes dos endpoints | [api-controle-de-estoque.hanrry.top/swagger-ui/index.html](https://api-controle-de-estoque.hanrry.top/swagger-ui/index.html) |
+| **Código Frontend** | Repositório com o código-fonte da interface | [github.com/hanrrysantos/inventory-manager-frontend](https://github.com/hanrrysantos/inventory-manager-frontend) |
 
-[![Java](https://img.shields.io/badge/Java_21-ED8B00?style=flat-square&logo=openjdk&logoColor=white)](https://openjdk.org/)
-[![Spring Boot](https://img.shields.io/badge/Spring_Boot_3-6DB33F?style=flat-square&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=flat-square&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
-[![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white)](https://www.docker.com/)
-[![CI](https://github.com/hanrrysantos/inventory-manager/actions/workflows/maven.yml/badge.svg)](https://github.com/hanrrysantos/inventory-manager/actions/workflows/maven.yml)
+> 💡 As operações administrativas exigem permissão de `ADMIN`. O passo a passo detalhado de autenticação pode ser consultado na seção [Como usar a API](#como-usar-a-api).
 
 ## Sumário
 
 - [Sobre o projeto](#sobre-o-projeto)
-- [Demonstração](#demonstração)
 - [Funcionalidades](#funcionalidades)
 - [Desafios técnicos e soluções](#desafios-técnicos-e-soluções)
 - [Tecnologias](#tecnologias)
@@ -23,24 +23,13 @@ API REST para controle de estoque por lotes, com foco em validade, rastreabilida
 - [Como usar a API](#como-usar-a-api)
 - [Testes e qualidade](#testes-e-qualidade)
 - [Próximos passos](#próximos-passos)
-- [Contribuição](#contribuição)
-- [Autor e licença](#autor-e-licença)
+- [Autor](#autor)
 
 ## Sobre o projeto
 
-Controlar estoque exige acompanhar a validade de cada lote, registrar entradas e saídas e lidar com operações simultâneas. Um saldo incorreto pode comprometer tanto o consumo quanto a decisão de reposição.
+Em cenários de alto volume, falhas na gestão de estoque costumam gerar divergências no saldo por conta de movimentações concorrentes, além de prejuízos causados pelo vencimento de produtos. Para resolver esse desafio de confiabilidade, desenvolvi o Controle de Estoque: uma solução centralizada criada para garantir a integridade dos dados, automatizar a priorização de consumo por validade e manter auditoria total sobre o fluxo de mercadorias.
 
-O Inventory Manager foi desenvolvido para reunir essas responsabilidades em uma aplicação: organizar o catálogo, priorizar o consumo dos lotes que vencem primeiro e manter o histórico das movimentações. A solução combina uma API com autenticação JWT, persistência em PostgreSQL, controle transacional e alertas de estoque baixo por e-mail com PDF.
-
-O resultado é um fluxo de gestão acessível pela interface web e pela API, com testes de integração que verificam cenários de validade, concorrência e reversão de operações incompletas. Os casos abaixo mostram as decisões técnicas e os comportamentos cobertos pela suíte.
-
-## Demonstração
-
-- **Interface web:** [controledeestoque.hanrry.top](https://controledeestoque.hanrry.top/).
-- **API interativa:** [Swagger da demonstração](https://inventory.hanrry.top/swagger-ui/index.html).
-- **Código da interface:** [inventory-manager-frontend](https://github.com/hanrrysantos/inventory-manager-frontend).
-
-Para conhecer o projeto, comece pela interface web. Para explorar os contratos da API, abra o Swagger, cadastre um usuário, faça login e utilize o token em **Authorize**. Consulte produtos, categorias e o resumo do estoque; operações administrativas dependem da permissão `ADMIN`. O passo a passo de autenticação está em [Como usar a API](#como-usar-a-api).
+A aplicação combina uma API REST em Java 21 e Spring Boot 3 integrada ao PostgreSQL, com controle transacional rigoroso para operações simultâneas, lógica de consumo baseada no critério FEFO (First Expire, First Out) e alertas automatizados de estoque baixo com emissão de relatórios em PDF. O resultado é uma arquitetura resiliente e pronta para produção, acessível por interface web e API, validada por uma suíte de testes de integração que cobre cenários reais de concorrência e rollback.
 
 ## Funcionalidades
 
@@ -53,30 +42,30 @@ Para conhecer o projeto, comece pela interface web. Para explorar os contratos d
 
 ## Desafios técnicos e soluções
 
-### Preservar o estoque durante operações concorrentes
+### 1. Preservar a integridade do estoque sob operações concorrentes
 
-- **Situação:** duas requisições podem tentar consumir o mesmo saldo ou adicionar quantidades ao mesmo lote simultaneamente.
-- **Tarefa:** impedir consumo acima do disponível e perda de atualizações nas entradas de estoque.
-- **Ação:** uso de transações e bloqueios pessimistas (`PESSIMISTIC_WRITE`) nas consultas de consumo e adição, com testes concorrentes contra PostgreSQL via Testcontainers.
-- **Resultado:** a suíte verifica que apenas um consumo é concluído quando o saldo não atende aos dois, que o bloqueio permanece até o commit e que entradas simultâneas são preservadas.
+- **Situação:** Duas requisições podem tentar consumir o mesmo saldo ou adicionar quantidades ao mesmo lote simultaneamente.
+- **Tarefa:** Impedir o problema de *race condition* (consumo além do disponível e perda de atualizações nas entradas).
+- **Ação:** Aplicação de bloqueios pessimistas (`PESSIMISTIC_WRITE`) nas consultas de leitura para escrita dentro de transações Spring/JPA, validados via testes de concorrência com PostgreSQL e Testcontainers
+- **Resultado:** Garantia de que apenas uma operação é consumida quando o saldo é insuficiente para ambas, mantendo a consistência dos dados até o *commit*.
 
 [Ver os testes de concorrência](src/test/java/br/com/hanrry/inventory/inventory/integration/InventoryConcurrencyIntegrationTest.java).
 
-### Consumir por validade sem deixar movimentações parciais
+### 2. Consumo inteligente por validade (FEFO) e rollback transacional
 
-- **Situação:** um pedido pode exigir saldo de vários lotes, incluindo lotes vencidos ou com a mesma data de validade.
-- **Tarefa:** aplicar FEFO (primeiro a vencer, primeiro a sair), excluir lotes vencidos e manter saldo e histórico consistentes se faltar estoque.
-- **Ação:** seleção de lotes válidos com saldo positivo, ordenação por validade e ID como desempate, além do registro das saídas na mesma transação do consumo.
-- **Resultado:** os testes verificam a ordem de consumo, a exclusão de lotes vencidos, o desempate determinístico e o rollback de saldos e registros quando a quantidade solicitada não pode ser atendida.
+- **Situação:** Um pedido pode exigir saldo de vários lotes, necessitando ignorar itens vencidos e resolver empates em datas idênticas.
+- **Tarefa:** Aplicar FEFO (primeiro a vencer, primeiro a sair), excluir lotes vencidos e manter saldo e histórico consistentes se faltar estoque.
+- **Ação:** Seleção de lotes válidos com saldo positivo, ordenação por validade e ID como desempate, além do registro das saídas na mesma transação do consumo.
+- **Resultado:** Garantia de consumo correto por validade e *rollback* automático (reversão total de saldos e logs) se a quantidade solicitada não for atendida por completo.
 
 [Ver os testes transacionais](src/test/java/br/com/hanrry/inventory/inventory/integration/InventoryTransactionIntegrationTest.java).
 
-### Transformar estoque baixo em informação para reposição
+### 3. Automação e consolidação de alertas de estoque baixo
 
-- **Situação:** identificar produtos abaixo do limite exige reunir dados do estoque e comunicá-los ao responsável.
-- **Tarefa:** automatizar a verificação e entregar um relatório que apoie a reposição.
-- **Ação:** consulta de estoque baixo, geração de PDF com OpenPDF e envio pelo Resend através da interface `EmailSender`. A verificação é agendada e também chamada no fluxo de consumo.
-- **Resultado:** o fluxo reúne os produtos identificados em um alerta com anexo PDF. Há testes para a orquestração do alerta, a geração do documento e a integração com o cliente de e-mail.
+- **Situação:** Identificar e reportar a escassez de produtos sem sobrecarregar a verificação manual ou gerar envios redundantes.
+- **Tarefa:** Automatizar a verificação de produtos abaixo do limite mínimo e consolidar os dados para reposição.
+- **Ação:** Execução agendada (`@Scheduled`) e engatada ao fluxo de consumo, gerando relatórios dinâmicos em PDF com OpenPDF e enviando via Resend API por meio do padrão `EmailSender`.
+- **Resultado:** Notificação automatizada com anexo PDF contendo o relatório de reposição.
 
 [Ver os testes de notificação](src/test/java/br/com/hanrry/inventory/notification). O processamento assíncrono das notificações faz parte dos [próximos passos](#próximos-passos).
 
@@ -84,13 +73,13 @@ Para conhecer o projeto, comece pela interface web. Para explorar os contratos d
 
 | Área | Tecnologias e aplicação |
 | :--- | :--- |
-| API | Java 21, Spring Boot 3 e Bean Validation para endpoints REST e validação de entrada. |
-| Segurança | Spring Security, JWT e BCrypt para autenticação e autorização por perfil. |
-| Persistência | PostgreSQL, Spring Data JPA e Flyway para dados, transações e migrations. |
-| Contratos | DTOs, MapStruct e OpenAPI/Swagger para mapeamento e documentação da API. |
-| Notificações | Resend para e-mails e OpenPDF para relatórios de reposição. |
-| Testes | JUnit 5, Mockito, MockMvc e Testcontainers; cobertura com JaCoCo. |
-| Execução e CI | Maven Wrapper, Docker, Docker Compose e GitHub Actions. |
+| API | Java 21, Spring Boot 3 e Jakarta Bean Validation para endpoints REST e validação de entrada. |
+| Segurança | Spring Security, JWT e BCrypt para autenticação e controle de acesso por perfil (`ADMIN`/`USER`). |
+| Persistência | PostgreSQL, Spring Data JPA e Flyway para modelagem relacional, gestão de transações e versionamento do banco. |
+| Contratos | DTOs, MapStruct e OpenAPI (Swagger UI) para mapeamento de entidades e documentação interativa. |
+| Notificações | Resend API para envio de e-mails e OpenPDF para geração dinâmica do relatório de reposição. |
+| Testes | JUnit 5, Mockito, MockMvc e Testcontainers (PostgreSQL); relatório de cobertura com JaCoCo. |
+| Execução e CI | Maven Wrapper, Docker, Docker Compose e GitHub Actions para integração contínua. |
 
 ## Arquitetura
 
@@ -112,15 +101,15 @@ Consulte [as decisões arquiteturais](docs/architecture.md) e [os planos de evol
 
 ## Deploy e infraestrutura
 
-- **Situação:** a demonstração do projeto precisa reunir interface, API e persistência em um ambiente acessível pela internet.
-- **Tarefa:** disponibilizar o fluxo de gestão de estoque para avaliação, com cada componente em seu serviço de hospedagem.
-- **Ação:** publicação do frontend na Vercel, do backend no Render e do banco PostgreSQL no Supabase, com envio de e-mails pelo Resend.
-- **Resultado:** a aplicação pode ser explorada pelo site e pelo Swagger nos links do início deste README, sem exigir a instalação local para conhecer o projeto.
+- **Situação:** A demonstração do projeto precisa integrar interface web, API REST e banco de dados em um ambiente público e acessível pela internet.
+- **Tarefa:** Disponibilizar o fluxo completo de gestão de estoque para avaliação online, distribuindo os componentes em serviços de hospedagem adequados.
+- **Ação:** Publicação do frontend na Vercel, do backend no Render e do banco PostgreSQL no Supabase, com integração ao Resend para envio de e-mails dinâmicos.
+- **Resultado:** Aplicação 100% funcional em produção, acessível via interface web e Swagger sem a necessidade de execução local.
 
 | Componente | Plataforma | Responsabilidade e acesso |
 | :--- | :--- | :--- |
-| Frontend | Vercel | Interface web em [controledeestoque.hanrry.top](https://controledeestoque.hanrry.top/). |
-| Backend | Render | API Spring Boot em `https://inventory.hanrry.top`, com [Swagger público](https://inventory.hanrry.top/swagger-ui/index.html). |
+| Frontend | Vercel | Interface web em [controle-de-estoque.hanrry.top](https://controle-de-estoque.hanrry.top/). |
+| Backend | Render | API Spring Boot com [api-controle-de-estoque.hanrry.top/swagger-ui/index.html](https://api-controle-de-estoque.hanrry.top/swagger-ui/index.html). |
 | Banco de dados | Supabase | PostgreSQL utilizado pelo backend para persistir usuários, catálogo, lotes e movimentações. |
 | E-mail | Resend | Envio dos alertas de estoque baixo com relatório PDF gerado pelo backend. |
 
@@ -132,7 +121,7 @@ flowchart LR
     Backend -->|Alerta com PDF| Email["Resend"]
 ```
 
-A interface executada no navegador consome a API, que concentra autenticação, regras de negócio e acesso ao banco. O Supabase fornece o PostgreSQL; a autenticação da aplicação é implementada no backend com Spring Security e JWT.
+> 💡 A interface no navegador consome diretamente os endpoints da API, que centraliza a autenticação, regras de negócio e persistência. O Supabase é utilizado estritamente como provedor PostgreSQL gerenciado — toda a autenticação e autorização da aplicação são tratadas pelo próprio backend via Spring Security e JWT.
 
 ## Como executar
 
@@ -141,6 +130,8 @@ A interface executada no navegador consome a API, que concentra autenticação, 
 Pré-requisito: Docker com Compose. Na raiz do repositório:
 
 ```bash
+git clone [https://github.com/hanrrysantos/inventory-manager.git](https://github.com/hanrrysantos/inventory-manager.git)
+cd inventory-manager
 cp .env.example .env
 # Edite a .env antes de iniciar.
 docker compose up -d --build
@@ -168,25 +159,25 @@ Use [.env.example](.env.example) como referência e mantenha a `.env` fora do ve
 | `RESEND_API_KEY` | Chave de API para envio de e-mails. |
 | `RESEND_FROM`, `RESEND_TO` | Remetente autorizado no Resend e destinatário dos alertas. |
 
-Substitua os valores de exemplo de senha e JWT. Para os alertas funcionarem, configure as três variáveis do Resend com valores válidos.
+> 💡 Dica CORS: Para liberar múltiplos ambientes no frontend, configure a variável separando as origens por vírgulas
 
-Exemplo para frontend local e publicado:
-
-```dotenv
+```bash
 FRONTEND_ORIGINS=http://localhost:5173,https://meu-frontend.com
 ```
 
-O Compose lê a `.env` automaticamente. Ao executar pelo Maven ou pela IDE, configure as variáveis no ambiente do processo; a aplicação não carrega a `.env` por conta própria.
-
 ### Com Maven ou IDE
 
-Requer Java 21 e PostgreSQL acessível. Configure as variáveis da API acima, incluindo `DB_URL` (por exemplo, `jdbc:postgresql://localhost:5432/inventory`), `DB_USERNAME` e `DB_PASSWORD`.
+Pré-requisitos: Java 21, Maven 3.9+ e uma instância do PostgreSQL acessível. 
+
+Configure as variáveis da API acima.
+
+Execute:
 
 ```bash
 bash ./mvnw spring-boot:run
 ```
 
-A porta padrão é `8080` e pode ser alterada com `PORT`. O PostgreSQL do Compose não publica uma porta no host; para rodar via Maven/IDE, use uma instância acessível ou configure explicitamente essa publicação.
+> 💡 A porta padrão é `8080` e pode ser alterada com `PORT`. O PostgreSQL do Compose não publica uma porta no host; para rodar via Maven/IDE, use uma instância acessível ou configure explicitamente essa publicação.
 
 ## Como usar a API
 
@@ -251,14 +242,6 @@ A evolução prevista em [architecture.md](docs/architecture.md) inclui:
 
 Esses itens representam trabalho futuro. A implementação atual envia alertas de forma síncrona; o desacoplamento busca impedir que falhas externas afetem movimentações de estoque.
 
-## Contribuição
-
-Para reportar um problema ou sugerir uma melhoria, [abra uma issue](https://github.com/hanrrysantos/inventory-manager/issues) com o contexto, o comportamento esperado e, quando aplicável, os passos para reproduzir.
-
-Para contribuir com código, consulte [as orientações do repositório](AGENTS.md) e [a arquitetura](docs/architecture.md), mantenha a alteração focada e informe no pull request quais testes foram executados. Mudanças no banco devem usar novas migrations Flyway.
-
-## Autor e licença
+## Autor
 
 [Hanrry Santos](https://github.com/hanrrysantos) · [LinkedIn](https://www.linkedin.com/in/hanrrysantos)
-
-Licença declarada: [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0).
