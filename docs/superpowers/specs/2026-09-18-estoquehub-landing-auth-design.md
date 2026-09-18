@@ -49,12 +49,10 @@ The page is a single scrolling document with these regions:
    missing visibility, and preventable stock loss.
 4. `#funcionalidades` section presenting only existing capabilities: stock
    summary, product catalogue, stock-status filters, and attention alerts.
-5. Dark footer with the brand, a short description, section shortcuts, and an
-   access-platform link.
+5. Dark footer with the brand, a short description, and section shortcuts.
 
-The header button and footer access link navigate to `/login`. The hero has no
-button, so the header contains the landing page's only prominent call to
-action.
+The header button navigates to `/login`. The hero and footer have no access
+button, so the header contains the landing page's only call to action.
 
 ### Access page (`/login`)
 
