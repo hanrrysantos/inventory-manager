@@ -84,9 +84,9 @@ HTTP 401 encerra a sessão local e direciona o usuário de volta ao login.
 ## Publicação na Vercel
 
 O arquivo `vercel.json` configura o fallback das rotas da SPA para
-`index.html`. O ambiente de produção está disponível em:
+`index.html`. O ambiente de produção está disponível no domínio oficial:
 
-https://frontend-mvp-beta.vercel.app
+https://controledeestoque.hanrry.top
 
 Para configurar a URL da API nos próximos deploys e publicar pela CLI:
 
@@ -97,6 +97,6 @@ npx vercel env add VITE_API_URL production,preview,development \
 npx vercel --prod --yes
 ```
 
-O backend deve incluir `https://frontend-mvp-beta.vercel.app` na variável
+O backend deve incluir `https://controledeestoque.hanrry.top` na variável
 `FRONTEND_ORIGINS` para liberar as chamadas via CORS. Se houver outras origens,
 os valores devem ser separados por vírgula.
