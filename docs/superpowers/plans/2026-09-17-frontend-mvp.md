@@ -291,14 +291,14 @@ git commit -m "configura fundacao do frontend"
 - Produces: `getCurrentUser(): Promise<User>`
 - Produces: `useAuth(): { user, isRestoring, login, logout }`
 
-- [ ] **Step 1: Definir handlers MSW com os contratos reais**
+- [x] **Step 1: Definir handlers MSW com os contratos reais**
 
 Add handlers for `POST */api/v1/auth/login` and `GET */api/v1/users/me`.
 Successful login returns `{ token: 'valid-token' }`; current user returns an
 `ADMIN` user with all OpenAPI fields. Invalid credentials return status `401`
 and a `StandardError`-shaped body.
 
-- [ ] **Step 2: Escrever testes falhando de login e rota protegida**
+- [x] **Step 2: Escrever testes falhando de login e rota protegida**
 
 Cover these exact behaviors:
 
@@ -310,7 +310,7 @@ it('redirects an anonymous visitor to login')
 it('restores a stored session through users/me')
 ```
 
-- [ ] **Step 3: Confirmar RED**
+- [x] **Step 3: Confirmar RED**
 
 Run:
 
@@ -320,7 +320,7 @@ npm test -- src/features/auth/LoginPage.test.tsx src/features/auth/ProtectedRout
 
 Expected: FAIL because auth components and providers do not exist.
 
-- [ ] **Step 4: Implementar contratos, storage e cliente HTTP**
+- [x] **Step 4: Implementar contratos, storage e cliente HTTP**
 
 Use these exact types:
 
@@ -342,7 +342,7 @@ injection. Expose a registration function for a single unauthorized callback so
 the provider can own logout and navigation behavior without importing React
 inside `api-client.ts`.
 
-- [ ] **Step 5: Implementar provider, schema e tela de login**
+- [x] **Step 5: Implementar provider, schema e tela de login**
 
 The schema must require a valid email and password with at least six characters.
 `AuthProvider` restores `/users/me` only when a token exists. On successful
@@ -352,13 +352,13 @@ On logout or `401`, clear token and private query cache.
 The login page must include labeled e-mail and password fields, submit loading
 state, inline validation, API error feedback, and no demo credentials in source.
 
-- [ ] **Step 6: Implementar router inicial**
+- [x] **Step 6: Implementar router inicial**
 
 Route `/login` publicly. Wrap `/dashboard` and `/products` in `ProtectedRoute`.
 Use temporary semantic pages for the private routes until their tasks replace
 them. Redirect unknown routes according to authentication state.
 
-- [ ] **Step 7: Confirmar GREEN e validar tipos**
+- [x] **Step 7: Confirmar GREEN e validar tipos**
 
 Run:
 
@@ -369,7 +369,7 @@ npm run typecheck
 
 Expected: tests and type checking pass.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add src
