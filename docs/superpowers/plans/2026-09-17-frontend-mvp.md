@@ -565,12 +565,12 @@ git commit -m "adiciona consulta e filtros de produtos"
 - Produces: `useDashboardSummary()` with query key `['dashboard-summary']`.
 - Consumes: `useProducts()`, `ProductTable`, `formatCurrency`, and feedback UI.
 
-- [ ] **Step 1: Adicionar resposta MSW do resumo**
+- [x] **Step 1: Adicionar resposta MSW do resumo**
 
 Return all fields from `DashboardSummaryDTO`, including `expiredBatchCount`, and
 attention items using only `IN_STOCK`, `LOW_STOCK`, or `OUT_OF_STOCK`.
 
-- [ ] **Step 2: Escrever testes falhando do dashboard**
+- [x] **Step 2: Escrever testes falhando do dashboard**
 
 Cover:
 
@@ -585,20 +585,20 @@ it('keeps summary and product errors isolated with retry actions')
 Assert BRL currency formatting and the absence of unsupported price and update
 columns.
 
-- [ ] **Step 3: Confirmar RED**
+- [x] **Step 3: Confirmar RED**
 
 Run: `npm test -- src/features/dashboard/DashboardPage.test.tsx`
 
 Expected: FAIL because dashboard components do not exist.
 
-- [ ] **Step 4: Implementar contrato, query e cartões**
+- [x] **Step 4: Implementar contrato, query e cartões**
 
 Use exact OpenAPI fields and a discriminated `InventoryStatus` for attention
 items. Build cards for total quantity, low stock, out of stock, and inventory
 value. Use Lucide icons with hidden decorative SVG semantics or accessible
 labels where the icon itself triggers an action.
 
-- [ ] **Step 5: Implementar painel de atenção e preview**
+- [x] **Step 5: Implementar painel de atenção e preview**
 
 Calculate progress display as:
 
@@ -611,13 +611,13 @@ const progress = minStock <= 0
 Render readable quantities beside the bar so color and bar length are not the
 only status indicators. Use `ProductTable` in compact mode for the dashboard.
 
-- [ ] **Step 6: Implementar responsividade da composição**
+- [x] **Step 6: Implementar responsividade da composição**
 
 Use four columns at large desktop widths, two on tablet, and one on mobile.
 Below the cards, use a wider products panel and narrower attention panel on
 desktop, stacking them on narrower screens.
 
-- [ ] **Step 7: Confirmar GREEN**
+- [x] **Step 7: Confirmar GREEN**
 
 Run:
 
@@ -629,7 +629,7 @@ npm run lint
 
 Expected: all commands pass.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add src

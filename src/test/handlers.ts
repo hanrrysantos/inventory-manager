@@ -35,6 +35,33 @@ export const productFixtures = [
   },
 ]
 
+export const dashboardFixture = {
+  totalQuantity: 170,
+  productCount: 3,
+  lowStockCount: 1,
+  outOfStockCount: 1,
+  expiredBatchCount: 2,
+  inventoryValue: 21480,
+  attentionItems: [
+    {
+      productId: 3,
+      productName: 'Sabonete Natural Lavanda',
+      sku: 'SAB-207',
+      quantity: 0,
+      minStock: 25,
+      status: 'OUT_OF_STOCK' as const,
+    },
+    {
+      productId: 2,
+      productName: 'Mel Silvestre 500g',
+      sku: 'MEL-014',
+      quantity: 28,
+      minStock: 30,
+      status: 'LOW_STOCK' as const,
+    },
+  ],
+}
+
 export const handlers = [
   http.post('*/api/v1/auth/login', async ({ request }) => {
     const credentials = (await request.json()) as {
@@ -75,4 +102,7 @@ export const handlers = [
     return HttpResponse.json(authenticatedUser)
   }),
   http.get('*/api/v1/products', () => HttpResponse.json(productFixtures)),
+  http.get('*/api/v1/dashboard/summary', () =>
+    HttpResponse.json(dashboardFixture),
+  ),
 ]
