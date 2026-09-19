@@ -26,6 +26,15 @@ export async function login(input: LoginRequest): Promise<AuthResponse> {
   return data
 }
 
+export async function googleLogin(idToken: string): Promise<AuthResponse> {
+  const { data } = await apiClient.post<AuthResponse>('/api/v1/auth/google', { idToken })
+  return data
+}
+
+export async function linkGoogleAccount(idToken: string): Promise<void> {
+  await apiClient.post('/api/v1/auth/google/link', { idToken })
+}
+
 export async function registerAccount(
   input: RegisterRequest,
 ): Promise<RegisterResponse> {

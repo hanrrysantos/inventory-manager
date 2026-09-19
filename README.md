@@ -12,7 +12,7 @@ consulta de produtos. Frontend e API são mantidos em repositórios separados.
 | Tela | Recursos |
 | --- | --- |
 | Landing (`/`) | Apresentação do EstoqueHub, problema de controle manual e recursos reais de indicadores, alertas e busca de produtos |
-| Acesso (`/login`) | Login, aviso de que o acesso com Google está planejado e criação de conta |
+| Acesso (`/login`) | Login por e-mail/senha ou Google, vínculo explícito de conta e criação de conta |
 | Dashboard (`/dashboard`) | Indicadores de estoque e itens que precisam de atenção |
 | Produtos (`/products`) | Consulta com busca por nome ou SKU e filtros de estoque |
 
@@ -45,10 +45,15 @@ O `.env` define a URL base do backend, sem barra final:
 
 ```dotenv
 VITE_API_URL=https://api-controle-de-estoque.hanrry.top
+VITE_GOOGLE_CLIENT_ID=1234567890-abc123.apps.googleusercontent.com
 ```
 
-Para usar a API local, altere o valor para `http://localhost:8080` e reinicie
+Para usar a API local, altere a URL para `http://localhost:8080` e reinicie
 o Vite. O backend precisa permitir a origem do frontend em `FRONTEND_ORIGINS`.
+Configure `VITE_GOOGLE_CLIENT_ID` com o client ID Web do mesmo projeto Google
+usado pelo backend. Adicione a origem local e a publicada nas *Authorized
+JavaScript origins* do Google Cloud Console. Esse valor é público; nunca use
+ou exponha um client secret no frontend.
 
 Entre com uma conta cadastrada na API. O JWT fica no `localStorage` e é enviado
 como `Bearer` nas requisições; respostas HTTP 401 encerram a sessão.
@@ -73,7 +78,8 @@ O frontend é hospedado na Vercel, em
 Configuração do projeto:
 
 - Framework: **Vite**; build: `npm run build`; saída: `dist`.
-- Variável: `VITE_API_URL=https://api-controle-de-estoque.hanrry.top`.
+- Variáveis: `VITE_API_URL=https://api-controle-de-estoque.hanrry.top` e
+  `VITE_GOOGLE_CLIENT_ID=<client-id-web-do-google>`.
 - Rotas: o [vercel.json](vercel.json) direciona acessos da SPA para `index.html`.
 
 Configure `VITE_API_URL` nos ambientes usados na Vercel e faça um novo deploy
