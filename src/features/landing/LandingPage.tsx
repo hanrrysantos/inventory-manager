@@ -103,7 +103,7 @@ export function LandingPage() {
               </div>
             </div>
 
-            <div className="relative z-10 pb-14 lg:translate-x-4">
+            <div className="relative z-10 lg:translate-x-4">
               <ProductPreview />
             </div>
           </div>

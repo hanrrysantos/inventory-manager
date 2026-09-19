@@ -1,144 +1,226 @@
 import {
-  AlertTriangle,
-  BarChart3,
-  CircleCheckBig,
+  CircleX,
+  LayoutDashboard,
+  LogOut,
+  Package,
   PackageCheck,
-  Search,
+  TrendingUp,
+  TriangleAlert,
 } from 'lucide-react'
+
+const metrics = [
+  {
+    label: 'Total de itens',
+    value: '462',
+    support: 'em 13 produtos',
+    icon: PackageCheck,
+    iconStyle: 'bg-[#e5f4e9] text-[#54b873]',
+  },
+  {
+    label: 'Estoque baixo',
+    value: '4',
+    support: 'abaixo do mínimo',
+    icon: TriangleAlert,
+    iconStyle: 'bg-[#f8f2da] text-[#e7a45d]',
+  },
+  {
+    label: 'Em falta',
+    value: '0',
+    support: 'reposição urgente',
+    icon: CircleX,
+    iconStyle: 'bg-[#fae3e3] text-[#e85d5d]',
+  },
+  {
+    label: 'Valor em estoque',
+    value: 'R$ 3.534',
+    support: 'valor atual estimado',
+    icon: TrendingUp,
+    iconStyle: 'bg-[#def3f5] text-[#2cabb7]',
+  },
+] as const
 
 const products = [
   {
-    name: 'Café especial 500g',
-    sku: 'CAF-042',
-    quantity: '4 un.',
-    status: 'Repor hoje',
-    critical: true,
+    name: 'Arroz Agulhinha 5kg',
+    sku: 'ARR-001',
+    category: 'Mercearia Seca',
+    quantity: 40,
+    status: 'Em estoque',
+    lowStock: false,
   },
   {
-    name: 'Leite integral',
-    sku: 'LEI-018',
-    quantity: '38 un.',
-    status: 'Em dia',
-    critical: false,
+    name: 'Feijão Carioca 1kg',
+    sku: 'FEI-001',
+    category: 'Mercearia Seca',
+    quantity: 12,
+    status: 'Estoque baixo',
+    lowStock: true,
   },
   {
-    name: 'Copo térmico',
-    sku: 'COP-107',
-    quantity: '21 un.',
-    status: 'Em dia',
-    critical: false,
+    name: 'Macarrão Espaguete 500g',
+    sku: 'MAC-001',
+    category: 'Mercearia Seca',
+    quantity: 21,
+    status: 'Em estoque',
+    lowStock: false,
   },
-]
+  {
+    name: 'Leite Integral UHT 1L',
+    sku: 'LEI-001',
+    category: 'Laticínios',
+    quantity: 150,
+    status: 'Em estoque',
+    lowStock: false,
+  },
+] as const
+
+const attentionItems = [
+  { name: 'Detergente Neutro 500ml', sku: 'DET-001', stock: '15/20', width: '75%' },
+  { name: 'Feijão Carioca 1kg', sku: 'FEI-001', stock: '12/15', width: '80%' },
+  { name: 'Suco de Laranja 1L', sku: 'SUC-001', stock: '2/10', width: '20%' },
+] as const
 
 export function ProductPreview() {
   return (
-    <div className="relative isolate mx-auto w-full max-w-[720px]" aria-hidden="true">
-      <div className="absolute -inset-10 -z-10 rounded-[50%_50%_18%_18%] border-[42px] border-[#75e49a]/18" />
-      <div className="absolute -right-3 top-4 -z-10 size-24 rotate-12 rounded-[28px] bg-[#caff6a] sm:-right-7" />
+    <div
+      className="relative isolate mx-auto w-full max-w-[800px]"
+      aria-hidden="true"
+      data-testid="dashboard-preview"
+    >
+      <div className="absolute -inset-x-10 -inset-y-8 -z-10 rounded-[46%_54%_24%_30%] bg-[#d9f3df]" />
+      <div className="absolute -right-5 top-4 -z-10 size-24 rotate-12 rounded-[28px] bg-[#caff6a]" />
 
-      <div className="overflow-hidden rounded-[26px] border-[8px] border-[#102d1e] bg-[#f5f8f2] shadow-[0_38px_100px_rgba(5,50,28,0.28)] sm:rounded-[34px] sm:border-[10px]">
-        <div className="flex h-11 items-center gap-2 border-b border-[#dce7dc] bg-white px-4 sm:px-5">
+      <div className="overflow-hidden rounded-[24px] border-[7px] border-[#143424] bg-[#f2faf4] shadow-[0_38px_100px_rgba(5,50,28,0.25)] sm:rounded-[30px] sm:border-[9px]">
+        <div className="flex h-10 items-center gap-2 border-b border-[#dce8df] bg-white px-4">
           <span className="size-2.5 rounded-full bg-[#ff7a6b]" />
           <span className="size-2.5 rounded-full bg-[#f3ca58]" />
           <span className="size-2.5 rounded-full bg-[#62cb82]" />
-          <span className="ml-3 text-[11px] font-bold tracking-[-0.02em] text-[#1a3826]">
-            EstoqueHub
-          </span>
+          <span className="ml-3 text-[10px] font-bold text-[#23402e]">EstoqueHub</span>
         </div>
 
-        <div className="grid min-h-[390px] grid-cols-[68px_1fr] sm:grid-cols-[128px_1fr]">
-          <aside className="bg-[#0d5531] p-3 text-white sm:p-4">
-            <div className="grid size-10 place-items-center rounded-xl bg-[#caff6a] text-[#103320]">
-              <PackageCheck className="size-5" />
+        <div className="grid min-h-[420px] grid-cols-[58px_1fr] sm:grid-cols-[116px_1fr]">
+          <aside className="border-r border-[#dce8df] bg-[#f7fcf8] p-2.5 sm:p-3">
+            <div className="flex items-center gap-2 px-1 sm:px-1.5">
+              <span className="grid size-8 shrink-0 place-items-center rounded-xl bg-[#d9f4e1] text-[#168d4f]">
+                <PackageCheck className="size-4" />
+              </span>
+              <span className="hidden text-[9px] font-bold text-[#22412d] sm:inline">EstoqueHub</span>
             </div>
-            <div className="mt-8 space-y-3">
-              <div className="flex items-center gap-2 rounded-xl bg-white/12 p-2 text-[10px] font-semibold">
-                <BarChart3 className="size-4 shrink-0" />
-                <span className="hidden sm:inline">Visão geral</span>
+
+            <div className="mt-7 space-y-2">
+              <div className="flex items-center gap-2 rounded-xl bg-[#5cbd79] p-2 text-[9px] font-semibold text-white">
+                <LayoutDashboard className="size-3.5 shrink-0" />
+                <span className="hidden sm:inline">Painel</span>
               </div>
-              <div className="flex items-center gap-2 p-2 text-[10px] text-white/60">
-                <PackageCheck className="size-4 shrink-0" />
+              <div className="flex items-center gap-2 rounded-xl p-2 text-[9px] text-[#65776c]">
+                <Package className="size-3.5 shrink-0" />
                 <span className="hidden sm:inline">Produtos</span>
-              </div>
-              <div className="flex items-center gap-2 p-2 text-[10px] text-white/60">
-                <AlertTriangle className="size-4 shrink-0" />
-                <span className="hidden sm:inline">Alertas</span>
               </div>
             </div>
           </aside>
 
-          <div className="min-w-0 p-4 sm:p-6">
-            <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <header className="flex h-[58px] items-center justify-between border-b border-[#dce8df] bg-white px-3 sm:px-5">
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#11834b]">
-                  Visão geral
-                </p>
-                <p className="mt-1 text-lg font-bold tracking-[-0.03em] text-[#142e1e] sm:text-2xl">
-                  Bom dia, Ana.
-                </p>
+                <p className="text-[11px] font-bold text-[#263a2d] sm:text-sm">Painel de estoque</p>
+                <p className="mt-0.5 hidden text-[8px] text-[#718177] sm:block">Bom dia, user1! Aqui está o resumo de hoje.</p>
               </div>
-              <span className="grid size-9 place-items-center rounded-full border border-[#d9e6db] bg-white text-[#52705d]">
-                <Search className="size-4" />
-              </span>
-            </div>
+              <div className="flex items-center gap-1.5">
+                <span className="grid size-7 place-items-center rounded-full bg-[#d7f0df] text-[9px] font-bold text-[#287044]">U</span>
+                <LogOut className="size-3.5 text-[#718177]" />
+              </div>
+            </header>
 
-            <div className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-3">
-              <div className="rounded-2xl bg-[#103d27] p-3 text-white sm:p-4">
-                <p className="text-[9px] text-white/60 sm:text-[10px]">Produtos</p>
-                <p className="mt-1 text-xl font-bold sm:text-2xl">128</p>
-              </div>
-              <div className="rounded-2xl bg-[#caff6a] p-3 text-[#173322] sm:p-4">
-                <p className="text-[9px] text-[#34573f] sm:text-[10px]">Estoque baixo</p>
-                <p className="mt-1 text-xl font-bold sm:text-2xl">12</p>
-              </div>
-              <div className="hidden rounded-2xl border border-[#dce7dc] bg-white p-4 sm:block">
-                <p className="text-[10px] text-[#65776b]">Valor em estoque</p>
-                <p className="mt-1 text-2xl font-bold text-[#173322]">R$ 48 mil</p>
-              </div>
-            </div>
-
-            <div className="mt-4 overflow-hidden rounded-2xl border border-[#dce7dc] bg-white">
-              <div className="flex items-center justify-between border-b border-[#e6eee7] px-3 py-3 sm:px-4">
-                <p className="text-[11px] font-bold text-[#173322] sm:text-xs">Produtos em destaque</p>
-                <span className="text-[9px] font-semibold text-[#11834b] sm:text-[10px]">Ver todos</span>
-              </div>
-              {products.map((product) => (
-                <div
-                  className="grid grid-cols-[1fr_auto] items-center gap-3 border-b border-[#edf2ed] px-3 py-2.5 last:border-0 sm:px-4"
-                  key={product.sku}
-                >
-                  <div className="min-w-0">
-                    <p className="truncate text-[10px] font-semibold text-[#203528] sm:text-[11px]">{product.name}</p>
-                    <p className="mt-0.5 text-[8px] text-[#829087] sm:text-[9px]">
-                      {product.sku} · {product.quantity}
-                    </p>
+            <div className="p-3 sm:p-4">
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                {metrics.map(({ label, value, support, icon: Icon, iconStyle }) => (
+                  <div className="rounded-xl border border-[#d9e5dc] bg-white p-2.5 shadow-sm" key={label}>
+                    <div className="flex items-start justify-between gap-1">
+                      <div className="min-w-0">
+                        <p className="truncate text-[8px] text-[#718177]">{label}</p>
+                        <p className="mt-1 truncate text-sm font-bold text-[#2b3e31] sm:text-base">{value}</p>
+                      </div>
+                      <span className={`hidden size-7 shrink-0 place-items-center rounded-lg sm:grid ${iconStyle}`}>
+                        <Icon className="size-3.5" />
+                      </span>
+                    </div>
+                    <p className="mt-2 hidden truncate text-[7px] text-[#7a8980] sm:block">{support}</p>
                   </div>
-                  <span
-                    className={`rounded-full px-2 py-1 text-[8px] font-bold sm:text-[9px] ${
-                      product.critical
-                        ? 'bg-[#fff0d8] text-[#a85a09]'
-                        : 'bg-[#e8f7ed] text-[#137542]'
-                    }`}
-                  >
-                    {product.status}
-                  </span>
-                </div>
-              ))}
+                ))}
+              </div>
+
+              <div className="mt-3 grid gap-3 min-[560px]:grid-cols-[1.65fr_0.85fr]">
+                <section className="overflow-hidden rounded-xl border border-[#d9e5dc] bg-white shadow-sm">
+                  <div className="border-b border-[#e1ebe4] px-3 py-2.5">
+                    <p className="text-[10px] font-bold text-[#2d4033]">Produtos</p>
+                    <p className="mt-0.5 text-[7px] text-[#77877c]">Gerencie os itens do seu estoque</p>
+                  </div>
+                  <table className="w-full table-fixed text-left">
+                    <thead className="bg-[#f4f9f5] text-[6px] uppercase text-[#6d7d73]">
+                      <tr>
+                        <th className="w-[44%] px-3 py-2 font-medium">Produto</th>
+                        <th className="hidden w-[28%] px-2 py-2 font-medium sm:table-cell">Categoria</th>
+                        <th className="w-[16%] px-2 py-2 font-medium">Qtd.</th>
+                        <th className="px-2 py-2 font-medium">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-[#e7eee8]">
+                      {products.map((product) => (
+                        <tr key={product.sku}>
+                          <td className="px-3 py-2">
+                            <p className="truncate text-[8px] font-semibold text-[#314337]">{product.name}</p>
+                            <p className="text-[6px] text-[#7c8b81]">{product.sku}</p>
+                          </td>
+                          <td className="hidden truncate px-2 py-2 text-[7px] text-[#6d7d73] sm:table-cell">{product.category}</td>
+                          <td className="px-2 py-2 text-[8px] font-semibold text-[#314337]">{product.quantity}</td>
+                          <td className="px-2 py-2">
+                            <span
+                              className={`inline-block whitespace-nowrap rounded-full px-1.5 py-1 text-[6px] font-semibold ${
+                                product.lowStock
+                                  ? 'bg-[#fbf0d5] text-[#bd7a20]'
+                                  : 'bg-[#e3f5e8] text-[#279557]'
+                              }`}
+                            >
+                              {product.status}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </section>
+
+                <section className="hidden rounded-xl border border-[#d9e5dc] bg-white p-3 shadow-sm min-[560px]:block">
+                  <div className="flex items-center gap-2">
+                    <span className="grid size-7 place-items-center rounded-full bg-[#fbf1d8] text-[#e5a146]">
+                      <TriangleAlert className="size-3.5" />
+                    </span>
+                    <div>
+                      <p className="text-[9px] font-bold text-[#304236]">Precisam de atenção</p>
+                      <p className="text-[7px] text-[#7b8a80]">Itens para repor em breve</p>
+                    </div>
+                  </div>
+
+                  <div className="mt-3 space-y-2">
+                    {attentionItems.map((item) => (
+                      <div className="rounded-lg border border-[#dfe9e1] bg-[#fbfdfb] p-2" key={item.sku}>
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="min-w-0">
+                            <p className="truncate text-[7px] font-semibold text-[#304236]">{item.name}</p>
+                            <p className="text-[6px] text-[#819087]">{item.sku}</p>
+                          </div>
+                          <span className="text-[6px] text-[#6e7e74]">{item.stock}</span>
+                        </div>
+                        <div className="mt-2 h-1 overflow-hidden rounded-full bg-[#e5eee7]">
+                          <div className="h-full rounded-full bg-[#dfc553]" style={{ width: item.width }} />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
-
-      <div className="absolute -bottom-12 -left-2 w-[148px] rounded-[28px] border-[7px] border-[#102d1e] bg-[#f8fbf5] p-3 shadow-[0_22px_55px_rgba(7,53,30,0.28)] sm:-left-10 sm:w-[188px] sm:border-[8px] sm:p-4">
-        <div className="mx-auto mb-4 h-1.5 w-12 rounded-full bg-[#102d1e]" />
-        <div className="rounded-2xl bg-[#0e6538] p-3 text-white">
-          <CircleCheckBig className="size-5 text-[#caff6a]" />
-          <p className="mt-7 text-[9px] text-white/65 sm:text-[10px]">Status do estoque</p>
-          <p className="mt-1 text-xs font-bold sm:text-sm">Tudo sob controle</p>
-        </div>
-        <div className="mt-3 flex items-center gap-2 rounded-xl bg-[#fff0d8] p-2 text-[#8c4e0d]">
-          <AlertTriangle className="size-3.5 shrink-0" />
-          <span className="text-[8px] font-semibold sm:text-[9px]">2 alertas novos</span>
         </div>
       </div>
     </div>
