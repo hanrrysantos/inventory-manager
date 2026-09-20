@@ -1,13 +1,18 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { http, HttpResponse } from 'msw'
-import { beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { App } from '../../app/App'
 import { server } from '../../test/server'
 
 describe('authentication flow', () => {
   beforeEach(() => {
     window.history.pushState({}, '', '/login')
+  })
+
+  afterEach(() => {
+    vi.unstubAllEnvs()
+    delete (window as Window & { google?: unknown }).google
   })
 
   it('submits valid credentials and navigates to the dashboard', async () => {
@@ -155,20 +160,140 @@ describe('authentication flow', () => {
     expect(password).toHaveAttribute('type', 'password')
   })
 
-  it('explains that Google access is not available yet without sending requests', async () => {
+  it('explains that Google login is not configured without sending requests', async () => {
     const requests: string[] = []
     const recordRequest = ({ request }: { request: Request }) => requests.push(request.url)
     server.events.on('request:start', recordRequest)
     try {
-      const user = userEvent.setup()
       render(<App />)
-      await user.click(await screen.findByRole('button', { name: /entrar com google/i }))
-      expect(screen.getByRole('status')).toHaveTextContent(/google estará disponível em breve/i)
+
+      expect(await screen.findByRole('alert')).toHaveTextContent(/google não foi configurado/i)
       expect(window.location.pathname).toBe('/login')
       expect(requests).toEqual([])
     } finally {
       server.events.removeListener('request:start', recordRequest)
     }
+  })
+
+  it('keeps a credential out of a Google login error and allows a retry', async () => {
+    let submittedBody: unknown
+    let googleAttempts = 0
+    server.use(
+      http.post('*/api/v1/auth/google', async ({ request }) => {
+        submittedBody = await request.json()
+        googleAttempts += 1
+        if (googleAttempts === 1) {
+          return HttpResponse.json(
+            { message: 'Credential google-id-token could not be verified' },
+            { status: 401 },
+          )
+        }
+        return HttpResponse.json({ token: 'valid-token' })
+      }),
+    )
+    vi.stubEnv('VITE_GOOGLE_CLIENT_ID', 'google-client-id')
+    let credentialCallback: ((response: { credential: string }) => void) | undefined
+    ;(window as Window & { google?: unknown }).google = {
+      accounts: {
+        id: {
+          initialize: ({ callback }: { callback: (response: { credential: string }) => void }) => {
+            credentialCallback = callback
+          },
+          renderButton: (element: HTMLElement) => {
+            const button = document.createElement('button')
+            button.type = 'button'
+            button.textContent = 'Entrar com Google'
+            button.addEventListener('click', () => credentialCallback?.({ credential: 'google-id-token' }))
+            element.replaceChildren(button)
+          },
+        },
+      },
+    }
+
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(await screen.findByRole('button', { name: 'Entrar com Google' }))
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(/não foi possível entrar com google/i)
+    expect(screen.queryByText(/google-id-token/i)).not.toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Entrar com Google' }))
+
+    expect(
+      await screen.findByRole('heading', { name: /painel de estoque/i }),
+    ).toBeInTheDocument()
+    expect(submittedBody).toEqual({ idToken: 'google-id-token' })
+    expect(localStorage.getItem('inventory-manager.token')).toBe('valid-token')
+  })
+
+  it('requires local authentication before linking an existing account to Google', async () => {
+    let linkBody: unknown
+    let linkAuthorization: string | null = null
+    let linkAttempts = 0
+    server.use(
+      http.post('*/api/v1/auth/google', () =>
+        HttpResponse.json(
+          {
+            status: 409,
+            error: 'GoogleAccountLinkRequired',
+            message: 'Google account must be linked from an authenticated session',
+            path: '/api/v1/auth/google',
+          },
+          { status: 409 },
+        ),
+      ),
+      http.post('*/api/v1/auth/google/link', async ({ request }) => {
+        linkBody = await request.json()
+        linkAuthorization = request.headers.get('Authorization')
+        linkAttempts += 1
+        if (linkAttempts === 1) {
+          return HttpResponse.json(
+            { message: 'Credential google-id-token could not be verified' },
+            { status: 500 },
+          )
+        }
+        return new HttpResponse(null, { status: 204 })
+      }),
+    )
+    vi.stubEnv('VITE_GOOGLE_CLIENT_ID', 'google-client-id')
+    let credentialCallback: ((response: { credential: string }) => void) | undefined
+    ;(window as Window & { google?: unknown }).google = {
+      accounts: {
+        id: {
+          initialize: ({ callback }: { callback: (response: { credential: string }) => void }) => {
+            credentialCallback = callback
+          },
+          renderButton: (element: HTMLElement) => {
+            const button = document.createElement('button')
+            button.type = 'button'
+            button.textContent = 'Entrar com Google'
+            button.addEventListener('click', () => credentialCallback?.({ credential: 'google-id-token' }))
+            element.replaceChildren(button)
+          },
+        },
+      },
+    }
+
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(await screen.findByRole('button', { name: 'Entrar com Google' }))
+    expect(await screen.findByText(/entre com e-mail e senha para vincular/i)).toBeVisible()
+
+    await user.type(screen.getByLabelText('E-mail'), 'admin@email.com')
+    await user.type(screen.getByLabelText('Senha'), 'admin123')
+    await user.click(screen.getByRole('button', { name: 'Entrar' }))
+    expect(await screen.findByRole('status')).toHaveTextContent(/entre novamente com google/i)
+
+    await user.click(screen.getByRole('button', { name: 'Entrar com Google' }))
+    expect(await screen.findByRole('alert')).toHaveTextContent(/não foi possível vincular sua conta google/i)
+    expect(screen.queryByText(/google-id-token/i)).not.toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Entrar com Google' }))
+    expect(
+      await screen.findByRole('heading', { name: /painel de estoque/i }),
+    ).toBeInTheDocument()
+    expect(linkBody).toEqual({ idToken: 'google-id-token' })
+    expect(linkAuthorization).toBe('Bearer valid-token')
   })
 
   it('switches between login and registration in the same card', async () => {

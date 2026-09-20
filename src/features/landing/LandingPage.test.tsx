@@ -93,7 +93,7 @@ describe('EstoqueHub landing page', () => {
     }
   })
 
-  it('presents a distinctive inventory workflow in the hero preview', async () => {
+  it('presents the real dashboard structure without a mobile preview', async () => {
     render(<App />)
 
     expect(
@@ -101,9 +101,12 @@ describe('EstoqueHub landing page', () => {
         name: /seu estoque no ritmo do seu negócio/i,
       }),
     ).toBeVisible()
-    expect(screen.getByText('Café especial 500g')).toBeInTheDocument()
-    expect(screen.getByText('Repor hoje')).toBeInTheDocument()
-    expect(screen.getByText('Tudo sob controle')).toBeInTheDocument()
+    expect(screen.getByText('Painel de estoque')).toBeInTheDocument()
+    expect(screen.getByText('Total de itens')).toBeInTheDocument()
+    expect(screen.getByText('Em falta')).toBeInTheDocument()
+    expect(screen.getByText('Precisam de atenção')).toBeInTheDocument()
+    expect(screen.getByText('Detergente Neutro 500ml')).toBeInTheDocument()
+    expect(screen.queryByText('Tudo sob controle')).not.toBeInTheDocument()
     expect(screen.queryByText(/movimentos/i)).not.toBeInTheDocument()
   })
 

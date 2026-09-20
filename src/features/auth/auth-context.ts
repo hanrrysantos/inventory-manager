@@ -6,6 +6,7 @@ export interface AuthContextValue {
   user: User | null
   isRestoring: boolean
   login: (input: LoginRequest) => Promise<void>
+  loginWithGoogle: (idToken: string) => Promise<void>
   logout: () => void
 }
 

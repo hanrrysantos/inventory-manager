@@ -7,8 +7,8 @@ import {
   type ReactNode,
 } from 'react'
 import { setUnauthorizedHandler } from '../../services/api-client'
-import type { LoginRequest } from '../../services/contracts/auth'
-import { getCurrentUser, login as requestLogin } from './auth-api'
+import type { AuthResponse, LoginRequest } from '../../services/contracts/auth'
+import { getCurrentUser, googleLogin, login as requestLogin } from './auth-api'
 import { AuthContext, type AuthContextValue } from './auth-context'
 import { authStorage } from './auth-storage'
 
@@ -34,17 +34,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => setUnauthorizedHandler(undefined)
   }, [logout])
 
+  const completeLogin = useCallback(async (response: AuthResponse) => {
+    authStorage.setToken(response.token)
+    setToken(response.token)
+    await queryClient.fetchQuery({
+      queryKey: ['currentUser'],
+      queryFn: getCurrentUser,
+    })
+  }, [queryClient])
+
   const login = useCallback(
-    async (input: LoginRequest) => {
-      const response = await requestLogin(input)
-      authStorage.setToken(response.token)
-      setToken(response.token)
-      await queryClient.fetchQuery({
-        queryKey: ['currentUser'],
-        queryFn: getCurrentUser,
-      })
-    },
-    [queryClient],
+    async (input: LoginRequest) => completeLogin(await requestLogin(input)),
+    [completeLogin],
+  )
+
+  const loginWithGoogle = useCallback(
+    async (idToken: string) => completeLogin(await googleLogin(idToken)),
+    [completeLogin],
   )
 
   const value = useMemo<AuthContextValue>(
@@ -52,9 +58,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       user: currentUserQuery.data ?? null,
       isRestoring: Boolean(token) && currentUserQuery.isPending,
       login,
+      loginWithGoogle,
       logout,
     }),
-    [currentUserQuery.data, currentUserQuery.isPending, login, logout, token],
+    [currentUserQuery.data, currentUserQuery.isPending, login, loginWithGoogle, logout, token],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

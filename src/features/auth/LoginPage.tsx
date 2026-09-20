@@ -13,11 +13,13 @@ export function LoginPage() {
   const [mode, setMode] = useState<AccessMode>('login')
   const [initialEmail, setInitialEmail] = useState('')
   const [notice, setNotice] = useState<string | null>(null)
+  const [isGoogleLinkPending, setIsGoogleLinkPending] = useState(false)
 
-  if (user) return <Navigate to="/dashboard" replace />
+  if (user && !isGoogleLinkPending) return <Navigate to="/dashboard" replace />
 
   function selectMode(nextMode: AccessMode) {
     setNotice(null)
+    setIsGoogleLinkPending(false)
     setMode(nextMode)
   }
 
@@ -88,7 +90,9 @@ export function LoginPage() {
               <LoginForm
                 initialEmail={initialEmail}
                 onCreateAccount={() => selectMode('register')}
-                onGoogleUnavailable={() => setNotice('O login com Google estará disponível em breve.')}
+                isGoogleLinkPending={isGoogleLinkPending}
+                onGoogleLinkRequired={() => setIsGoogleLinkPending(true)}
+                onGoogleLinkCompleted={() => setIsGoogleLinkPending(false)}
               />
             ) : (
               <RegisterForm onBack={() => selectMode('login')} onSuccess={handleRegistered} />

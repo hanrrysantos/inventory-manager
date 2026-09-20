@@ -1,9 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import axios from 'axios'
 import { Mail } from 'lucide-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 import { getApiErrorMessage } from '../../services/api-error'
+import { linkGoogleAccount } from './auth-api'
+import { GoogleLoginButton } from './GoogleLoginButton'
 import { loginSchema, type LoginFormData } from './login-schema'
 import { PasswordField } from './PasswordField'
 import { useAuth } from './use-auth'
@@ -11,12 +14,26 @@ import { useAuth } from './use-auth'
 interface LoginFormProps {
   initialEmail: string
   onCreateAccount: () => void
-  onGoogleUnavailable: () => void
+  isGoogleLinkPending: boolean
+  onGoogleLinkRequired: () => void
+  onGoogleLinkCompleted: () => void
 }
 
-export function LoginForm({ initialEmail, onCreateAccount, onGoogleUnavailable }: LoginFormProps) {
+function requiresGoogleAccountLink(error: unknown): boolean {
+  return axios.isAxiosError<{ error?: string }>(error)
+    && error.response?.status === 409
+    && error.response.data?.error === 'GoogleAccountLinkRequired'
+}
+
+export function LoginForm({
+  initialEmail,
+  onCreateAccount,
+  isGoogleLinkPending,
+  onGoogleLinkRequired,
+  onGoogleLinkCompleted,
+}: LoginFormProps) {
   const navigate = useNavigate()
-  const { login } = useAuth()
+  const { login, loginWithGoogle } = useAuth()
   const [apiError, setApiError] = useState<string | null>(null)
   const {
     register,
@@ -31,11 +48,36 @@ export function LoginForm({ initialEmail, onCreateAccount, onGoogleUnavailable }
     setApiError(null)
     try {
       await login(data)
-      navigate('/dashboard', { replace: true })
+      if (!isGoogleLinkPending) navigate('/dashboard', { replace: true })
     } catch (error) {
       setApiError(getApiErrorMessage(error, 'Não foi possível entrar.'))
     }
   })
+
+  async function handleGoogleCredential(idToken: string) {
+    setApiError(null)
+    try {
+      if (isGoogleLinkPending) {
+        await linkGoogleAccount(idToken)
+        onGoogleLinkCompleted()
+        return
+      }
+
+      await loginWithGoogle(idToken)
+      navigate('/dashboard', { replace: true })
+    } catch (error) {
+      if (requiresGoogleAccountLink(error)) {
+        onGoogleLinkRequired()
+        setApiError('Esta conta já existe. Entre com e-mail e senha para vincular seu Google.')
+        return
+      }
+      setApiError(
+        isGoogleLinkPending
+          ? 'Não foi possível vincular sua conta Google. Tente novamente.'
+          : 'Não foi possível entrar com Google. Tente novamente.',
+      )
+    }
+  }
 
   return (
     <form className="space-y-5" onSubmit={onSubmit} noValidate>
@@ -61,7 +103,8 @@ export function LoginForm({ initialEmail, onCreateAccount, onGoogleUnavailable }
         {isSubmitting ? 'Entrando...' : 'Entrar'}
       </button>
       <div className="flex items-center gap-3" aria-hidden="true"><span className="h-px flex-1 bg-[#dce8df]" /><span className="text-xs font-medium uppercase tracking-[0.15em] text-[#52655a]">ou</span><span className="h-px flex-1 bg-[#dce8df]" /></div>
-      <button className="flex h-12 w-full items-center justify-center gap-3 rounded-xl bg-[#151a17] font-medium text-white hover:bg-black" type="button" onClick={onGoogleUnavailable}><span className="grid size-6 place-items-center rounded-full bg-white font-bold text-[#4285f4]" aria-hidden="true">G</span>Entrar com Google</button>
+      {isGoogleLinkPending && <p className="rounded-xl bg-[#eef7f0] p-3 text-sm text-[#173b27]" role="status">Agora, entre novamente com Google para concluir o vínculo.</p>}
+      <GoogleLoginButton clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID} onCredential={handleGoogleCredential} />
       <p className="text-center text-sm text-[#617168]">Ainda não tem uma conta? <button className="inline-flex min-h-11 min-w-11 items-center justify-center font-semibold text-[#107842]" type="button" onClick={onCreateAccount}>Criar conta</button></p>
       <p className="text-center text-xs leading-5 text-[#52655a]">O primeiro acesso pode levar até um minuto enquanto o servidor inicia.</p>
     </form>
