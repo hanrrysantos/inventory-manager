@@ -10,6 +10,8 @@ import br.com.hanrry.inventory.shared.exception.notification.pdf.WritePdfExcepti
 import br.com.hanrry.inventory.shared.exception.product.product.ProductAlreadyExistsException;
 import br.com.hanrry.inventory.shared.exception.product.product.ProductNotFoundException;
 import br.com.hanrry.inventory.shared.exception.auth.InvalidTokenException;
+import br.com.hanrry.inventory.shared.exception.auth.GoogleAccountLinkRequiredException;
+import br.com.hanrry.inventory.shared.exception.auth.GoogleAccountAlreadyLinkedException;
 import br.com.hanrry.inventory.shared.exception.user.EmailAlreadyExistsException;
 import br.com.hanrry.inventory.shared.exception.user.UserNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -147,6 +149,36 @@ public class GlobalExceptionHandler {
         String error = "InvalidTokenException";
         HttpStatus status = HttpStatus.UNAUTHORIZED;
         StandardError err = new StandardError(Instant.now(), status.value(), error, ex.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(status).body(err);
+    }
+
+    @ExceptionHandler(GoogleAccountLinkRequiredException.class)
+    public ResponseEntity<StandardError> handleGoogleAccountLinkRequiredException(
+            GoogleAccountLinkRequiredException ex,
+            HttpServletRequest request) {
+        HttpStatus status = HttpStatus.CONFLICT;
+        StandardError err = new StandardError(
+                Instant.now(),
+                status.value(),
+                "GoogleAccountLinkRequired",
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(status).body(err);
+    }
+
+    @ExceptionHandler(GoogleAccountAlreadyLinkedException.class)
+    public ResponseEntity<StandardError> handleGoogleAccountAlreadyLinkedException(
+            GoogleAccountAlreadyLinkedException ex,
+            HttpServletRequest request) {
+        HttpStatus status = HttpStatus.CONFLICT;
+        StandardError err = new StandardError(
+                Instant.now(),
+                status.value(),
+                "GoogleAccountAlreadyLinked",
+                ex.getMessage(),
+                request.getRequestURI()
+        );
         return ResponseEntity.status(status).body(err);
     }
 

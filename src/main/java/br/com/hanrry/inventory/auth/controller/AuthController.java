@@ -3,6 +3,7 @@ package br.com.hanrry.inventory.auth.controller;
 import br.com.hanrry.inventory.auth.controller.docs.AuthControllerDocs;
 import br.com.hanrry.inventory.auth.dto.AuthRequestDTO;
 import br.com.hanrry.inventory.auth.dto.AuthResponseDTO;
+import br.com.hanrry.inventory.auth.dto.GoogleAuthRequestDTO;
 import br.com.hanrry.inventory.auth.security.JwtUtil;
 import br.com.hanrry.inventory.user.dto.UserRequestDTO;
 import br.com.hanrry.inventory.user.dto.UserResponseDTO;
@@ -19,6 +20,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import jakarta.validation.Valid;
 
 import java.net.URI;
+import java.security.Principal;
 
 @RequiredArgsConstructor
 @RestController
@@ -37,6 +39,22 @@ public class AuthController implements AuthControllerDocs {
 
         String token = jwtUtil.generateToken(request.email());
         return ResponseEntity.ok().body(new AuthResponseDTO(token));
+    }
+
+    @PostMapping(value = "/google")
+    public ResponseEntity<AuthResponseDTO> loginWithGoogle(@Valid @RequestBody GoogleAuthRequestDTO request){
+
+        String userEmail = userService.authenticateWithGoogle(request.idToken());
+
+        String token = jwtUtil.generateToken(userEmail);
+
+        return ResponseEntity.ok().body(new AuthResponseDTO(token));
+    }
+
+    @PostMapping(value = "/google/link")
+    public ResponseEntity<Void> linkGoogleAccount(@Valid @RequestBody GoogleAuthRequestDTO request, Principal principal) {
+        userService.linkGoogleAccount(principal.getName(), request.idToken());
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping(value = "/register")

@@ -47,6 +47,8 @@ public class SecurityConfig {
                         .accessDeniedHandler(jsonAccessDeniedHandler))
                 .authorizeHttpRequests(auth -> auth
 
+                        .requestMatchers(HttpMethod.POST, "/api/v1/auth/google/link").authenticated()
+                        .requestMatchers("/api/v1/auth/login", "/api/v1/auth/google").permitAll()
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
