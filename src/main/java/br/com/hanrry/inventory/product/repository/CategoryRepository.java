@@ -14,6 +14,8 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
     Optional<Category> findByIdAndOwner(@org.springframework.data.repository.query.Param("id") Long id, @org.springframework.data.repository.query.Param("owner") User owner);
     @org.springframework.data.jpa.repository.Query("select c from Category c where lower(c.name) = lower(:name) and (c.owner = :owner or c.owner is null)")
     Optional<Category> findByNameIgnoreCaseAndOwner(@org.springframework.data.repository.query.Param("name") String name, @org.springframework.data.repository.query.Param("owner") User owner);
+    @org.springframework.data.jpa.repository.Query("select c from Category c where lower(c.name) = lower(:name) and c.owner = :owner and c.id <> :id")
+    Optional<Category> findByNameIgnoreCaseAndOwnerExcludingId(@org.springframework.data.repository.query.Param("name") String name, @org.springframework.data.repository.query.Param("owner") User owner, @org.springframework.data.repository.query.Param("id") Long id);
     @org.springframework.data.jpa.repository.Query("select c from Category c where c.owner = :owner or c.owner is null")
     List<Category> findAllByOwner(@org.springframework.data.repository.query.Param("owner") User owner);
 }
