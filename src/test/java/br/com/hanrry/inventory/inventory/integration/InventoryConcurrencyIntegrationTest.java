@@ -16,6 +16,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
@@ -68,6 +70,8 @@ class InventoryConcurrencyIntegrationTest {
 
     @BeforeEach
     void prepareDatabase() {
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken("hanrry@email.com", null, List.of()));
         jdbcTemplate.update("UPDATE tb_products SET min_stock = 0");
         executor = Executors.newFixedThreadPool(2);
     }
@@ -75,6 +79,7 @@ class InventoryConcurrencyIntegrationTest {
     @AfterEach
     void shutdownExecutor() {
         executor.shutdownNow();
+        SecurityContextHolder.clearContext();
     }
 
     @Test
@@ -268,13 +273,18 @@ class InventoryConcurrencyIntegrationTest {
 
     private Future<?> submitAddition(CountDownLatch ready, CountDownLatch start, Long batchId) {
         return executor.submit(() -> {
+            authenticateSeedOwner();
             ready.countDown();
             await(start);
-            transactionTemplate.execute(status -> {
-                batchService.addStock(batchId, new AddStockBatchRequestDTO(8L));
+            try {
+                transactionTemplate.execute(status -> {
+                    batchService.addStock(batchId, new AddStockBatchRequestDTO(8L));
+                    return null;
+                });
                 return null;
-            });
-            return null;
+            } finally {
+                SecurityContextHolder.clearContext();
+            }
         });
     }
 
@@ -285,6 +295,7 @@ class InventoryConcurrencyIntegrationTest {
             Long quantity
     ) {
         return executor.submit(() -> {
+            authenticateSeedOwner();
             ready.countDown();
             await(start);
             try {
@@ -295,8 +306,15 @@ class InventoryConcurrencyIntegrationTest {
                 return true;
             } catch (InsufficientStockException exception) {
                 return false;
+            } finally {
+                SecurityContextHolder.clearContext();
             }
         });
+    }
+
+    private void authenticateSeedOwner() {
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken("hanrry@email.com", null, List.of()));
     }
 
     private void await(CountDownLatch latch) {
