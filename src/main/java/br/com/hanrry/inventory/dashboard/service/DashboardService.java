@@ -7,6 +7,7 @@ import br.com.hanrry.inventory.inventory.batch.Batch;
 import br.com.hanrry.inventory.product.entity.Product;
 import br.com.hanrry.inventory.product.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
+import br.com.hanrry.inventory.shared.security.OwnerContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,10 +23,12 @@ import java.util.List;
 public class DashboardService {
 
     private final ProductRepository productRepository;
+    private final OwnerContext ownerContext;
 
     @Transactional(readOnly = true)
     public DashboardSummaryDTO getSummary() {
-        List<Product> products = productRepository.findAllWithBatches();
+        var owner = ownerContext == null ? null : ownerContext.currentUser();
+        List<Product> products = owner == null ? productRepository.findAllWithBatches() : productRepository.findAllWithBatchesByOwner(owner);
         LocalDate today = LocalDate.now();
 
         long totalQuantity = 0L;
