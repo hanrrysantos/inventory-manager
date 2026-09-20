@@ -17,6 +17,7 @@ import br.com.hanrry.inventory.inventory.repository.BatchRepository;
 import br.com.hanrry.inventory.product.repository.ProductRepository;
 import br.com.hanrry.inventory.notification.service.StockAlertService;
 import lombok.RequiredArgsConstructor;
+import br.com.hanrry.inventory.shared.security.OwnerContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +33,7 @@ public class BatchService {
     private final InventoryLogService inventoryLogService;
     private final ProductRepository productRepository;
     private final StockAlertService stockAlertService;
+    private final OwnerContext ownerContext;
 
     @Transactional
     public BatchResponseDTO createBatch(BatchRequestDTO request) {
@@ -40,7 +42,8 @@ public class BatchService {
                     throw new BatchAlreadyExists("Batch already exists");
                 });
 
-        Product product = productRepository.findById(request.productId())
+        var owner = ownerContext == null ? null : ownerContext.currentUser();
+        Product product = (owner == null ? productRepository.findById(request.productId()) : productRepository.findByIdAndOwner(request.productId(), owner))
                 .orElseThrow(() -> new ProductNotFoundException
                         ("Product not found with this id: " + request.productId())
                 );
@@ -60,6 +63,10 @@ public class BatchService {
         Batch batch = batchRepository.findByIdForUpdate(id)
                 .orElseThrow(() -> new BatchNotFound
                         ("Batch not found with this id: " + id));
+        var owner = ownerContext == null ? null : ownerContext.currentUser();
+        if (owner != null && (batch.getProduct().getOwner() != null && !owner.equals(batch.getProduct().getOwner()))) {
+            throw new BatchNotFound("Batch not found with this id: " + id);
+        }
 
         Long quantityToAdd = request.quantityToAdd();
 
@@ -78,6 +85,12 @@ public class BatchService {
 
     @Transactional
     public void consumeStock(ConsumeBatchRequestDTO request) {
+
+        var owner = ownerContext == null ? null : ownerContext.currentUser();
+        if (owner != null) {
+            productRepository.findByIdAndOwner(request.productId(), owner)
+                    .orElseThrow(() -> new ProductNotFoundException("Product not found with this id: " + request.productId()));
+        }
 
         List<Batch> batches = batchRepository.
                 findByProductIdAndQuantityGreaterThanAndExpiryDateGreaterThanEqualOrderByExpiryDateAscIdAsc(
@@ -113,6 +126,12 @@ public class BatchService {
 
     public List<BatchResponseDTO> findExpiredBatches() {
         List<Batch> batchesExpired = batchRepository.findByExpiryDateBefore(LocalDate.now());
+        var owner = ownerContext == null ? null : ownerContext.currentUser();
+        if (owner != null) {
+            batchesExpired = batchesExpired.stream()
+                    .filter(batch -> batch.getProduct().getOwner() == null || owner.equals(batch.getProduct().getOwner()))
+                    .toList();
+        }
 
         return batchMapper.toDTOList(batchesExpired);
     }
