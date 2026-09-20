@@ -12,6 +12,7 @@ import br.com.hanrry.inventory.product.mapper.ProductMapper;
 import br.com.hanrry.inventory.product.repository.CategoryRepository;
 import br.com.hanrry.inventory.product.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
+import br.com.hanrry.inventory.shared.security.OwnerContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,18 +26,23 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
     private final CategoryRepository categoryRepository;
+    private final OwnerContext ownerContext;
 
     @Transactional
     public ProductResponseDTO createProduct(ProductRequestDTO request){
 
-        productRepository.findBySku(request.sku()).ifPresent(
+        var owner = ownerContext == null ? null : ownerContext.currentUser();
+        var skuLookup = owner == null ? productRepository.findBySku(request.sku()) : productRepository.findBySkuAndOwner(request.sku(), owner);
+        skuLookup.ifPresent(
                p -> {
                    throw new ProductAlreadyExistsException("Product already exists");
                });
-        Category category = categoryRepository.findById(request.categoryId())
+        Category category = (owner == null ? categoryRepository.findById(request.categoryId()) : categoryRepository.findByIdAndOwner(request.categoryId(), owner))
                 .orElseThrow(() -> new CategoryNotFoundException("Category not found"));
 
        Product product = productMapper.toEntity(request);
+
+       product.setOwner(owner);
 
        product.setCategory(category);
 
@@ -46,13 +52,15 @@ public class ProductService {
     }
 
     public List<ProductResponseDTO> findAllProducts( ){
-        List<Product> productsList = productRepository.findAll();
+        var owner = ownerContext == null ? null : ownerContext.currentUser();
+        List<Product> productsList = owner == null ? productRepository.findAll() : productRepository.findAllByOwner(owner);
 
         return productMapper.toDTOList(productsList);
     }
 
     public ProductResponseDTO findProductById(Long id){
-        Product product = productRepository.findById(id).orElseThrow(
+        var owner = ownerContext == null ? null : ownerContext.currentUser();
+        Product product = (owner == null ? productRepository.findById(id) : productRepository.findByIdAndOwner(id, owner)).orElseThrow(
                 () -> new ProductNotFoundException("Product not found with this id: " + id)
         );
 
@@ -61,7 +69,8 @@ public class ProductService {
 
     @Transactional
     public ProductResponseDTO updateProduct(Long id, UpdateProdcutRequestDTO request){
-        Product product = productRepository.findById(id).orElseThrow(
+        var owner = ownerContext == null ? null : ownerContext.currentUser();
+        Product product = (owner == null ? productRepository.findById(id) : productRepository.findByIdAndOwner(id, owner)).orElseThrow(
                 () -> new ProductNotFoundException("Product not found with this id: " + id)
         );
 
@@ -87,7 +96,8 @@ public class ProductService {
     }
 
     public List<ProductResponseDTO> getLowStockProducts() {
-        List<Product> allProducts = productRepository.findAll();
+        var owner = ownerContext == null ? null : ownerContext.currentUser();
+        List<Product> allProducts = owner == null ? productRepository.findAll() : productRepository.findAllByOwner(owner);
 
         return allProducts.stream()
                 .filter(product -> {
