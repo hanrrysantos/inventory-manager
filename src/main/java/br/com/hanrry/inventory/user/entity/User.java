@@ -27,6 +27,9 @@ public class User {
     @Column(unique = true, nullable = false)
     private String email;
 
+    @Column(name = "google_subject", unique = true)
+    private String googleSubject;
+
     @Column(nullable = false)
     private String password;
 
