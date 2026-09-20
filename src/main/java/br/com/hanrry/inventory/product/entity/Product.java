@@ -2,6 +2,7 @@ package br.com.hanrry.inventory.product.entity;
 
 import br.com.hanrry.inventory.inventory.batch.Batch;
 import jakarta.persistence.*;
+import br.com.hanrry.inventory.user.entity.User;
 import lombok.*;
 import org.hibernate.Hibernate;
 
@@ -13,7 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "tb_products")
+@Table(name = "tb_products", uniqueConstraints = @UniqueConstraint(columnNames = {"owner_id", "sku"}))
 public class Product {
 
     @Id
@@ -23,8 +24,12 @@ public class Product {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String sku;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id")
+    private User owner;
 
     @Column(name = "min_stock", nullable = false)
     private Long minStock;
