@@ -31,18 +31,23 @@ input {
 
 .google-login-button {
   display: flex;
-  min-height: 44px;
+  min-height: 52px;
   width: 100%;
   justify-content: center;
+  align-items: center;
   border-radius: 9999px;
-  transition: box-shadow 180ms ease;
+  overflow: hidden;
+  transition: box-shadow 180ms ease, transform 180ms ease;
 }
 
-.google-login-button:hover {
-  box-shadow: 0 0 0 3px rgb(16 120 66 / 35%), 0 8px 20px rgb(16 120 66 / 18%);
+.google-login-button:hover,
+.google-login-button:focus-within {
+  box-shadow: 0 0 0 3px rgb(16 120 66 / 80%), 0 8px 20px rgb(16 120 66 / 24%);
+  transform: translateY(-1px);
 }
 
 .google-login-button iframe {
+  display: block;
   max-width: 100% !important;
 }
 
@@ -64,5 +69,10 @@ input {
 
   .google-login-button {
     transition: none;
+  }
+
+  .google-login-button:hover,
+  .google-login-button:focus-within {
+    transform: none;
   }
 }
