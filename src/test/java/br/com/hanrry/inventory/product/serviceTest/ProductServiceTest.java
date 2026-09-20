@@ -36,6 +36,9 @@ class ProductServiceTest {
     @Mock
     private CategoryRepository categoryRepository;
 
+    @Mock
+    private br.com.hanrry.inventory.shared.security.OwnerContext ownerContext;
+
     @InjectMocks
     private ProductService productService;
 
