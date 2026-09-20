@@ -30,20 +30,8 @@ input {
 }
 
 .google-login-button {
-  display: flex;
-  min-height: 52px;
+  min-height: 40px;
   width: 100%;
-  justify-content: center;
-  align-items: center;
-  border-radius: 9999px;
-  overflow: hidden;
-  transition: box-shadow 180ms ease, transform 180ms ease;
-}
-
-.google-login-button:hover,
-.google-login-button:focus-within {
-  box-shadow: 0 0 0 3px rgb(16 120 66 / 80%), 0 8px 20px rgb(16 120 66 / 24%);
-  transform: translateY(-1px);
 }
 
 .google-login-button iframe {
@@ -65,14 +53,5 @@ input {
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
-  }
-
-  .google-login-button {
-    transition: none;
-  }
-
-  .google-login-button:hover,
-  .google-login-button:focus-within {
-    transform: none;
   }
 }
