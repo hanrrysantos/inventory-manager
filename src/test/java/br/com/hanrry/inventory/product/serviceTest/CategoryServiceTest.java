@@ -32,8 +32,32 @@ class CategoryServiceTest {
     @Mock
     private CategoryMapper categoryMapper;
 
+    @Mock
+    private br.com.hanrry.inventory.shared.security.OwnerContext ownerContext;
+
     @InjectMocks
     private CategoryService categoryService;
+
+    @Test
+    void shouldRejectRenamingCategoryToAnotherCategoryOwnedBySameUser() {
+        var owner = new br.com.hanrry.inventory.user.entity.User();
+        owner.setId(7L);
+        when(ownerContext.currentUser()).thenReturn(owner);
+
+        Category current = new Category();
+        current.setId(1L);
+        current.setOwner(owner);
+        when(categoryRepository.findByIdAndOwner(1L, owner)).thenReturn(Optional.of(current));
+
+        Category duplicate = new Category();
+        duplicate.setId(2L);
+        when(categoryRepository.findByNameIgnoreCaseAndOwnerExcludingId("Bebidas", owner, 1L))
+                .thenReturn(Optional.of(duplicate));
+
+        assertThrows(CategoryAlreadyExistsException.class,
+                () -> categoryService.updateCategory(1L, new CategoryRequestDTO("Bebidas", null)));
+        verify(categoryRepository, never()).save(any());
+    }
 
     @Test
     void shouldCreateCategorySuccessfully() {
