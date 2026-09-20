@@ -129,7 +129,7 @@ public class BatchService {
         var owner = ownerContext == null ? null : ownerContext.currentUser();
         if (owner != null) {
             batchesExpired = batchesExpired.stream()
-                    .filter(batch -> batch.getProduct().getOwner() == null || owner.equals(batch.getProduct().getOwner()))
+                    .filter(batch -> owner.equals(batch.getProduct().getOwner()))
                     .toList();
         }
 
