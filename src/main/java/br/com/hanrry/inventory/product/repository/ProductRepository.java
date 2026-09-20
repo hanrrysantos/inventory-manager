@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.Optional;
+import br.com.hanrry.inventory.user.entity.User;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
@@ -13,4 +14,12 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findAllWithBatches();
 
     Optional<Product> findBySku(String sku);
+    @Query("select p from Product p where p.id = :id and (p.owner = :owner or p.owner is null)")
+    Optional<Product> findByIdAndOwner(@org.springframework.data.repository.query.Param("id") Long id, @org.springframework.data.repository.query.Param("owner") User owner);
+    @Query("select p from Product p where p.sku = :sku and (p.owner = :owner or p.owner is null)")
+    Optional<Product> findBySkuAndOwner(@org.springframework.data.repository.query.Param("sku") String sku, @org.springframework.data.repository.query.Param("owner") User owner);
+    @Query("select p from Product p where p.owner = :owner or p.owner is null")
+    List<Product> findAllByOwner(@org.springframework.data.repository.query.Param("owner") User owner);
+    @Query("select distinct p from Product p left join fetch p.batches where p.owner = :owner or p.owner is null")
+    List<Product> findAllWithBatchesByOwner(@org.springframework.data.repository.query.Param("owner") User owner);
 }
