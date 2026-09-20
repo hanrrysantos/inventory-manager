@@ -64,6 +64,12 @@ public class CategoryService {
                 () -> new CategoryNotFoundException("Category not found with this id: " + id)
         );
 
+        if (request.name() != null && !request.name().isBlank()) {
+            (owner == null ? categoryRepository.findByNameIgnoreCase(request.name()) : categoryRepository.findByNameIgnoreCaseAndOwnerExcludingId(request.name(), owner, id)).ifPresent(existing -> {
+                throw new CategoryAlreadyExistsException("Category already exists");
+            });
+        }
+
             if (request.description() != null && !request.description().isBlank()) {
                 category.setDescription(request.description());
             }
