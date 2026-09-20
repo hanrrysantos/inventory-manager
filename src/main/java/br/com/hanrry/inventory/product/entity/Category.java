@@ -1,6 +1,7 @@
 package br.com.hanrry.inventory.product.entity;
 
 import jakarta.persistence.*;
+import br.com.hanrry.inventory.user.entity.User;
 import lombok.*;
 import org.hibernate.Hibernate;
 
@@ -12,15 +13,19 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "tb_categories")
+@Table(name = "tb_categories", uniqueConstraints = @UniqueConstraint(columnNames = {"owner_id", "name"}))
 public class Category {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String name;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id")
+    private User owner;
 
     private String description;
 
