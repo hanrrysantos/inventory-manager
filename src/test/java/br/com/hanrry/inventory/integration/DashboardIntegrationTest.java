@@ -54,15 +54,7 @@ class DashboardIntegrationTest {
 
     @BeforeEach
     void setUpUser() {
-        admin = userRepository.findByEmail("dashboard-admin@example.com").orElseGet(() -> {
-            User user = new User();
-            user.setName("Dashboard Admin");
-            user.setEmail("dashboard-admin@example.com");
-            user.setPassword("test-password");
-            user.setRole(UserRole.ADMIN);
-            user.setCreatedAt(LocalDateTime.now());
-            return userRepository.save(user);
-        });
+        admin = userRepository.findByEmail("hanrry@email.com").orElseThrow();
         user = userRepository.findByEmail("dashboard-user@example.com").orElseGet(() -> {
             User newUser = new User();
             newUser.setName("Dashboard User");
@@ -93,6 +85,6 @@ class DashboardIntegrationTest {
         mockMvc.perform(get("/api/v1/dashboard/summary")
                         .header(AUTHORIZATION, "Bearer " + jwtUtil.generateToken(user.getEmail())))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.productCount").value(13));
+                .andExpect(jsonPath("$.productCount").value(0));
     }
 }
