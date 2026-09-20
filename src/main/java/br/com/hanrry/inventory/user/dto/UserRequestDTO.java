@@ -7,18 +7,18 @@ import jakarta.validation.constraints.Size;
 
 public record UserRequestDTO (
 
-        @Schema(example = "user1")
+        @Schema(example = "Hanrry")
         @NotBlank
         String name,
 
         @NotBlank(message = "Email is required")
         @Email(message = "Invalid email format")
-        @Schema(example = "user1@email.com")
+        @Schema(example = "hanrry@email.com")
         String email,
 
         @NotBlank(message = "Password is required")
         @Size(min = 6, message = "Password must have at least 6 characters")
-        @Schema(example = "user1234")
+        @Schema(example = "hanrry01")
         String password
 ){
 }
