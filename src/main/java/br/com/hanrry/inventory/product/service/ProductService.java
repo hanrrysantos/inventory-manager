@@ -32,8 +32,7 @@ public class ProductService {
     public ProductResponseDTO createProduct(ProductRequestDTO request){
 
         var owner = ownerContext == null ? null : ownerContext.currentUser();
-        var skuLookup = owner == null ? productRepository.findBySku(request.sku()) : productRepository.findBySkuAndOwner(request.sku(), owner);
-        skuLookup.ifPresent(
+        (owner == null ? productRepository.findBySku(request.sku()) : productRepository.findBySkuAndOwner(request.sku(), owner)).ifPresent(
                p -> {
                    throw new ProductAlreadyExistsException("Product already exists");
                });
