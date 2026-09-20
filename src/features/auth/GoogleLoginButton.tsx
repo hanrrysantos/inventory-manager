@@ -76,7 +76,8 @@ export function GoogleLoginButton({ clientId, onCredential }: GoogleLoginButtonP
         const container = containerRef.current
         if (!active || !container || !window.google) return
 
-        const width = Math.min(container.clientWidth || 384, 384)
+        const availableWidth = container.getBoundingClientRect().width || container.clientWidth
+        const width = Math.min(Math.floor(availableWidth || 384), 384)
         if (width === renderedWidth) return
 
         if (renderedWidth !== undefined) container.replaceChildren()
