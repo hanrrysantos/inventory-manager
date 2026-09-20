@@ -22,6 +22,8 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.dao.DataIntegrityViolationException;
+import br.com.hanrry.inventory.shared.exception.security.OwnerNotAuthenticatedException;
 
 import java.time.Instant;
 import java.util.stream.Collectors;
@@ -110,6 +112,18 @@ public class GlobalExceptionHandler {
         HttpStatus status = HttpStatus.CONFLICT;
         StandardError err = new StandardError(Instant.now(), status.value(), error, ex.getMessage(), request.getRequestURI());
         return ResponseEntity.status(status).body(err);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<StandardError> handleDataIntegrityViolationException(DataIntegrityViolationException ex, HttpServletRequest request){
+        StandardError err = new StandardError(Instant.now(), HttpStatus.CONFLICT.value(), "DataIntegrityViolation", "A record with the same owner and identifier already exists", request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(err);
+    }
+
+    @ExceptionHandler(OwnerNotAuthenticatedException.class)
+    public ResponseEntity<StandardError> handleOwnerNotAuthenticatedException(OwnerNotAuthenticatedException ex, HttpServletRequest request){
+        StandardError err = new StandardError(Instant.now(), HttpStatus.UNAUTHORIZED.value(), "OwnerNotAuthenticated", ex.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(err);
     }
 
     @ExceptionHandler(CascadeCategoryException.class)
