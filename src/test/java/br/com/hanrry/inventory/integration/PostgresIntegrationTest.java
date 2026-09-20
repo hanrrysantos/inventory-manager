@@ -44,16 +44,22 @@ class PostgresIntegrationTest {
     void shouldStartApplicationAndApplyFlywayMigrationsInCleanDatabase() {
         List<Map<String, Object>> migrations = jdbcTemplate.queryForList(
                 "SELECT version, description, success FROM flyway_schema_history "
-                        + "WHERE version IN ('1', '2') ORDER BY installed_rank"
+                        + "WHERE version IN ('1', '2', '3', '4') ORDER BY installed_rank"
         );
 
-        assertEquals(2, migrations.size());
+        assertEquals(4, migrations.size());
         assertEquals("1", migrations.get(0).get("version"));
         assertEquals("Create Tables", migrations.get(0).get("description"));
         assertEquals(true, migrations.get(0).get("success"));
         assertEquals("2", migrations.get(1).get("version"));
-        assertEquals("Populate Tables", migrations.get(1).get("description"));
+        assertEquals("Insert Default User", migrations.get(1).get("description"));
         assertEquals(true, migrations.get(1).get("success"));
+        assertEquals("3", migrations.get(2).get("version"));
+        assertEquals("Populate Tables", migrations.get(2).get("description"));
+        assertEquals(true, migrations.get(2).get("success"));
+        assertEquals("4", migrations.get(3).get("version"));
+        assertEquals("Enforce Case Insensitive Ownership Uniqueness", migrations.get(3).get("description"));
+        assertEquals(true, migrations.get(3).get("success"));
     }
 
     @Test
