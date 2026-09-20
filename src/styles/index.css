@@ -11,6 +11,7 @@
 
 html {
   scroll-behavior: smooth;
+  scrollbar-gutter: stable;
 }
 
 * {
@@ -28,6 +29,23 @@ input {
   font: inherit;
 }
 
+.google-login-button {
+  display: flex;
+  min-height: 44px;
+  width: 100%;
+  justify-content: center;
+  border-radius: 9999px;
+  transition: box-shadow 180ms ease;
+}
+
+.google-login-button:hover {
+  box-shadow: 0 0 0 3px rgb(16 120 66 / 35%), 0 8px 20px rgb(16 120 66 / 18%);
+}
+
+.google-login-button iframe {
+  max-width: 100% !important;
+}
+
 button,
 a,
 input {
@@ -42,5 +60,9 @@ input {
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
+  }
+
+  .google-login-button {
+    transition: none;
   }
 }

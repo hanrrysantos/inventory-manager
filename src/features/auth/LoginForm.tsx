@@ -13,7 +13,6 @@ import { useAuth } from './use-auth'
 
 interface LoginFormProps {
   initialEmail: string
-  onCreateAccount: () => void
   isGoogleLinkPending: boolean
   onGoogleLinkRequired: () => void
   onGoogleLinkCompleted: () => void
@@ -27,7 +26,6 @@ function requiresGoogleAccountLink(error: unknown): boolean {
 
 export function LoginForm({
   initialEmail,
-  onCreateAccount,
   isGoogleLinkPending,
   onGoogleLinkRequired,
   onGoogleLinkCompleted,
@@ -105,7 +103,6 @@ export function LoginForm({
       <div className="flex items-center gap-3" aria-hidden="true"><span className="h-px flex-1 bg-[#dce8df]" /><span className="text-xs font-medium uppercase tracking-[0.15em] text-[#52655a]">ou</span><span className="h-px flex-1 bg-[#dce8df]" /></div>
       {isGoogleLinkPending && <p className="rounded-xl bg-[#eef7f0] p-3 text-sm text-[#173b27]" role="status">Agora, entre novamente com Google para concluir o vínculo.</p>}
       <GoogleLoginButton clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID} onCredential={handleGoogleCredential} />
-      <p className="text-center text-sm text-[#617168]">Ainda não tem uma conta? <button className="inline-flex min-h-11 min-w-11 items-center justify-center font-semibold text-[#107842]" type="button" onClick={onCreateAccount}>Criar conta</button></p>
       <p className="text-center text-xs leading-5 text-[#52655a]">O primeiro acesso pode levar até um minuto enquanto o servidor inicia.</p>
     </form>
   )

@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { act, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { http, HttpResponse } from 'msw'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -12,6 +12,7 @@ describe('authentication flow', () => {
 
   afterEach(() => {
     vi.unstubAllEnvs()
+    vi.unstubAllGlobals()
     delete (window as Window & { google?: unknown }).google
   })
 
@@ -123,7 +124,7 @@ describe('authentication flow', () => {
     expect(password).toHaveAttribute('type', 'password')
   })
 
-  it('provides 44px touch targets for password, inline mode actions, and the home link', async () => {
+  it('uses only the access tabs to switch modes and shows a pointer cursor', async () => {
     const user = userEvent.setup()
     render(<App />)
 
@@ -132,20 +133,62 @@ describe('authentication flow', () => {
     expect(backLink).toHaveAttribute('href', '/')
     expect(screen.getByRole('button', { name: 'Mostrar senha' })).toHaveClass('size-11')
 
-    const createAccount = screen.getByRole('button', { name: 'Criar conta' })
-    expect(createAccount).toHaveClass('min-h-11', 'min-w-11', 'text-[#107842]')
+    const loginTab = screen.getByRole('tab', { name: 'Entrar' })
+    const createAccount = screen.getByRole('tab', { name: 'Criar conta' })
+    expect(loginTab).toHaveClass('cursor-pointer')
+    expect(createAccount).toHaveClass('cursor-pointer')
+    expect(screen.queryByRole('button', { name: 'Criar conta' })).not.toBeInTheDocument()
+    expect(screen.queryByText(/ainda não tem uma conta/i)).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Entrar' })).toHaveClass('bg-[#107842]')
-    expect(screen.getByRole('tab', { name: 'Criar conta' })).toHaveClass('text-[#617168]')
     await user.click(createAccount)
     expect(screen.getByLabelText('Nome')).toBeVisible()
     expect(screen.getByRole('button', { name: 'Mostrar senha' })).toHaveClass('size-11')
 
-    const returnToLogin = screen.getByRole('button', { name: 'Entrar' })
-    expect(returnToLogin).toHaveClass('min-h-11', 'min-w-11', 'text-[#107842]')
+    const returnToLogin = screen.getByRole('tab', { name: 'Entrar' })
+    expect(returnToLogin).toHaveClass('cursor-pointer')
+    expect(screen.queryByRole('button', { name: 'Entrar' })).not.toBeInTheDocument()
+    expect(screen.queryByText(/já tem uma conta/i)).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Criar minha conta' })).toHaveClass('bg-[#107842]')
     await user.click(returnToLogin)
     expect(screen.queryByLabelText('Nome')).not.toBeInTheDocument()
     expect(screen.getByRole('tab', { name: 'Entrar' })).toHaveAttribute('aria-selected', 'true')
+  })
+
+  it('keeps the card top anchored while animating the access panel height', async () => {
+    let resizeCallback: (() => void) | undefined
+    class TestResizeObserver {
+      constructor(callback: () => void) {
+        resizeCallback = callback
+      }
+
+      observe() {}
+      disconnect() {}
+    }
+    vi.stubGlobal('ResizeObserver', TestResizeObserver)
+
+    const user = userEvent.setup()
+    render(<App />)
+
+    const main = await screen.findByRole('main')
+    expect(main).toHaveClass('items-start', 'justify-items-center')
+
+    const animatedPanel = screen.getByTestId('access-panel-height')
+    const panelContent = animatedPanel.firstElementChild as HTMLElement
+    expect(getComputedStyle(panelContent).display).toBe('flow-root')
+    Object.defineProperty(panelContent, 'scrollHeight', {
+      configurable: true,
+      value: 420,
+    })
+    act(() => resizeCallback?.())
+    expect(animatedPanel).toHaveStyle({ height: '420px' })
+
+    Object.defineProperty(panelContent, 'scrollHeight', {
+      configurable: true,
+      value: 560,
+    })
+    await user.click(screen.getByRole('tab', { name: 'Criar conta' }))
+    act(() => resizeCallback?.())
+    expect(animatedPanel).toHaveStyle({ height: '560px' })
   })
 
   it('shows and hides the registration password accessibly', async () => {

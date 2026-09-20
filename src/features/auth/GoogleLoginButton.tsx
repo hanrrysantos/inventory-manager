@@ -13,7 +13,14 @@ interface GoogleIdentityServices {
       }) => void
       renderButton: (
         element: HTMLElement,
-        options: { theme: 'outline'; size: 'large'; text: 'signin_with'; width: number },
+        options: {
+          theme: 'filled_black'
+          size: 'large'
+          text: 'continue_with'
+          shape: 'pill'
+          logo_alignment: 'left'
+          width: number
+        },
       ) => void
     }
   }
@@ -47,6 +54,8 @@ export function GoogleLoginButton({ clientId, onCredential }: GoogleLoginButtonP
     }
 
     let active = true
+    let resizeObserver: ResizeObserver | undefined
+    let renderedWidth: number | undefined
     const handleScriptError = () => {
       if (active) setError('Não foi possível carregar o login com Google. Tente novamente.')
     }
@@ -62,12 +71,31 @@ export function GoogleLoginButton({ clientId, onCredential }: GoogleLoginButtonP
           if (credential) onCredentialRef.current(credential)
         },
       })
-      window.google.accounts.id.renderButton(containerRef.current, {
-        theme: 'outline',
-        size: 'large',
-        text: 'signin_with',
-        width: 384,
-      })
+
+      const renderGoogleButton = () => {
+        const container = containerRef.current
+        if (!active || !container || !window.google) return
+
+        const width = Math.min(container.clientWidth || 384, 384)
+        if (width === renderedWidth) return
+
+        if (renderedWidth !== undefined) container.replaceChildren()
+        renderedWidth = width
+        window.google.accounts.id.renderButton(container, {
+          theme: 'filled_black',
+          size: 'large',
+          text: 'continue_with',
+          shape: 'pill',
+          logo_alignment: 'left',
+          width,
+        })
+      }
+
+      renderGoogleButton()
+      if (typeof ResizeObserver !== 'undefined') {
+        resizeObserver = new ResizeObserver(renderGoogleButton)
+        resizeObserver.observe(containerRef.current)
+      }
     }
 
     let script = document.getElementById(SCRIPT_ID) as HTMLScriptElement | null
@@ -75,6 +103,7 @@ export function GoogleLoginButton({ clientId, onCredential }: GoogleLoginButtonP
       initialize()
       return () => {
         active = false
+        resizeObserver?.disconnect()
       }
     }
 
@@ -92,6 +121,7 @@ export function GoogleLoginButton({ clientId, onCredential }: GoogleLoginButtonP
 
     return () => {
       active = false
+      resizeObserver?.disconnect()
       script?.removeEventListener('load', initialize)
       script?.removeEventListener('error', handleScriptError)
     }
@@ -103,5 +133,5 @@ export function GoogleLoginButton({ clientId, onCredential }: GoogleLoginButtonP
 
   if (message) return <p className="rounded-xl bg-red-50 p-3 text-sm text-red-700" role="alert">{message}</p>
 
-  return <div ref={containerRef} aria-label="Entrar com Google" />
+  return <div className="google-login-button" ref={containerRef} aria-label="Entrar com Google" />
 }

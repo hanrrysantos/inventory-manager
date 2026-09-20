@@ -2,6 +2,7 @@ import { ArrowLeft } from 'lucide-react'
 import { useState, type KeyboardEvent } from 'react'
 import { Link, Navigate } from 'react-router-dom'
 import { BrandMark } from '../../components/ui/BrandMark'
+import { AnimatedHeight } from './AnimatedHeight'
 import { LoginForm } from './LoginForm'
 import { RegisterForm } from './RegisterForm'
 import { useAuth } from './use-auth'
@@ -51,7 +52,7 @@ export function LoginPage() {
   }
 
   return (
-    <main className="grid min-h-screen place-items-center bg-[#f4fbf6] bg-[linear-gradient(rgba(34,120,65,0.055)_1px,transparent_1px),linear-gradient(90deg,rgba(34,120,65,0.055)_1px,transparent_1px)] bg-[size:48px_48px] px-5 py-10 text-[#18281e]">
+    <main className="grid min-h-screen items-start justify-items-center bg-[#f4fbf6] bg-[linear-gradient(rgba(34,120,65,0.055)_1px,transparent_1px),linear-gradient(90deg,rgba(34,120,65,0.055)_1px,transparent_1px)] bg-[size:48px_48px] px-5 py-10 text-[#18281e]">
       <div className="w-full max-w-md">
         <Link className="mb-6 inline-flex min-h-11 min-w-11 items-center gap-2 text-sm font-medium text-[#52655a] hover:text-[#107842]" to="/">
           <ArrowLeft className="size-4" aria-hidden="true" />Voltar ao início
@@ -75,7 +76,7 @@ export function LoginPage() {
                   aria-selected={selected}
                   aria-controls="access-panel"
                   tabIndex={selected ? 0 : -1}
-                  className={selected ? 'min-h-11 rounded-lg bg-white font-semibold text-[#173b27] shadow-sm' : 'min-h-11 rounded-lg font-medium text-[#617168]'}
+                  className={selected ? 'min-h-11 cursor-pointer rounded-lg bg-white font-semibold text-[#173b27] shadow-sm' : 'min-h-11 cursor-pointer rounded-lg font-medium text-[#617168]'}
                   onClick={() => selectMode(item)}
                   onKeyDown={(event) => handleTabKeyDown(event, item)}
                 >
@@ -85,19 +86,20 @@ export function LoginPage() {
             })}
           </div>
           {notice && <p className="mt-5 rounded-xl bg-[#eef7f0] p-3 text-sm text-[#173b27]" role="status">{notice}</p>}
-          <div className="mt-6" id="access-panel" role="tabpanel" aria-labelledby={`${mode}-tab`}>
-            {mode === 'login' ? (
-              <LoginForm
-                initialEmail={initialEmail}
-                onCreateAccount={() => selectMode('register')}
-                isGoogleLinkPending={isGoogleLinkPending}
-                onGoogleLinkRequired={() => setIsGoogleLinkPending(true)}
-                onGoogleLinkCompleted={() => setIsGoogleLinkPending(false)}
-              />
-            ) : (
-              <RegisterForm onBack={() => selectMode('login')} onSuccess={handleRegistered} />
-            )}
-          </div>
+          <AnimatedHeight dependency={mode}>
+            <div className="mt-6" id="access-panel" role="tabpanel" aria-labelledby={`${mode}-tab`}>
+              {mode === 'login' ? (
+                <LoginForm
+                  initialEmail={initialEmail}
+                  isGoogleLinkPending={isGoogleLinkPending}
+                  onGoogleLinkRequired={() => setIsGoogleLinkPending(true)}
+                  onGoogleLinkCompleted={() => setIsGoogleLinkPending(false)}
+                />
+              ) : (
+                <RegisterForm onSuccess={handleRegistered} />
+              )}
+            </div>
+          </AnimatedHeight>
         </section>
       </div>
     </main>

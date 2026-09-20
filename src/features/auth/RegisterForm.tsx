@@ -8,11 +8,10 @@ import { PasswordField } from './PasswordField'
 import { registerSchema, type RegisterFormData } from './register-schema'
 
 interface RegisterFormProps {
-  onBack: () => void
   onSuccess: (email: string) => void
 }
 
-export function RegisterForm({ onBack, onSuccess }: RegisterFormProps) {
+export function RegisterForm({ onSuccess }: RegisterFormProps) {
   const [apiError, setApiError] = useState<string | null>(null)
   const {
     register,
@@ -74,7 +73,6 @@ export function RegisterForm({ onBack, onSuccess }: RegisterFormProps) {
       <button className="h-12 w-full rounded-xl bg-[#107842] font-medium text-white transition hover:bg-[#0c6236] disabled:cursor-not-allowed disabled:opacity-60" type="submit" disabled={isSubmitting}>
         {isSubmitting ? 'Criando conta...' : 'Criar minha conta'}
       </button>
-      <p className="text-center text-sm text-[#617168]">Já tem uma conta? <button className="inline-flex min-h-11 min-w-11 items-center justify-center font-semibold text-[#107842]" type="button" onClick={onBack}>Entrar</button></p>
     </form>
   )
 }
