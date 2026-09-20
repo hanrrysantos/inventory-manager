@@ -17,3 +17,6 @@ spring:
 jwt:
   secret: test-secret-test-secret-test-secret-test-secret
   expiration: 3600000
+google:
+  client:
+    id: test-client-id

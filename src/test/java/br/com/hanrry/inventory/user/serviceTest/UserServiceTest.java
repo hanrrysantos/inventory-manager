@@ -1,14 +1,18 @@
 package br.com.hanrry.inventory.user.serviceTest;
 
+import br.com.hanrry.inventory.auth.service.GoogleAuthService;
+import br.com.hanrry.inventory.shared.exception.auth.GoogleAccountLinkRequiredException;
 import br.com.hanrry.inventory.user.dto.UpdateUserRequestDTO;
 import br.com.hanrry.inventory.user.dto.UserRequestDTO;
 import br.com.hanrry.inventory.user.dto.UserResponseDTO;
 import br.com.hanrry.inventory.user.entity.User;
+import br.com.hanrry.inventory.user.entity.enums.UserRole;
 import br.com.hanrry.inventory.shared.exception.user.EmailAlreadyExistsException;
 import br.com.hanrry.inventory.shared.exception.user.UserNotFoundException;
 import br.com.hanrry.inventory.user.mapper.UserMapper;
 import br.com.hanrry.inventory.user.repository.UserRepository;
 import br.com.hanrry.inventory.user.service.UserService;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,6 +26,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -35,6 +40,9 @@ class UserServiceTest {
 
     @Mock
     private PasswordEncoder passwordEncoder;
+
+    @Mock
+    private GoogleAuthService googleAuthService;
 
     @InjectMocks
     private UserService userService;
@@ -95,6 +103,87 @@ class UserServiceTest {
 
         verify(userRepository).existsByEmail(userRequestDTO.email());
         verify(userRepository, never()).save(any());
+    }
+
+    @Test
+    void shouldAuthenticateGoogleUserByStableGoogleSubject() {
+        GoogleIdToken.Payload payload = new GoogleIdToken.Payload()
+                .setSubject("google-subject-123")
+                .setEmail("hanrry@gmail.com")
+                .setEmailVerified(true)
+                .set("name", "Hanrry");
+
+        when(googleAuthService.validarTokenGoogle("google-id-token")).thenReturn(payload);
+        when(userRepository.findByGoogleSubject("google-subject-123")).thenReturn(Optional.of(user));
+
+        String authenticatedEmail = assertDoesNotThrow(
+                () -> userService.authenticateWithGoogle("google-id-token")
+        );
+
+        assertEquals("hanrry@gmail.com", authenticatedEmail);
+        verify(userRepository, never()).findByEmail("hanrry@gmail.com");
+    }
+
+    @Test
+    void shouldCreateGoogleUserWithVerifiedIdentityWhenSubjectIsUnknown() {
+        GoogleIdToken.Payload payload = new GoogleIdToken.Payload()
+                .setSubject("google-subject-456")
+                .setEmail("new.user@gmail.com")
+                .setEmailVerified(true)
+                .set("name", "New User");
+
+        when(googleAuthService.validarTokenGoogle("google-id-token")).thenReturn(payload);
+        when(userRepository.findByGoogleSubject("google-subject-456")).thenReturn(Optional.empty());
+        when(userRepository.findByEmail("new.user@gmail.com")).thenReturn(Optional.empty());
+        when(passwordEncoder.encode(anyString())).thenReturn("encoded-random-password");
+        when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        String authenticatedEmail = assertDoesNotThrow(
+                () -> userService.authenticateWithGoogle("google-id-token")
+        );
+
+        assertEquals("new.user@gmail.com", authenticatedEmail);
+        verify(userRepository).findByEmail("new.user@gmail.com");
+        verify(userRepository).save(argThat(savedUser ->
+                "google-subject-456".equals(savedUser.getGoogleSubject())
+                        && "new.user@gmail.com".equals(savedUser.getEmail())
+                        && "New User".equals(savedUser.getName())
+                        && UserRole.USER.equals(savedUser.getRole())
+        ));
+    }
+
+    @Test
+    void shouldRejectGoogleLoginForExistingAccountWithoutGoogleLink() {
+        GoogleIdToken.Payload payload = new GoogleIdToken.Payload()
+                .setSubject("google-subject-789")
+                .setEmail("hanrry@gmail.com")
+                .setEmailVerified(true)
+                .set("name", "Hanrry");
+
+        when(googleAuthService.validarTokenGoogle("google-id-token")).thenReturn(payload);
+        when(userRepository.findByGoogleSubject("google-subject-789")).thenReturn(Optional.empty());
+        when(userRepository.findByEmail("hanrry@gmail.com")).thenReturn(Optional.of(user));
+
+        assertThrows(GoogleAccountLinkRequiredException.class, () -> userService.authenticateWithGoogle("google-id-token"));
+
+        verify(userRepository, never()).save(any(User.class));
+    }
+
+    @Test
+    void shouldLinkGoogleSubjectToAuthenticatedUser() {
+        GoogleIdToken.Payload payload = new GoogleIdToken.Payload()
+                .setSubject("google-subject-987")
+                .setEmail("hanrry@gmail.com")
+                .setEmailVerified(true);
+
+        when(googleAuthService.validarTokenGoogle("google-id-token")).thenReturn(payload);
+        when(userRepository.findByEmail("hanrry@gmail.com")).thenReturn(Optional.of(user));
+        when(userRepository.findByGoogleSubject("google-subject-987")).thenReturn(Optional.empty());
+
+        userService.linkGoogleAccount("hanrry@gmail.com", "google-id-token");
+
+        assertEquals("google-subject-987", user.getGoogleSubject());
+        verify(userRepository).save(user);
     }
 
     @Test

@@ -4,6 +4,8 @@ import br.com.hanrry.inventory.auth.controller.AuthController;
 import br.com.hanrry.inventory.auth.dto.AuthRequestDTO;
 import br.com.hanrry.inventory.auth.dto.AuthResponseDTO;
 import br.com.hanrry.inventory.auth.security.JwtUtil;
+import br.com.hanrry.inventory.shared.exception.auth.InvalidTokenException;
+import br.com.hanrry.inventory.shared.exception.handler.GlobalExceptionHandler;
 import br.com.hanrry.inventory.user.dto.UserRequestDTO;
 import br.com.hanrry.inventory.user.dto.UserResponseDTO;
 import br.com.hanrry.inventory.user.service.UserService;
@@ -51,6 +53,7 @@ class AuthControllerTest {
 
         mockMvc = MockMvcBuilders
                 .standaloneSetup(authController)
+                .setControllerAdvice(new GlobalExceptionHandler())
                 .build();
     }
 
@@ -75,6 +78,29 @@ class AuthControllerTest {
 
         verify(authenticationManager).authenticate(any(UsernamePasswordAuthenticationToken.class));
         verify(jwtUtil).generateToken("admin@email.com");
+    }
+
+    @Test
+    void shouldLinkGoogleAccountForAuthenticatedUser() throws Exception {
+        mockMvc.perform(post("/api/v1/auth/google/link")
+                        .principal(() -> "hanrry@email.com")
+                        .contentType("application/json")
+                        .content("{\"idToken\":\"google-id-token\"}"))
+                .andExpect(status().isNoContent());
+
+        verify(userService).linkGoogleAccount("hanrry@email.com", "google-id-token");
+    }
+
+    @Test
+    void shouldReturnUnauthorizedForInvalidGoogleToken() throws Exception {
+        when(userService.authenticateWithGoogle("invalid-google-id-token"))
+                .thenThrow(new InvalidTokenException("Invalid Google ID token"));
+
+        mockMvc.perform(post("/api/v1/auth/google")
+                        .contentType("application/json")
+                        .content("{\"idToken\":\"invalid-google-id-token\"}"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.error").value("InvalidTokenException"));
     }
 
     @Test

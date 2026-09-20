@@ -147,6 +147,15 @@ class SecurityIntegrationTest {
     }
 
     @Test
+    void shouldRequireJwtToLinkGoogleAccount() throws Exception {
+        mockMvc.perform(post("/api/v1/auth/google/link")
+                        .contentType(APPLICATION_JSON)
+                        .content("{\"idToken\":\"google-id-token\"}"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.error").value("Unauthorized"));
+    }
+
+    @Test
     void shouldAllowUnauthenticatedAccessToOpenApiDocs() throws Exception {
         mockMvc.perform(get("/v3/api-docs"))
                 .andExpect(status().isOk());
