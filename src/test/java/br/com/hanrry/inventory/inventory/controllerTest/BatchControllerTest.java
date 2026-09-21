@@ -6,6 +6,8 @@ import br.com.hanrry.inventory.inventory.dto.batch.BatchRequestDTO;
 import br.com.hanrry.inventory.inventory.dto.batch.BatchResponseDTO;
 import br.com.hanrry.inventory.inventory.dto.batch.ConsumeBatchRequestDTO;
 import br.com.hanrry.inventory.inventory.service.BatchService;
+import br.com.hanrry.inventory.shared.dto.PageResponse;
+import br.com.hanrry.inventory.shared.exception.handler.GlobalExceptionHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,6 +15,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -20,6 +24,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -43,6 +48,8 @@ class BatchControllerTest {
 
         mockMvc = MockMvcBuilders
                 .standaloneSetup(batchController)
+                .setControllerAdvice(new GlobalExceptionHandler())
+                .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
                 .build();
     }
 
@@ -59,18 +66,27 @@ class BatchControllerTest {
                 "Notebook"
         );
 
-        when(batchService.findExpiredBatches())
-                .thenReturn(List.of(batch));
+        PageResponse<BatchResponseDTO> page = new PageResponse<>(
+                List.of(batch),
+                0,
+                20,
+                1,
+                1
+        );
+
+        when(batchService.findExpiredBatches(any(Pageable.class)))
+                .thenReturn(page);
 
         mockMvc.perform(get("/api/v1/batches/expired"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].id").value(1L))
-                .andExpect(jsonPath("$[0].batchNumber").value("BATCH-001"))
-                .andExpect(jsonPath("$[0].quantity").value(10L))
-                .andExpect(jsonPath("$[0].productId").value(1L))
-                .andExpect(jsonPath("$[0].productName").value("Notebook"));
+                .andExpect(jsonPath("$.content[0].id").value(1L))
+                .andExpect(jsonPath("$.content[0].batchNumber").value("BATCH-001"))
+                .andExpect(jsonPath("$.content[0].quantity").value(10L))
+                .andExpect(jsonPath("$.content[0].productId").value(1L))
+                .andExpect(jsonPath("$.content[0].productName").value("Notebook"))
+                .andExpect(jsonPath("$.totalElements").value(1));
 
-        verify(batchService).findExpiredBatches();
+        verify(batchService).findExpiredBatches(any(Pageable.class));
     }
 
     @Test

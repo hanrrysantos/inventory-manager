@@ -15,10 +15,15 @@ import br.com.hanrry.inventory.user.service.UserService;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import br.com.hanrry.inventory.shared.dto.PageResponse;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
@@ -216,17 +221,16 @@ class UserServiceTest {
     @Test
     void shouldFindAllUsersSuccessfully() {
 
-        List<User> users = List.of(user);
-        List<UserResponseDTO> responseDTOList = List.of(userResponseDTO);
+        Pageable pageable = PageRequest.of(0, 20);
+        Page<User> userPage = new PageImpl<>(List.of(user), pageable, 1);
 
-        when(userRepository.findAll()).thenReturn(users);
-        when(userMapper.toDTOList(users)).thenReturn(responseDTOList);
+        when(userRepository.findAll(pageable)).thenReturn(userPage);
+        when(userMapper.toDTO(user)).thenReturn(userResponseDTO);
 
-        List<UserResponseDTO> response = userService.findAllUsers();
+        PageResponse<UserResponseDTO> response = userService.findAllUsers(pageable);
 
-        assertEquals(1, response.size());
-
-        verify(userRepository).findAll();
+        assertEquals(1, response.content().size());
+        verify(userRepository).findAll(pageable);
     }
 
     @Test

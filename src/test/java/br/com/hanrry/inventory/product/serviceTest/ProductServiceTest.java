@@ -12,11 +12,17 @@ import br.com.hanrry.inventory.product.mapper.ProductMapper;
 import br.com.hanrry.inventory.product.repository.CategoryRepository;
 import br.com.hanrry.inventory.product.repository.ProductRepository;
 import br.com.hanrry.inventory.product.service.ProductService;
+import br.com.hanrry.inventory.shared.dto.PageResponse;
+import br.com.hanrry.inventory.user.entity.User;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -168,22 +174,54 @@ class ProductServiceTest {
                 10L
         );
 
-        List<Product> products = List.of(product);
-        List<ProductResponseDTO> responses = List.of(response);
+        Pageable pageable = PageRequest.of(0, 20);
+        Page<Product> productPage = new PageImpl<>(List.of(product), pageable, 1);
 
-        when(productRepository.findAll())
-                .thenReturn(products);
+        when(productRepository.findAll(pageable))
+                .thenReturn(productPage);
 
-        when(productMapper.toDTOList(products))
-                .thenReturn(responses);
+        when(productMapper.toDTO(product))
+                .thenReturn(response);
 
-        List<ProductResponseDTO> result = productService.findAllProducts();
+        PageResponse<ProductResponseDTO> result = productService.findAllProducts(pageable);
 
-        assertEquals(1, result.size());
-        assertEquals("Notebook", result.getFirst().name());
+        assertEquals(1, result.content().size());
+        assertEquals("Notebook", result.content().getFirst().name());
+        assertEquals(0, result.page());
+        assertEquals(20, result.size());
+        assertEquals(1, result.totalElements());
 
-        verify(productRepository).findAll();
-        verify(productMapper).toDTOList(products);
+        verify(productRepository).findAll(pageable);
+        verify(productMapper).toDTO(product);
+    }
+
+    @Test
+    void shouldFindAllProductsByOwnerWhenUserIsAuthenticated() {
+        User owner = new User();
+        owner.setId(7L);
+
+        Product product = new Product();
+        ProductResponseDTO response = new ProductResponseDTO(
+                1L,
+                "Notebook",
+                "NOTE-001",
+                5L,
+                "Eletrônicos",
+                10L
+        );
+
+        Pageable pageable = PageRequest.of(0, 20);
+        Page<Product> productPage = new PageImpl<>(List.of(product), pageable, 1);
+
+        when(ownerContext.currentUser()).thenReturn(owner);
+        when(productRepository.findAllByOwner(owner, pageable)).thenReturn(productPage);
+        when(productMapper.toDTO(product)).thenReturn(response);
+
+        PageResponse<ProductResponseDTO> result = productService.findAllProducts(pageable);
+
+        assertEquals(1, result.content().size());
+        verify(productRepository).findAllByOwner(owner, pageable);
+        verify(productRepository, never()).findAll(any(Pageable.class));
     }
 
     @Test
@@ -323,28 +361,19 @@ class ProductServiceTest {
                 10L
         );
 
-        when(productRepository.findAll())
-                .thenReturn(List.of(productLowStock, productNormalStock));
+        Pageable pageable = PageRequest.of(0, 20);
+        Page<Product> lowStockPage = new PageImpl<>(List.of(productLowStock), pageable, 1);
 
-        when(productMapper.calculateTotalQuantity(productLowStock))
-                .thenReturn(3L);
+        when(productRepository.findLowStockProducts(null, pageable)).thenReturn(lowStockPage);
+        when(productMapper.toDTO(productLowStock)).thenReturn(response);
 
-        when(productMapper.calculateTotalQuantity(productNormalStock))
-                .thenReturn(20L);
+        PageResponse<ProductResponseDTO> result = productService.findLowStockProducts(pageable);
 
-        when(productMapper.toDTO(productLowStock))
-                .thenReturn(response);
+        assertEquals(1, result.content().size());
+        assertEquals("Notebook", result.content().getFirst().name());
 
-        List<ProductResponseDTO> result = productService.getLowStockProducts();
-
-        assertEquals(1, result.size());
-        assertEquals("Notebook", result.getFirst().name());
-
-        verify(productRepository).findAll();
-        verify(productMapper).calculateTotalQuantity(productLowStock);
-        verify(productMapper).calculateTotalQuantity(productNormalStock);
+        verify(productRepository).findLowStockProducts(null, pageable);
         verify(productMapper).toDTO(productLowStock);
-        verify(productMapper, never()).toDTO(productNormalStock);
     }
 
     @Test
@@ -363,8 +392,8 @@ class ProductServiceTest {
                 10L
         );
 
-        when(productRepository.findAll()).thenReturn(List.of(product));
-        when(productMapper.calculateTotalQuantity(product)).thenReturn(10L);
+        Page<Product> lowStockPage = new PageImpl<>(List.of(product));
+        when(productRepository.findLowStockProducts(null, Pageable.unpaged())).thenReturn(lowStockPage);
         when(productMapper.toDTO(product)).thenReturn(response);
 
         List<ProductResponseDTO> result = productService.getLowStockProducts();

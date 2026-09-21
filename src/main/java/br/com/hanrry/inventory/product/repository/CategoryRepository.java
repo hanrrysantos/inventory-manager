@@ -1,6 +1,8 @@
 package br.com.hanrry.inventory.product.repository;
 
 import br.com.hanrry.inventory.product.entity.Category;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
@@ -18,4 +20,10 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
     Optional<Category> findByNameIgnoreCaseAndOwnerExcludingId(@org.springframework.data.repository.query.Param("name") String name, @org.springframework.data.repository.query.Param("owner") User owner, @org.springframework.data.repository.query.Param("id") Long id);
     @org.springframework.data.jpa.repository.Query("select c from Category c where c.owner = :owner or c.owner is null")
     List<Category> findAllByOwner(@org.springframework.data.repository.query.Param("owner") User owner);
+
+    @org.springframework.data.jpa.repository.Query("select c from Category c where c.owner = :owner or c.owner is null")
+    Page<Category> findAllByOwner(
+            @org.springframework.data.repository.query.Param("owner") User owner,
+            Pageable pageable
+    );
 }

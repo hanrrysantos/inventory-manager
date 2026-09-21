@@ -480,22 +480,56 @@ class BatchServiceTest {
                 "Notebook"
         );
 
-        List<Batch> expiredBatches = List.of(batch);
-        List<BatchResponseDTO> responses = List.of(response);
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(0, 20);
+        org.springframework.data.domain.Page<Batch> batchPage =
+                new org.springframework.data.domain.PageImpl<>(List.of(batch), pageable, 1);
 
-        when(batchRepository.findByExpiryDateBefore(LocalDate.now()))
-                .thenReturn(expiredBatches);
+        when(batchRepository.findExpiredBatches(eq(LocalDate.now()), isNull(), eq(pageable)))
+                .thenReturn(batchPage);
 
-        when(batchMapper.toDTOList(expiredBatches))
-                .thenReturn(responses);
+        when(batchMapper.toDTO(batch)).thenReturn(response);
 
-        List<BatchResponseDTO> result = batchService.findExpiredBatches();
+        var result = batchService.findExpiredBatches(pageable);
 
-        assertEquals(1, result.size());
-        assertEquals("BATCH-001", result.get(0).batchNumber());
-        assertEquals(expiryDate, result.get(0).expiryDate());
+        assertEquals(1, result.content().size());
+        assertEquals("BATCH-001", result.content().getFirst().batchNumber());
+        assertEquals(expiryDate, result.content().getFirst().expiryDate());
 
-        verify(batchRepository).findByExpiryDateBefore(LocalDate.now());
-        verify(batchMapper).toDTOList(expiredBatches);
+        verify(batchRepository).findExpiredBatches(eq(LocalDate.now()), isNull(), eq(pageable));
+        verify(batchMapper).toDTO(batch);
+    }
+
+    @Test
+    void shouldFindBatchesByProductIdSuccessfully() {
+        Product product = new Product();
+        product.setId(5L);
+
+        Batch batch = new Batch();
+        batch.setId(1L);
+        batch.setBatchNumber("LOT-001");
+
+        BatchResponseDTO response = new BatchResponseDTO(
+                1L,
+                "LOT-001",
+                10L,
+                LocalDate.now().minusMonths(1),
+                LocalDate.now().plusMonths(6),
+                BigDecimal.TEN,
+                5L,
+                "Notebook"
+        );
+
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(0, 20);
+        org.springframework.data.domain.Page<Batch> batchPage =
+                new org.springframework.data.domain.PageImpl<>(List.of(batch), pageable, 1);
+
+        when(productRepository.findById(5L)).thenReturn(Optional.of(product));
+        when(batchRepository.findByProductId(5L, null, pageable)).thenReturn(batchPage);
+        when(batchMapper.toDTO(batch)).thenReturn(response);
+
+        var result = batchService.findBatchesByProductId(5L, pageable);
+
+        assertEquals(1, result.content().size());
+        verify(batchRepository).findByProductId(5L, null, pageable);
     }
 }

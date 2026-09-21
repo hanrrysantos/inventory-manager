@@ -2,6 +2,7 @@ package br.com.hanrry.inventory.shared.exception.handler;
 
 import br.com.hanrry.inventory.shared.exception.StandardError;
 import br.com.hanrry.inventory.shared.exception.inventory.batch.InsufficientStockException;
+import br.com.hanrry.inventory.shared.exception.inventory.log.InventoryLogNotFoundException;
 import br.com.hanrry.inventory.shared.exception.inventory.batch.InvalidQuantityException;
 import br.com.hanrry.inventory.shared.exception.product.category.CascadeCategoryException;
 import br.com.hanrry.inventory.shared.exception.product.category.CategoryAlreadyExistsException;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.dao.DataIntegrityViolationException;
+import br.com.hanrry.inventory.shared.exception.pagination.InvalidPaginationException;
 import br.com.hanrry.inventory.shared.exception.security.OwnerNotAuthenticatedException;
 
 import java.time.Instant;
@@ -132,6 +134,34 @@ public class GlobalExceptionHandler {
         HttpStatus status = HttpStatus.CONFLICT;
         StandardError err = new StandardError(Instant.now(), status.value(), error, ex.getMessage(), request.getRequestURI());
         return ResponseEntity.status(status).body(err);
+    }
+
+    @ExceptionHandler(InvalidPaginationException.class)
+    public ResponseEntity<StandardError> handleInvalidPaginationException(
+            InvalidPaginationException ex,
+            HttpServletRequest request) {
+        StandardError err = new StandardError(
+                Instant.now(),
+                HttpStatus.BAD_REQUEST.value(),
+                "InvalidPagination",
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+        return ResponseEntity.badRequest().body(err);
+    }
+
+    @ExceptionHandler(InventoryLogNotFoundException.class)
+    public ResponseEntity<StandardError> handleInventoryLogNotFoundException(
+            InventoryLogNotFoundException ex,
+            HttpServletRequest request) {
+        StandardError err = new StandardError(
+                Instant.now(),
+                HttpStatus.NOT_FOUND.value(),
+                "InventoryLogNotFound",
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(err);
     }
 
     @ExceptionHandler(InsufficientStockException.class)

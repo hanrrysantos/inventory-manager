@@ -11,7 +11,9 @@ import java.util.List;
 public interface InventoryLogMapper {
 
     @Mapping(target = "productName", source = "product.name")
+    @Mapping(target = "productId", source = "product.id")
     @Mapping(target = "batchId", source = "batch.id")
+    @Mapping(target = "batchNumber", source = "batch.batchNumber")
     InventoryLogResponseDTO toDTO(InventoryLog log);
 
     List<InventoryLogResponseDTO> toDTOList(List<InventoryLog> logs);
