@@ -12,8 +12,10 @@ import br.com.hanrry.inventory.shared.exception.user.EmailAlreadyExistsException
 import br.com.hanrry.inventory.shared.exception.user.UserNotFoundException;
 import br.com.hanrry.inventory.user.mapper.UserMapper;
 import br.com.hanrry.inventory.user.repository.UserRepository;
+import br.com.hanrry.inventory.shared.dto.PageResponse;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -111,10 +113,8 @@ public class UserService {
         return userMapper.toDTO(user);
     }
 
-    public List<UserResponseDTO> findAllUsers(){
-        List<User> users = userRepository.findAll();
-
-        return userMapper.toDTOList(users);
+    public PageResponse<UserResponseDTO> findAllUsers(Pageable pageable) {
+        return PageResponse.from(userRepository.findAll(pageable), userMapper::toDTO);
     }
 
     public UserResponseDTO updateUser(Long id, UpdateUserRequestDTO request){
