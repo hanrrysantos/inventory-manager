@@ -2,6 +2,7 @@ package br.com.hanrry.inventory.shared.exception.handler;
 
 import br.com.hanrry.inventory.shared.exception.StandardError;
 import br.com.hanrry.inventory.shared.exception.inventory.batch.InsufficientStockException;
+import br.com.hanrry.inventory.shared.exception.inventory.log.InventoryLogNotFoundException;
 import br.com.hanrry.inventory.shared.exception.inventory.batch.InvalidQuantityException;
 import br.com.hanrry.inventory.shared.exception.product.category.CascadeCategoryException;
 import br.com.hanrry.inventory.shared.exception.product.category.CategoryAlreadyExistsException;
@@ -147,6 +148,20 @@ public class GlobalExceptionHandler {
                 request.getRequestURI()
         );
         return ResponseEntity.badRequest().body(err);
+    }
+
+    @ExceptionHandler(InventoryLogNotFoundException.class)
+    public ResponseEntity<StandardError> handleInventoryLogNotFoundException(
+            InventoryLogNotFoundException ex,
+            HttpServletRequest request) {
+        StandardError err = new StandardError(
+                Instant.now(),
+                HttpStatus.NOT_FOUND.value(),
+                "InventoryLogNotFound",
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(err);
     }
 
     @ExceptionHandler(InsufficientStockException.class)

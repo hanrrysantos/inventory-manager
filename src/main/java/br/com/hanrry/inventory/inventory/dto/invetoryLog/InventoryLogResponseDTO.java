@@ -9,7 +9,9 @@ public record InventoryLogResponseDTO(
         LogType type,
         LocalDateTime timestamp,
         Long quantity,
+        Long productId,
         Long batchId,
-        String productName
+        String productName,
+        String batchNumber
 ) {
 }
