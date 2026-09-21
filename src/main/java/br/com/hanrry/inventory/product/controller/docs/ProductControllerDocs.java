@@ -1,15 +1,17 @@
 package br.com.hanrry.inventory.product.controller.docs;
 
+import br.com.hanrry.inventory.inventory.dto.batch.BatchResponseDTO;
 import br.com.hanrry.inventory.product.dto.product.ProductRequestDTO;
 import br.com.hanrry.inventory.product.dto.product.ProductResponseDTO;
 import br.com.hanrry.inventory.product.dto.product.UpdateProdcutRequestDTO;
+import br.com.hanrry.inventory.shared.dto.PageResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-
-import java.util.List;
 
 @Tag(name = "04 Produtos", description = "Endpoints para gerenciar produtos e monitorar níveis de estoque.")
 public interface ProductControllerDocs {
@@ -34,15 +36,43 @@ public interface ProductControllerDocs {
     })
     ResponseEntity<ProductResponseDTO> findProductById(Long id);
 
-    @Operation(summary = "Lista todos os produtos",
-            description = "Retorna o catálogo completo disponível.")
-            @ApiResponse(responseCode = "200", description = "Operação realizada com sucesso")
-    ResponseEntity<List<ProductResponseDTO>> findAllProducts();
+    @Operation(summary = "Lista produtos paginados",
+            description = "Retorna o catálogo paginado. Parâmetros: page (0-based), size (máx. 100), sort (id, name, sku).")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Operação realizada com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Parâmetros de paginação ou sort inválidos")
+    })
+    ResponseEntity<PageResponse<ProductResponseDTO>> findAllProducts(
+            Integer page,
+            Integer size,
+            @ParameterObject Pageable pageable
+    );
 
     @Operation(summary = "Lista produtos abaixo do estoque mínimo",
-            description = "Filtra produtos onde a soma de todos os lotes é menor do que o estoque mínimo.")
-            @ApiResponse(responseCode = "200", description = "Lista de alertas gerada")
-    ResponseEntity<List<ProductResponseDTO>> getLowStock();
+            description = "Filtra produtos paginados onde a soma de todos os lotes é <= estoque mínimo.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lista de alertas gerada"),
+            @ApiResponse(responseCode = "400", description = "Parâmetros de paginação ou sort inválidos")
+    })
+    ResponseEntity<PageResponse<ProductResponseDTO>> getLowStock(
+            Integer page,
+            Integer size,
+            @ParameterObject Pageable pageable
+    );
+
+    @Operation(summary = "Lista lotes paginados de um produto",
+            description = "Sort: expiryDate, id, batchNumber.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Página de lotes retornada"),
+            @ApiResponse(responseCode = "400", description = "Parâmetros de paginação ou sort inválidos"),
+            @ApiResponse(responseCode = "404", description = "Produto não encontrado")
+    })
+    ResponseEntity<PageResponse<BatchResponseDTO>> findBatchesByProduct(
+            Long productId,
+            Integer page,
+            Integer size,
+            @ParameterObject Pageable pageable
+    );
 
     @Operation(summary = "Atualiza dados cadastrais",
             description = "Altera nome, preço ou estoque de segurança.")

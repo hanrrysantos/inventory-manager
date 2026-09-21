@@ -2,13 +2,14 @@ package br.com.hanrry.inventory.user.controller.docs;
 
 import br.com.hanrry.inventory.user.dto.UpdateUserRequestDTO;
 import br.com.hanrry.inventory.user.dto.UserResponseDTO;
+import br.com.hanrry.inventory.shared.dto.PageResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Pageable;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
-
-import java.util.List;
 
 @Tag(name = "02 Usuários", description = "Gestão de acessos e perfis - Apenas para ADMIN")
 public interface UserControllerDocs {
@@ -22,14 +23,19 @@ public interface UserControllerDocs {
     })
     ResponseEntity<UserResponseDTO> findUserById(Long id);
 
-    @Operation(summary = "Lista todos os usuários",
-            description = "Retorna uma lista com todos usuários")
+    @Operation(summary = "Lista usuários paginados",
+            description = "Retorna usuários paginados. Parâmetros: page, size (máx. 100), sort (id, name, email).")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Lista retornada com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Parâmetros de paginação ou sort inválidos"),
             @ApiResponse(responseCode = "401", description = "Não autenticado"),
             @ApiResponse(responseCode = "403", description = "Acesso negado - Requer Role ADMIN")
     })
-    ResponseEntity<List<UserResponseDTO>> findAllUsers();
+    ResponseEntity<PageResponse<UserResponseDTO>> findAllUsers(
+            Integer page,
+            Integer size,
+            @ParameterObject Pageable pageable
+    );
 
     @Operation(summary = "Busca o usuário autenticado",
             description = "Retorna os dados do usuário identificado pelo token JWT atual.")

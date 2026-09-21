@@ -8,8 +8,11 @@ import br.com.hanrry.inventory.shared.exception.product.category.CategoryAlready
 import br.com.hanrry.inventory.shared.exception.product.category.CategoryNotFoundException;
 import br.com.hanrry.inventory.product.mapper.CategoryMapper;
 import br.com.hanrry.inventory.product.repository.CategoryRepository;
+import br.com.hanrry.inventory.shared.dto.PageResponse;
 import lombok.RequiredArgsConstructor;
 import br.com.hanrry.inventory.shared.security.OwnerContext;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,11 +44,13 @@ public class CategoryService {
         return categoryMapper.toDTO(savedCategory);
     }
 
-    public List<CategoryResponseDTO> findAllCategories(){
+    public PageResponse<CategoryResponseDTO> findAllCategories(Pageable pageable) {
         var owner = ownerContext == null ? null : ownerContext.currentUser();
-        List<Category> categories = owner == null ? categoryRepository.findAll() : categoryRepository.findAllByOwner(owner);
+        Page<Category> page = owner == null
+                ? categoryRepository.findAll(pageable)
+                : categoryRepository.findAllByOwner(owner, pageable);
 
-        return categoryMapper.toDTOList(categories);
+        return PageResponse.from(page, categoryMapper::toDTO);
     }
 
     public CategoryResponseDTO findCategoryById(Long id){

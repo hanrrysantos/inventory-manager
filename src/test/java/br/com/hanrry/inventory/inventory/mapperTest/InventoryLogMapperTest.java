@@ -26,6 +26,7 @@ class InventoryLogMapperTest {
 
         Batch batch = new Batch();
         batch.setId(10L);
+        batch.setBatchNumber("LOT-001");
 
         InventoryLog log = new InventoryLog();
         log.setId(1L);
@@ -50,6 +51,7 @@ class InventoryLogMapperTest {
 
         Batch batch = new Batch();
         batch.setId(10L);
+        batch.setBatchNumber("LOT-001");
 
         InventoryLog log = new InventoryLog();
         log.setProduct(product);

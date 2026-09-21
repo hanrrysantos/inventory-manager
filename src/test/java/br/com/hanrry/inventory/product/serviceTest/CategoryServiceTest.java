@@ -10,11 +10,17 @@ import br.com.hanrry.inventory.shared.exception.product.category.CategoryNotFoun
 import br.com.hanrry.inventory.product.mapper.CategoryMapper;
 import br.com.hanrry.inventory.product.repository.CategoryRepository;
 import br.com.hanrry.inventory.product.service.CategoryService;
+import br.com.hanrry.inventory.shared.dto.PageResponse;
+import br.com.hanrry.inventory.user.entity.User;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -143,22 +149,54 @@ class CategoryServiceTest {
                 "Produtos eletrônicos"
         );
 
-        List<Category> categories = List.of(category);
-        List<CategoryResponseDTO> responses = List.of(response);
+        Pageable pageable = PageRequest.of(0, 20);
+        Page<Category> categoryPage = new PageImpl<>(List.of(category), pageable, 1);
 
-        when(categoryRepository.findAll())
-                .thenReturn(categories);
+        when(categoryRepository.findAll(pageable))
+                .thenReturn(categoryPage);
 
-        when(categoryMapper.toDTOList(categories))
-                .thenReturn(responses);
+        when(categoryMapper.toDTO(category))
+                .thenReturn(response);
 
-        List<CategoryResponseDTO> result = categoryService.findAllCategories();
+        PageResponse<CategoryResponseDTO> result = categoryService.findAllCategories(pageable);
 
-        assertEquals(1, result.size());
-        assertEquals("Eletrônicos", result.get(0).name());
+        assertEquals(1, result.content().size());
+        assertEquals("Eletrônicos", result.content().getFirst().name());
+        assertEquals(0, result.page());
+        assertEquals(20, result.size());
+        assertEquals(1, result.totalElements());
 
-        verify(categoryRepository).findAll();
-        verify(categoryMapper).toDTOList(categories);
+        verify(categoryRepository).findAll(pageable);
+        verify(categoryMapper).toDTO(category);
+    }
+
+    @Test
+    void shouldFindAllCategoriesByOwnerWhenUserIsAuthenticated() {
+        User owner = new User();
+        owner.setId(7L);
+
+        Category category = new Category();
+        category.setId(1L);
+        category.setName("Eletrônicos");
+
+        CategoryResponseDTO response = new CategoryResponseDTO(
+                1L,
+                "Eletrônicos",
+                "Produtos eletrônicos"
+        );
+
+        Pageable pageable = PageRequest.of(0, 20);
+        Page<Category> categoryPage = new PageImpl<>(List.of(category), pageable, 1);
+
+        when(ownerContext.currentUser()).thenReturn(owner);
+        when(categoryRepository.findAllByOwner(owner, pageable)).thenReturn(categoryPage);
+        when(categoryMapper.toDTO(category)).thenReturn(response);
+
+        PageResponse<CategoryResponseDTO> result = categoryService.findAllCategories(pageable);
+
+        assertEquals(1, result.content().size());
+        verify(categoryRepository).findAllByOwner(owner, pageable);
+        verify(categoryRepository, never()).findAll(any(Pageable.class));
     }
 
     @Test
