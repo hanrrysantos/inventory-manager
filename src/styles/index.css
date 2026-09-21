@@ -29,16 +29,18 @@ input {
   font: inherit;
 }
 
+/*
+ * Google Identity Services renders its own button and manages the styling of
+ * any internal <iframe> it injects (e.g. a hidden messaging frame). We only
+ * size/center the container and must NOT override the iframe's display or
+ * dimensions: forcing it visible turned the hidden frame into a phantom
+ * second button below the real one.
+ */
 .google-login-button {
+  display: flex;
+  justify-content: center;
   min-height: 40px;
   width: 100%;
-}
-
-.google-login-button iframe {
-  display: block;
-  width: 100% !important;
-  height: 40px !important;
-  max-width: 100% !important;
 }
 
 button,

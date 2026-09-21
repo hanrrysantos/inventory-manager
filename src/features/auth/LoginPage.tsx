@@ -63,7 +63,7 @@ export function LoginPage() {
           <p className="mt-2 text-sm text-[#617168]">
             {mode === 'login' ? 'Entre para acompanhar o estoque da sua empresa.' : 'Comece a organizar o estoque da sua empresa.'}
           </p>
-          <div className="mt-6 grid grid-cols-2 rounded-xl bg-[#eef5f0] p-1" role="tablist" aria-label="Forma de acesso">
+          <div className="mt-6 grid grid-cols-2 gap-1 rounded-xl bg-[#eef5f0] p-1" role="tablist" aria-label="Forma de acesso">
             {(['login', 'register'] as const).map((item) => {
               const selected = mode === item
               const label = item === 'login' ? 'Entrar' : 'Criar conta'
@@ -76,7 +76,11 @@ export function LoginPage() {
                   aria-selected={selected}
                   aria-controls="access-panel"
                   tabIndex={selected ? 0 : -1}
-                  className={selected ? 'min-h-11 cursor-pointer rounded-lg bg-white font-semibold text-[#173b27] shadow-sm' : 'min-h-11 cursor-pointer rounded-lg font-medium text-[#617168]'}
+                  className={
+                    selected
+                      ? 'flex min-h-11 w-full min-w-0 cursor-pointer items-center justify-center rounded-lg bg-white font-semibold text-[#173b27] shadow-sm ring-1 ring-black/5 transition-colors'
+                      : 'flex min-h-11 w-full min-w-0 cursor-pointer items-center justify-center rounded-lg font-medium text-[#617168] transition-colors'
+                  }
                   onClick={() => selectMode(item)}
                   onKeyDown={(event) => handleTabKeyDown(event, item)}
                 >
