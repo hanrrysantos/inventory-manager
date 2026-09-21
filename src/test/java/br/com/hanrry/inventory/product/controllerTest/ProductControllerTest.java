@@ -4,6 +4,8 @@ import br.com.hanrry.inventory.product.controller.ProductController;
 import br.com.hanrry.inventory.product.dto.product.ProductRequestDTO;
 import br.com.hanrry.inventory.product.dto.product.ProductResponseDTO;
 import br.com.hanrry.inventory.product.dto.product.UpdateProdcutRequestDTO;
+import br.com.hanrry.inventory.inventory.dto.batch.BatchResponseDTO;
+import br.com.hanrry.inventory.inventory.service.BatchService;
 import br.com.hanrry.inventory.product.service.ProductService;
 import br.com.hanrry.inventory.shared.dto.PageResponse;
 import br.com.hanrry.inventory.shared.exception.handler.GlobalExceptionHandler;
@@ -18,9 +20,12 @@ import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -31,13 +36,16 @@ class ProductControllerTest {
     @Mock
     private ProductService productService;
 
+    @Mock
+    private BatchService batchService;
+
     private MockMvc mockMvc;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
     void setUp() {
-        ProductController productController = new ProductController(productService);
+        ProductController productController = new ProductController(productService, batchService);
 
         mockMvc = MockMvcBuilders
                 .standaloneSetup(productController)
@@ -109,6 +117,31 @@ class ProductControllerTest {
                 .andExpect(jsonPath("$.error").value("InvalidPagination"));
 
         verifyNoInteractions(productService);
+    }
+
+    @Test
+    void shouldFindBatchesByProduct() throws Exception {
+        BatchResponseDTO batch = new BatchResponseDTO(
+                1L,
+                "LOT-001",
+                10L,
+                LocalDate.of(2025, 1, 1),
+                LocalDate.of(2026, 1, 1),
+                BigDecimal.TEN,
+                5L,
+                "Notebook"
+        );
+
+        PageResponse<BatchResponseDTO> page = new PageResponse<>(List.of(batch), 0, 20, 1, 1);
+
+        when(batchService.findBatchesByProductId(eq(5L), any(Pageable.class))).thenReturn(page);
+
+        mockMvc.perform(get("/api/v1/products/5/batches"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].batchNumber").value("LOT-001"))
+                .andExpect(jsonPath("$.totalElements").value(1));
+
+        verify(batchService).findBatchesByProductId(eq(5L), any(Pageable.class));
     }
 
     @Test

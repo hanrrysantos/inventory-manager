@@ -132,4 +132,13 @@ public class BatchService {
         Page<Batch> page = batchRepository.findExpiredBatches(LocalDate.now(), owner, pageable);
         return PageResponse.from(page, batchMapper::toDTO);
     }
+
+    @Transactional(readOnly = true)
+    public PageResponse<BatchResponseDTO> findBatchesByProductId(Long productId, Pageable pageable) {
+        var owner = ownerContext == null ? null : ownerContext.currentUser();
+        (owner == null ? productRepository.findById(productId) : productRepository.findByIdAndOwner(productId, owner))
+                .orElseThrow(() -> new ProductNotFoundException("Product not found with this id: " + productId));
+        Page<Batch> page = batchRepository.findByProductId(productId, owner, pageable);
+        return PageResponse.from(page, batchMapper::toDTO);
+    }
 }

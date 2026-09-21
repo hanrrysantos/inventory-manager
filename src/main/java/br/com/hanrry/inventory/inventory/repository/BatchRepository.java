@@ -41,4 +41,16 @@ public interface BatchRepository extends JpaRepository<Batch, Long> {
             @Param("owner") User owner,
             Pageable pageable
     );
+
+    @Query("""
+            SELECT b FROM Batch b
+            JOIN b.product p
+            WHERE p.id = :productId
+              AND (:owner IS NULL OR p.owner = :owner OR p.owner IS NULL)
+            """)
+    Page<Batch> findByProductId(
+            @Param("productId") Long productId,
+            @Param("owner") User owner,
+            Pageable pageable
+    );
 }

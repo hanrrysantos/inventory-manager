@@ -1,5 +1,6 @@
 package br.com.hanrry.inventory.product.controller.docs;
 
+import br.com.hanrry.inventory.inventory.dto.batch.BatchResponseDTO;
 import br.com.hanrry.inventory.product.dto.product.ProductRequestDTO;
 import br.com.hanrry.inventory.product.dto.product.ProductResponseDTO;
 import br.com.hanrry.inventory.product.dto.product.UpdateProdcutRequestDTO;
@@ -11,8 +12,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-
-import java.util.List;
 
 @Tag(name = "04 Produtos", description = "Endpoints para gerenciar produtos e monitorar níveis de estoque.")
 public interface ProductControllerDocs {
@@ -56,6 +55,20 @@ public interface ProductControllerDocs {
             @ApiResponse(responseCode = "400", description = "Parâmetros de paginação ou sort inválidos")
     })
     ResponseEntity<PageResponse<ProductResponseDTO>> getLowStock(
+            Integer page,
+            Integer size,
+            @ParameterObject Pageable pageable
+    );
+
+    @Operation(summary = "Lista lotes paginados de um produto",
+            description = "Sort: expiryDate, id, batchNumber.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Página de lotes retornada"),
+            @ApiResponse(responseCode = "400", description = "Parâmetros de paginação ou sort inválidos"),
+            @ApiResponse(responseCode = "404", description = "Produto não encontrado")
+    })
+    ResponseEntity<PageResponse<BatchResponseDTO>> findBatchesByProduct(
+            Long productId,
             Integer page,
             Integer size,
             @ParameterObject Pageable pageable
