@@ -61,7 +61,9 @@ describe('GoogleLoginButton', () => {
       disconnect() {}
     }
     vi.stubGlobal('ResizeObserver', TestResizeObserver)
-    const renderButton = vi.fn()
+    const renderButton = vi.fn((element: HTMLElement) => {
+      element.replaceChildren(document.createElement('span'))
+    })
     googleWindow.google = {
       accounts: {
         id: {

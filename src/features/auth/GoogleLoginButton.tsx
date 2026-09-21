@@ -38,6 +38,10 @@ interface GoogleLoginButtonProps {
 }
 
 const SCRIPT_ID = 'google-identity-services'
+// Only re-render the Google button for meaningful width changes (e.g. an
+// orientation change), not for the small transient fluctuations that occur
+// while the page finishes loading.
+const WIDTH_RERENDER_THRESHOLD = 16
 
 export function GoogleLoginButton({ clientId, onCredential }: GoogleLoginButtonProps) {
   const containerRef = useRef<HTMLDivElement>(null)
@@ -78,18 +82,39 @@ export function GoogleLoginButton({ clientId, onCredential }: GoogleLoginButtonP
 
         const availableWidth = container.getBoundingClientRect().width || container.clientWidth
         const width = Math.min(Math.floor(availableWidth || 384), 384)
-        if (width === renderedWidth) return
+        // Ignore tiny width fluctuations that happen while the page settles
+        // (fonts, scrollbar, layout). Re-rendering for them empties the
+        // container for a frame and makes the button visibly jump/shake.
+        if (
+          renderedWidth !== undefined
+          && Math.abs(width - renderedWidth) < WIDTH_RERENDER_THRESHOLD
+        ) {
+          return
+        }
 
-        if (renderedWidth !== undefined) container.replaceChildren()
         renderedWidth = width
-        window.google.accounts.id.renderButton(container, {
+        const options = {
           theme: 'filled_black',
           size: 'large',
           text: 'continue_with',
           shape: 'pill',
           logo_alignment: 'left',
           width,
-        })
+        } as const
+
+        // Render into a detached node first, then swap it in, so the button
+        // never disappears for a frame during a re-render (which caused the
+        // visible jump/shake).
+        const staging = document.createElement('div')
+        window.google.accounts.id.renderButton(staging, options)
+        if (staging.childNodes.length > 0) {
+          container.replaceChildren(...staging.childNodes)
+          return
+        }
+
+        // Fallback: some environments only render into an attached node.
+        container.replaceChildren()
+        window.google.accounts.id.renderButton(container, options)
       }
 
       renderGoogleButton()
