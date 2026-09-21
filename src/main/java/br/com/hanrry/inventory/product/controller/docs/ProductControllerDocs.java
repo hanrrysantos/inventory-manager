@@ -50,9 +50,16 @@ public interface ProductControllerDocs {
     );
 
     @Operation(summary = "Lista produtos abaixo do estoque mínimo",
-            description = "Filtra produtos onde a soma de todos os lotes é menor do que o estoque mínimo.")
-            @ApiResponse(responseCode = "200", description = "Lista de alertas gerada")
-    ResponseEntity<List<ProductResponseDTO>> getLowStock();
+            description = "Filtra produtos paginados onde a soma de todos os lotes é <= estoque mínimo.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lista de alertas gerada"),
+            @ApiResponse(responseCode = "400", description = "Parâmetros de paginação ou sort inválidos")
+    })
+    ResponseEntity<PageResponse<ProductResponseDTO>> getLowStock(
+            Integer page,
+            Integer size,
+            @ParameterObject Pageable pageable
+    );
 
     @Operation(summary = "Atualiza dados cadastrais",
             description = "Altera nome, preço ou estoque de segurança.")

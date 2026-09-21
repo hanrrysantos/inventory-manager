@@ -145,16 +145,25 @@ class ProductControllerTest {
                 10L
         );
 
-        when(productService.getLowStockProducts())
-                .thenReturn(List.of(product));
+        PageResponse<ProductResponseDTO> page = new PageResponse<>(
+                List.of(product),
+                0,
+                20,
+                1,
+                1
+        );
+
+        when(productService.findLowStockProducts(any(Pageable.class)))
+                .thenReturn(page);
 
         mockMvc.perform(get("/api/v1/products/low-stock"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].name").value("Notebook"))
-                .andExpect(jsonPath("$[0].totalQuantity").value(3L))
-                .andExpect(jsonPath("$[0].minStock").value(10L));
+                .andExpect(jsonPath("$.content[0].name").value("Notebook"))
+                .andExpect(jsonPath("$.content[0].totalQuantity").value(3L))
+                .andExpect(jsonPath("$.content[0].minStock").value(10L))
+                .andExpect(jsonPath("$.totalElements").value(1));
 
-        verify(productService).getLowStockProducts();
+        verify(productService).findLowStockProducts(any(Pageable.class));
     }
 
     @Test

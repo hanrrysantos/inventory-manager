@@ -361,28 +361,19 @@ class ProductServiceTest {
                 10L
         );
 
-        when(productRepository.findAll())
-                .thenReturn(List.of(productLowStock, productNormalStock));
+        Pageable pageable = PageRequest.of(0, 20);
+        Page<Product> lowStockPage = new PageImpl<>(List.of(productLowStock), pageable, 1);
 
-        when(productMapper.calculateTotalQuantity(productLowStock))
-                .thenReturn(3L);
+        when(productRepository.findLowStockProducts(null, pageable)).thenReturn(lowStockPage);
+        when(productMapper.toDTO(productLowStock)).thenReturn(response);
 
-        when(productMapper.calculateTotalQuantity(productNormalStock))
-                .thenReturn(20L);
+        PageResponse<ProductResponseDTO> result = productService.findLowStockProducts(pageable);
 
-        when(productMapper.toDTO(productLowStock))
-                .thenReturn(response);
+        assertEquals(1, result.content().size());
+        assertEquals("Notebook", result.content().getFirst().name());
 
-        List<ProductResponseDTO> result = productService.getLowStockProducts();
-
-        assertEquals(1, result.size());
-        assertEquals("Notebook", result.getFirst().name());
-
-        verify(productRepository).findAll();
-        verify(productMapper).calculateTotalQuantity(productLowStock);
-        verify(productMapper).calculateTotalQuantity(productNormalStock);
+        verify(productRepository).findLowStockProducts(null, pageable);
         verify(productMapper).toDTO(productLowStock);
-        verify(productMapper, never()).toDTO(productNormalStock);
     }
 
     @Test
@@ -401,8 +392,8 @@ class ProductServiceTest {
                 10L
         );
 
-        when(productRepository.findAll()).thenReturn(List.of(product));
-        when(productMapper.calculateTotalQuantity(product)).thenReturn(10L);
+        Page<Product> lowStockPage = new PageImpl<>(List.of(product));
+        when(productRepository.findLowStockProducts(null, Pageable.unpaged())).thenReturn(lowStockPage);
         when(productMapper.toDTO(product)).thenReturn(response);
 
         List<ProductResponseDTO> result = productService.getLowStockProducts();

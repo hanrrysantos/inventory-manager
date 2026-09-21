@@ -99,16 +99,13 @@ public class ProductService {
         productRepository.deleteById(id);
     }
 
-    public List<ProductResponseDTO> getLowStockProducts() {
+    public PageResponse<ProductResponseDTO> findLowStockProducts(Pageable pageable) {
         var owner = ownerContext == null ? null : ownerContext.currentUser();
-        List<Product> allProducts = owner == null ? productRepository.findAll() : productRepository.findAllByOwner(owner);
+        Page<Product> page = productRepository.findLowStockProducts(owner, pageable);
+        return PageResponse.from(page, productMapper::toDTO);
+    }
 
-        return allProducts.stream()
-                .filter(product -> {
-                    Long totalStock = productMapper.calculateTotalQuantity(product);
-                    return totalStock <= product.getMinStock();
-                })
-                .map(productMapper::toDTO)
-                .toList();
+    public List<ProductResponseDTO> getLowStockProducts() {
+        return findLowStockProducts(Pageable.unpaged()).content();
     }
 }

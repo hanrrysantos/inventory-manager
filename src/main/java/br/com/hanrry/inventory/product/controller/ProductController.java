@@ -53,10 +53,14 @@ public class ProductController implements ProductControllerDocs {
     }
 
     @GetMapping("/low-stock")
-    public ResponseEntity<List<ProductResponseDTO>> getLowStock(){
-        List<ProductResponseDTO> productList = productService.getLowStockProducts();
-
-        return ResponseEntity.ok().body(productList);
+    public ResponseEntity<PageResponse<ProductResponseDTO>> getLowStock(
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer size,
+            @PageableDefault(size = PaginationConfig.DEFAULT_PAGE_SIZE, sort = "name") Pageable pageable
+    ) {
+        PaginationBoundsValidator.validate(page, size, PaginationConfig.MAX_PAGE_SIZE);
+        PaginationSortValidator.validateAllowedProperties(pageable, PRODUCT_LIST_SORT_PROPERTIES);
+        return ResponseEntity.ok(productService.findLowStockProducts(pageable));
     }
 
     @PostMapping

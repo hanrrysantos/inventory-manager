@@ -28,6 +28,20 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             @org.springframework.data.repository.query.Param("owner") User owner,
             Pageable pageable
     );
+
+    @Query("""
+            SELECT p FROM Product p
+            WHERE (:owner IS NULL OR p.owner = :owner OR p.owner IS NULL)
+              AND (
+                SELECT COALESCE(SUM(b.quantity), 0)
+                FROM Batch b
+                WHERE b.product = p
+              ) <= p.minStock
+            """)
+    Page<Product> findLowStockProducts(
+            @org.springframework.data.repository.query.Param("owner") User owner,
+            Pageable pageable
+    );
     @Query("select distinct p from Product p left join fetch p.batches where p.owner = :owner or p.owner is null")
     List<Product> findAllWithBatchesByOwner(@org.springframework.data.repository.query.Param("owner") User owner);
 }
