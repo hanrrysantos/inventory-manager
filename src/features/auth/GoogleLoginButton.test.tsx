@@ -1,4 +1,4 @@
-import { act, render, screen } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { GoogleLoginButton } from './GoogleLoginButton'
@@ -39,28 +39,15 @@ describe('GoogleLoginButton', () => {
       text: 'continue_with',
       shape: 'pill',
       logo_alignment: 'left',
-      width: 384,
+      width: 400,
     })
     expect(screen.getByLabelText('Entrar com Google')).toHaveClass(
       'google-login-button',
     )
   })
 
-  it('re-renders the Google button when its available width changes', () => {
-    let availableWidth = 320
-    vi.spyOn(HTMLElement.prototype, 'clientWidth', 'get').mockImplementation(
-      () => availableWidth,
-    )
-    let resizeCallback: (() => void) | undefined
-    class TestResizeObserver {
-      constructor(callback: () => void) {
-        resizeCallback = callback
-      }
-
-      observe() {}
-      disconnect() {}
-    }
-    vi.stubGlobal('ResizeObserver', TestResizeObserver)
+  it('sizes the button to the available width and renders it exactly once', () => {
+    vi.spyOn(HTMLElement.prototype, 'clientWidth', 'get').mockReturnValue(320)
     const renderButton = vi.fn((element: HTMLElement) => {
       element.replaceChildren(document.createElement('span'))
     })
@@ -80,18 +67,12 @@ describe('GoogleLoginButton', () => {
       />,
     )
 
+    // Rendered once at the available width — never re-rendered, so the button
+    // cannot flicker or "fight" itself into view.
+    expect(renderButton).toHaveBeenCalledTimes(1)
     expect(renderButton).toHaveBeenLastCalledWith(
       expect.any(HTMLElement),
       expect.objectContaining({ width: 320 }),
-    )
-
-    availableWidth = 280
-    act(() => resizeCallback?.())
-
-    expect(renderButton).toHaveBeenCalledTimes(2)
-    expect(renderButton).toHaveBeenLastCalledWith(
-      expect.any(HTMLElement),
-      expect.objectContaining({ width: 280 }),
     )
   })
 

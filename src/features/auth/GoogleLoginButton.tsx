@@ -38,10 +38,10 @@ interface GoogleLoginButtonProps {
 }
 
 const SCRIPT_ID = 'google-identity-services'
-// Only re-render the Google button for meaningful width changes (e.g. an
-// orientation change), not for the small transient fluctuations that occur
-// while the page finishes loading.
-const WIDTH_RERENDER_THRESHOLD = 16
+// Google Identity Services renders a fixed-width button (max 400px). We fit it
+// to the container width once, at render time, so it matches the screen without
+// ever re-rendering (re-rendering is what made the button flicker/fight).
+const MAX_BUTTON_WIDTH = 400
 
 export function GoogleLoginButton({ clientId, onCredential }: GoogleLoginButtonProps) {
   const containerRef = useRef<HTMLDivElement>(null)
@@ -58,16 +58,11 @@ export function GoogleLoginButton({ clientId, onCredential }: GoogleLoginButtonP
     }
 
     let active = true
-    let resizeObserver: ResizeObserver | undefined
-    let renderedWidth: number | undefined
-    const handleScriptError = () => {
-      if (active) setError('Não foi possível carregar o login com Google. Tente novamente.')
-    }
-    const initialize = () => {
-      if (!active || !containerRef.current || !window.google) {
-        if (active) setError('Não foi possível carregar o login com Google. Tente novamente.')
-        return
-      }
+    let hasRendered = false
+
+    const renderGoogleButton = () => {
+      const container = containerRef.current
+      if (!active || hasRendered || !container || !window.google) return
 
       window.google.accounts.id.initialize({
         client_id: clientId,
@@ -76,63 +71,46 @@ export function GoogleLoginButton({ clientId, onCredential }: GoogleLoginButtonP
         },
       })
 
-      const renderGoogleButton = () => {
-        const container = containerRef.current
-        if (!active || !container || !window.google) return
+      const availableWidth =
+        container.getBoundingClientRect().width || container.clientWidth || MAX_BUTTON_WIDTH
+      const width = Math.min(Math.floor(availableWidth), MAX_BUTTON_WIDTH)
 
-        const availableWidth = container.getBoundingClientRect().width || container.clientWidth
-        const width = Math.min(Math.floor(availableWidth || 384), 384)
-        // Ignore tiny width fluctuations that happen while the page settles
-        // (fonts, scrollbar, layout). Re-rendering for them empties the
-        // container for a frame and makes the button visibly jump/shake.
-        if (
-          renderedWidth !== undefined
-          && Math.abs(width - renderedWidth) < WIDTH_RERENDER_THRESHOLD
-        ) {
-          return
-        }
+      // Render exactly once. Clearing first keeps it idempotent under React
+      // StrictMode's double-invoked effects, so we never end up with two
+      // buttons competing to appear.
+      container.replaceChildren()
+      window.google.accounts.id.renderButton(container, {
+        theme: 'filled_black',
+        size: 'large',
+        text: 'continue_with',
+        shape: 'pill',
+        logo_alignment: 'left',
+        width,
+      })
+      hasRendered = true
+    }
 
-        renderedWidth = width
-        const options = {
-          theme: 'filled_black',
-          size: 'large',
-          text: 'continue_with',
-          shape: 'pill',
-          logo_alignment: 'left',
-          width,
-        } as const
-
-        // Render into a detached node first, then swap it in, so the button
-        // never disappears for a frame during a re-render (which caused the
-        // visible jump/shake).
-        const staging = document.createElement('div')
-        window.google.accounts.id.renderButton(staging, options)
-        if (staging.childNodes.length > 0) {
-          container.replaceChildren(...staging.childNodes)
-          return
-        }
-
-        // Fallback: some environments only render into an attached node.
-        container.replaceChildren()
-        window.google.accounts.id.renderButton(container, options)
+    const handleScriptLoad = () => {
+      if (!active) return
+      if (!window.google) {
+        setError('Não foi possível carregar o login com Google. Tente novamente.')
+        return
       }
-
       renderGoogleButton()
-      if (typeof ResizeObserver !== 'undefined') {
-        resizeObserver = new ResizeObserver(renderGoogleButton)
-        resizeObserver.observe(containerRef.current)
+    }
+
+    const handleScriptError = () => {
+      if (active) setError('Não foi possível carregar o login com Google. Tente novamente.')
+    }
+
+    if (window.google) {
+      renderGoogleButton()
+      return () => {
+        active = false
       }
     }
 
     let script = document.getElementById(SCRIPT_ID) as HTMLScriptElement | null
-    if (window.google) {
-      initialize()
-      return () => {
-        active = false
-        resizeObserver?.disconnect()
-      }
-    }
-
     if (!script) {
       script = document.createElement('script')
       script.id = SCRIPT_ID
@@ -142,13 +120,12 @@ export function GoogleLoginButton({ clientId, onCredential }: GoogleLoginButtonP
       document.head.append(script)
     }
 
-    script.addEventListener('load', initialize)
+    script.addEventListener('load', handleScriptLoad)
     script.addEventListener('error', handleScriptError)
 
     return () => {
       active = false
-      resizeObserver?.disconnect()
-      script?.removeEventListener('load', initialize)
+      script?.removeEventListener('load', handleScriptLoad)
       script?.removeEventListener('error', handleScriptError)
     }
   }, [clientId])
