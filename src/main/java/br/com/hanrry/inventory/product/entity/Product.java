@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import br.com.hanrry.inventory.user.entity.User;
 import lombok.*;
 import org.hibernate.Hibernate;
+import org.hibernate.annotations.BatchSize;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +40,7 @@ public class Product {
     private Category category;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    @BatchSize(size = 100)
     private List<Batch> batches = new ArrayList<>();
 
     @Override

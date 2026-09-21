@@ -3,10 +3,13 @@ package br.com.hanrry.inventory.product.controller.docs;
 import br.com.hanrry.inventory.product.dto.product.ProductRequestDTO;
 import br.com.hanrry.inventory.product.dto.product.ProductResponseDTO;
 import br.com.hanrry.inventory.product.dto.product.UpdateProdcutRequestDTO;
+import br.com.hanrry.inventory.shared.dto.PageResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
@@ -34,10 +37,17 @@ public interface ProductControllerDocs {
     })
     ResponseEntity<ProductResponseDTO> findProductById(Long id);
 
-    @Operation(summary = "Lista todos os produtos",
-            description = "Retorna o catálogo completo disponível.")
-            @ApiResponse(responseCode = "200", description = "Operação realizada com sucesso")
-    ResponseEntity<List<ProductResponseDTO>> findAllProducts();
+    @Operation(summary = "Lista produtos paginados",
+            description = "Retorna o catálogo paginado. Parâmetros: page (0-based), size (máx. 100), sort (id, name, sku).")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Operação realizada com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Parâmetros de paginação ou sort inválidos")
+    })
+    ResponseEntity<PageResponse<ProductResponseDTO>> findAllProducts(
+            Integer page,
+            Integer size,
+            @ParameterObject Pageable pageable
+    );
 
     @Operation(summary = "Lista produtos abaixo do estoque mínimo",
             description = "Filtra produtos onde a soma de todos os lotes é menor do que o estoque mínimo.")

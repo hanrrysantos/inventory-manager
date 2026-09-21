@@ -11,8 +11,11 @@ import br.com.hanrry.inventory.shared.exception.product.product.ProductNotFoundE
 import br.com.hanrry.inventory.product.mapper.ProductMapper;
 import br.com.hanrry.inventory.product.repository.CategoryRepository;
 import br.com.hanrry.inventory.product.repository.ProductRepository;
+import br.com.hanrry.inventory.shared.dto.PageResponse;
 import lombok.RequiredArgsConstructor;
 import br.com.hanrry.inventory.shared.security.OwnerContext;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,11 +53,13 @@ public class ProductService {
        return productMapper.toDTO(savedProduct);
     }
 
-    public List<ProductResponseDTO> findAllProducts( ){
+    public PageResponse<ProductResponseDTO> findAllProducts(Pageable pageable) {
         var owner = ownerContext == null ? null : ownerContext.currentUser();
-        List<Product> productsList = owner == null ? productRepository.findAll() : productRepository.findAllByOwner(owner);
+        Page<Product> page = owner == null
+                ? productRepository.findAll(pageable)
+                : productRepository.findAllByOwner(owner, pageable);
 
-        return productMapper.toDTOList(productsList);
+        return PageResponse.from(page, productMapper::toDTO);
     }
 
     public ProductResponseDTO findProductById(Long id){

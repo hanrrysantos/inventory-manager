@@ -5,17 +5,22 @@ import br.com.hanrry.inventory.product.dto.product.ProductRequestDTO;
 import br.com.hanrry.inventory.product.dto.product.ProductResponseDTO;
 import br.com.hanrry.inventory.product.dto.product.UpdateProdcutRequestDTO;
 import br.com.hanrry.inventory.product.service.ProductService;
+import br.com.hanrry.inventory.shared.dto.PageResponse;
+import br.com.hanrry.inventory.shared.exception.handler.GlobalExceptionHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -36,6 +41,8 @@ class ProductControllerTest {
 
         mockMvc = MockMvcBuilders
                 .standaloneSetup(productController)
+                .setControllerAdvice(new GlobalExceptionHandler())
+                .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
                 .build();
     }
 
@@ -50,19 +57,58 @@ class ProductControllerTest {
                 10L
         );
 
-        when(productService.findAllProducts())
-                .thenReturn(List.of(product));
+        PageResponse<ProductResponseDTO> page = new PageResponse<>(
+                List.of(product),
+                0,
+                20,
+                1,
+                1
+        );
+
+        when(productService.findAllProducts(any(Pageable.class)))
+                .thenReturn(page);
 
         mockMvc.perform(get("/api/v1/products"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].id").value(1L))
-                .andExpect(jsonPath("$[0].name").value("Notebook"))
-                .andExpect(jsonPath("$[0].sku").value("NOTE-001"))
-                .andExpect(jsonPath("$[0].totalQuantity").value(5L))
-                .andExpect(jsonPath("$[0].categoryName").value("Eletrônicos"))
-                .andExpect(jsonPath("$[0].minStock").value(10L));
+                .andExpect(jsonPath("$.content[0].id").value(1L))
+                .andExpect(jsonPath("$.content[0].name").value("Notebook"))
+                .andExpect(jsonPath("$.content[0].sku").value("NOTE-001"))
+                .andExpect(jsonPath("$.content[0].totalQuantity").value(5L))
+                .andExpect(jsonPath("$.content[0].categoryName").value("Eletrônicos"))
+                .andExpect(jsonPath("$.content[0].minStock").value(10L))
+                .andExpect(jsonPath("$.page").value(0))
+                .andExpect(jsonPath("$.size").value(20))
+                .andExpect(jsonPath("$.totalElements").value(1))
+                .andExpect(jsonPath("$.totalPages").value(1));
 
-        verify(productService).findAllProducts();
+        verify(productService).findAllProducts(any(Pageable.class));
+    }
+
+    @Test
+    void shouldRejectInvalidSortPropertyOnFindAllProducts() throws Exception {
+        mockMvc.perform(get("/api/v1/products").param("sort", "category,asc"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("InvalidPagination"));
+
+        verifyNoInteractions(productService);
+    }
+
+    @Test
+    void shouldRejectSizeAboveMaximumOnFindAllProducts() throws Exception {
+        mockMvc.perform(get("/api/v1/products").param("size", "101"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("InvalidPagination"));
+
+        verifyNoInteractions(productService);
+    }
+
+    @Test
+    void shouldRejectNestedSortPropertyOnFindAllProducts() throws Exception {
+        mockMvc.perform(get("/api/v1/products").param("sort", "category.name,asc"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("InvalidPagination"));
+
+        verifyNoInteractions(productService);
     }
 
     @Test
