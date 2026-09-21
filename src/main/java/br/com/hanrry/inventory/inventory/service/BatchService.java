@@ -17,7 +17,10 @@ import br.com.hanrry.inventory.inventory.repository.BatchRepository;
 import br.com.hanrry.inventory.product.repository.ProductRepository;
 import br.com.hanrry.inventory.notification.service.StockAlertService;
 import lombok.RequiredArgsConstructor;
+import br.com.hanrry.inventory.shared.dto.PageResponse;
 import br.com.hanrry.inventory.shared.security.OwnerContext;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -124,15 +127,9 @@ public class BatchService {
         this.stockAlertService.checkInventoryAndNotify();
     }
 
-    public List<BatchResponseDTO> findExpiredBatches() {
-        List<Batch> batchesExpired = batchRepository.findByExpiryDateBefore(LocalDate.now());
+    public PageResponse<BatchResponseDTO> findExpiredBatches(Pageable pageable) {
         var owner = ownerContext == null ? null : ownerContext.currentUser();
-        if (owner != null) {
-            batchesExpired = batchesExpired.stream()
-                    .filter(batch -> owner.equals(batch.getProduct().getOwner()))
-                    .toList();
-        }
-
-        return batchMapper.toDTOList(batchesExpired);
+        Page<Batch> page = batchRepository.findExpiredBatches(LocalDate.now(), owner, pageable);
+        return PageResponse.from(page, batchMapper::toDTO);
     }
 }

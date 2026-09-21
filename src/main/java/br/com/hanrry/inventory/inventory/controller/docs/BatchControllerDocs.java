@@ -4,13 +4,14 @@ import br.com.hanrry.inventory.inventory.dto.batch.AddStockBatchRequestDTO;
 import br.com.hanrry.inventory.inventory.dto.batch.BatchRequestDTO;
 import br.com.hanrry.inventory.inventory.dto.batch.BatchResponseDTO;
 import br.com.hanrry.inventory.inventory.dto.batch.ConsumeBatchRequestDTO;
+import br.com.hanrry.inventory.shared.dto.PageResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Pageable;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
-
-import java.util.List;
 
 @Tag(name = "05 Lotes", description = "Endpoints para criação de lotes, adição e remoção de produtos de um lote e lista dos lotes estragados.")
 public interface BatchControllerDocs {
@@ -52,11 +53,16 @@ public interface BatchControllerDocs {
 
     @Operation(
             summary = "Lista lotes com validade vencida",
-            description = "Retorna todos os lotes cadastrados cuja data de expiração é menor do que a data atual do servidor."
+            description = "Retorna lotes expirados paginados. Sort: id, expiryDate, batchNumber."
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Lista de lotes vencidos retornada com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Parâmetros de paginação ou sort inválidos"),
             @ApiResponse(responseCode = "401", description = "Usuário não autenticado")
     })
-    ResponseEntity<List<BatchResponseDTO>> listExpired();
+    ResponseEntity<PageResponse<BatchResponseDTO>> listExpired(
+            Integer page,
+            Integer size,
+            @ParameterObject Pageable pageable
+    );
 }
