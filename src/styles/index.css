@@ -44,6 +44,17 @@ input {
   width: 100%;
 }
 
+/*
+ * Pin the button's text to Google's own fallback font. GSI styles the label as
+ * `"Google Sans", arial, sans-serif`, so the browser paints with arial first
+ * and then re-renders once the "Google Sans" webfont downloads — making the
+ * text visibly change thickness ("flash of font"). Forcing the fallback keeps
+ * the button stable from the first paint.
+ */
+.google-login-button * {
+  font-family: Arial, sans-serif !important;
+}
+
 button,
 a,
 input {
