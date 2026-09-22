@@ -11,6 +11,7 @@ interface AppHeaderProps {
 const pageTitles: Record<string, string> = {
   '/dashboard': 'Painel de estoque',
   '/products': 'Produtos',
+  '/categories': 'Categorias',
 }
 
 function getInitials(name: string): string {

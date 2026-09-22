@@ -29,6 +29,12 @@ const ProductsPage = lazy(() =>
   })),
 )
 
+const CategoriesPage = lazy(() =>
+  import('../../features/categories/CategoriesPage').then(
+    ({ CategoriesPage }) => ({ default: CategoriesPage }),
+  ),
+)
+
 function UnknownRouteRedirect() {
   const { user, isRestoring } = useAuth()
 
@@ -49,6 +55,7 @@ export function AppRouter() {
           <Route element={<AppLayout />}>
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/products" element={<ProductsPage />} />
+            <Route path="/categories" element={<CategoriesPage />} />
           </Route>
         </Route>
         <Route path="*" element={<UnknownRouteRedirect />} />

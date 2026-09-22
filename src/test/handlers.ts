@@ -43,6 +43,11 @@ export const productPageFixture = {
   totalPages: 1,
 }
 
+export const categoryFixtures = [
+  { id: 1, name: 'Bebidas', description: 'Bebidas e infusões' },
+  { id: 2, name: 'Alimentos', description: null },
+]
+
 export const dashboardFixture = {
   totalQuantity: 170,
   productCount: 3,
@@ -130,6 +135,21 @@ export const handlers = [
     return HttpResponse.json(authenticatedUser)
   }),
   http.get('*/api/v1/products', () => HttpResponse.json(productPageFixture)),
+  http.get('*/api/v1/categories', () =>
+    HttpResponse.json({
+      content: categoryFixtures,
+      page: 0,
+      size: 20,
+      totalElements: categoryFixtures.length,
+      totalPages: 1,
+    }),
+  ),
+  http.get('*/api/v1/categories/:id', ({ params }) => {
+    const category = categoryFixtures.find(({ id }) => id === Number(params.id))
+    return category
+      ? HttpResponse.json(category)
+      : HttpResponse.json({ message: 'Categoria não encontrada' }, { status: 404 })
+  }),
   http.get('*/api/v1/dashboard/summary', () =>
     HttpResponse.json(dashboardFixture),
   ),
