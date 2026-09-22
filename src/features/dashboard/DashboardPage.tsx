@@ -4,8 +4,10 @@ import {
   TrendingUp,
   TriangleAlert,
 } from 'lucide-react'
+import { useState } from 'react'
 import { ErrorState } from '../../components/feedback/ErrorState'
 import { PageLoader } from '../../components/feedback/PageLoader'
+import { PaginationControls } from '../../components/navigation/PaginationControls'
 import { formatCurrency } from '../../lib/formatters'
 import { ProductTable } from '../products/ProductTable'
 import { useProducts } from '../products/use-products'
@@ -14,8 +16,13 @@ import { SummaryCard } from './SummaryCard'
 import { useDashboardSummary } from './use-dashboard-summary'
 
 export function DashboardPage() {
+  const [productPage, setProductPage] = useState(0)
   const summaryQuery = useDashboardSummary()
-  const productsQuery = useProducts()
+  const productsQuery = useProducts({
+    page: productPage,
+    size: 6,
+    sort: 'name,asc',
+  })
 
   return (
     <main className="p-5 md:p-8">
@@ -80,12 +87,20 @@ export function DashboardPage() {
               title="Não foi possível carregar os produtos"
               onRetry={() => void productsQuery.refetch()}
             />
-          ) : productsQuery.data.length === 0 ? (
+          ) : productsQuery.data.content.length === 0 ? (
             <p className="p-8 text-center text-sm text-[#718177]">
               Nenhum produto cadastrado.
             </p>
           ) : (
-            <ProductTable products={productsQuery.data} compact />
+            <>
+              <ProductTable products={productsQuery.data.content} compact />
+              <PaginationControls
+                page={productsQuery.data.page}
+                totalPages={productsQuery.data.totalPages}
+                onPageChange={setProductPage}
+                compact
+              />
+            </>
           )}
         </section>
 

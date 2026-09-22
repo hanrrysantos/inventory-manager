@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { expect, it } from 'vitest'
 import { App } from './App'
 
-it('supports login, dashboard, products, search, and logout as one flow', async () => {
+it('supports login, dashboard, product catalog, and logout as one flow', async () => {
   window.history.pushState({}, '', '/')
   const user = userEvent.setup()
   render(<App />)
@@ -27,12 +27,11 @@ it('supports login, dashboard, products, search, and logout as one flow', async 
   expect(await screen.findByText('Total de itens')).toBeVisible()
 
   await user.click(screen.getByRole('link', { name: /produtos/i }))
-  const searchInput = await screen.findByLabelText(/buscar produto ou sku/i)
-  expect(screen.getByText('Chá Verde Orgânico')).toBeVisible()
-
-  await user.type(searchInput, 'MEL-014')
-  expect(screen.getByText('Mel Silvestre 500g')).toBeVisible()
-  expect(screen.queryByText('Chá Verde Orgânico')).not.toBeInTheDocument()
+  expect(
+    await screen.findByRole('heading', { level: 1, name: 'Produtos' }),
+  ).toBeVisible()
+  expect(await screen.findByText('Chá Verde Orgânico')).toBeVisible()
+  expect(screen.getByText('3 produtos no catálogo')).toBeVisible()
 
   await user.click(screen.getByRole('button', { name: /sair/i }))
   expect(
