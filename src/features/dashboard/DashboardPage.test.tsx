@@ -1,7 +1,9 @@
 import { render, screen, within } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { http, HttpResponse } from 'msw'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { App } from '../../app/App'
+import { productFixtures } from '../../test/handlers'
 import { server } from '../../test/server'
 
 describe('DashboardPage', () => {
@@ -52,6 +54,39 @@ describe('DashboardPage', () => {
     expect(await within(productRegion).findByText('Chá Verde Orgânico')).toBeVisible()
     expect(within(productRegion).queryByText(/preço/i)).not.toBeInTheDocument()
     expect(within(productRegion).queryByText(/atualizado/i)).not.toBeInTheDocument()
+  })
+
+  it('navigates through product preview pages with compact controls', async () => {
+    server.use(
+      http.get('*/api/v1/products', ({ request }) => {
+        const page = Number(new URL(request.url).searchParams.get('page') ?? 0)
+        return HttpResponse.json({
+          content: [productFixtures[page]],
+          page,
+          size: 6,
+          totalElements: 2,
+          totalPages: 2,
+        })
+      }),
+    )
+    const user = userEvent.setup()
+    render(<App />)
+
+    const productRegion = await screen.findByRole('region', {
+      name: /resumo de produtos/i,
+    })
+    expect(await within(productRegion).findByText('Chá Verde Orgânico')).toBeVisible()
+    expect(within(productRegion).getByText('1 / 2')).toBeVisible()
+
+    await user.click(
+      within(productRegion).getByRole('button', { name: /próxima página/i }),
+    )
+
+    expect(await within(productRegion).findByText('Mel Silvestre 500g')).toBeVisible()
+    expect(within(productRegion).queryByText('Chá Verde Orgânico')).not.toBeInTheDocument()
+    expect(
+      within(productRegion).getByRole('button', { name: /próxima página/i }),
+    ).toBeDisabled()
   })
 
   it('keeps summary errors isolated from the product preview', async () => {

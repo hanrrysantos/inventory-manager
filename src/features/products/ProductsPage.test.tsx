@@ -22,64 +22,51 @@ describe('ProductsPage', () => {
     expect(screen.queryByRole('button', { name: /novo produto/i })).not.toBeInTheDocument()
   })
 
-  it('searches by product name case-insensitively', async () => {
-    const user = userEvent.setup()
-    render(<App />)
-
-    await screen.findByText('Chá Verde Orgânico')
-    await user.type(screen.getByLabelText(/buscar produto ou sku/i), 'mel silvestre')
-
-    expect(screen.getByText('Mel Silvestre 500g')).toBeVisible()
-    expect(screen.queryByText('Chá Verde Orgânico')).not.toBeInTheDocument()
-  })
-
-  it('searches by SKU case-insensitively', async () => {
-    const user = userEvent.setup()
-    render(<App />)
-
-    await screen.findByText('Chá Verde Orgânico')
-    await user.type(screen.getByLabelText(/buscar produto ou sku/i), 'sab-207')
-
-    expect(screen.getByText('Sabonete Natural Lavanda')).toBeVisible()
-    expect(screen.queryByText('Mel Silvestre 500g')).not.toBeInTheDocument()
-  })
-
-  it('filters products by derived stock status', async () => {
-    const user = userEvent.setup()
-    render(<App />)
-
-    await screen.findByText('Chá Verde Orgânico')
-    const allFilter = screen.getByRole('button', { name: /^todos$/i })
-    const lowStockFilter = screen.getByRole('button', { name: /^estoque baixo$/i })
-    expect(allFilter).toHaveAttribute('aria-pressed', 'true')
-    expect(lowStockFilter).toHaveAttribute('aria-pressed', 'false')
-
-    await user.click(lowStockFilter)
-
-    expect(screen.getByText('Mel Silvestre 500g')).toBeVisible()
-    expect(screen.queryByText('Chá Verde Orgânico')).not.toBeInTheDocument()
-    expect(screen.queryByText('Sabonete Natural Lavanda')).not.toBeInTheDocument()
-    expect(allFilter).toHaveAttribute('aria-pressed', 'false')
-    expect(lowStockFilter).toHaveAttribute('aria-pressed', 'true')
-    expect(window.location.search).toContain('status=LOW_STOCK')
-  })
-
-  it('distinguishes an empty catalog from no matching results', async () => {
+  it('shows the total and navigates between product pages', async () => {
     server.use(
-      http.get('*/api/v1/products', () => HttpResponse.json([])),
+      http.get('*/api/v1/products', ({ request }) => {
+        const page = Number(new URL(request.url).searchParams.get('page') ?? 0)
+        return HttpResponse.json({
+          content: [productFixtures[page]],
+          page,
+          size: 20,
+          totalElements: 2,
+          totalPages: 2,
+        })
+      }),
     )
-    const { unmount } = render(<App />)
+    const user = userEvent.setup()
+    render(<App />)
+
+    expect(await screen.findByText('Chá Verde Orgânico')).toBeVisible()
+    expect(screen.getByText('2 produtos no catálogo')).toBeVisible()
+    expect(screen.getByText('Página 1 de 2')).toBeVisible()
+    expect(screen.getByRole('button', { name: /página anterior/i })).toBeDisabled()
+
+    await user.click(screen.getByRole('button', { name: /próxima página/i }))
+
+    expect(await screen.findByText('Mel Silvestre 500g')).toBeVisible()
+    expect(screen.queryByText('Chá Verde Orgânico')).not.toBeInTheDocument()
+    expect(screen.getByText('Página 2 de 2')).toBeVisible()
+    expect(screen.getByRole('button', { name: /próxima página/i })).toBeDisabled()
+    expect(window.location.search).toContain('page=1')
+  })
+
+  it('renders an empty catalog', async () => {
+    server.use(
+      http.get('*/api/v1/products', () =>
+        HttpResponse.json({
+          content: [],
+          page: 0,
+          size: 20,
+          totalElements: 0,
+          totalPages: 0,
+        }),
+      ),
+    )
+    render(<App />)
 
     expect(await screen.findByText(/nenhum produto cadastrado/i)).toBeVisible()
-
-    unmount()
-    server.use(
-      http.get('*/api/v1/products', () => HttpResponse.json(productFixtures)),
-    )
-    window.history.pushState({}, '', '/products?q=inexistente')
-    render(<App />)
-
-    expect(await screen.findByText(/nenhum produto encontrado/i)).toBeVisible()
   })
 
   it('shows an error with a retry action when the API fails', async () => {
@@ -96,7 +83,15 @@ describe('ProductsPage', () => {
     ).toBeVisible()
 
     server.use(
-      http.get('*/api/v1/products', () => HttpResponse.json(productFixtures)),
+      http.get('*/api/v1/products', () =>
+        HttpResponse.json({
+          content: productFixtures,
+          page: 0,
+          size: 20,
+          totalElements: productFixtures.length,
+          totalPages: 1,
+        }),
+      ),
     )
     await user.click(screen.getByRole('button', { name: /tentar novamente/i }))
     expect(await screen.findByText('Chá Verde Orgânico')).toBeVisible()

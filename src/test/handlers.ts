@@ -35,6 +35,14 @@ export const productFixtures = [
   },
 ]
 
+export const productPageFixture = {
+  content: productFixtures,
+  page: 0,
+  size: 20,
+  totalElements: productFixtures.length,
+  totalPages: 1,
+}
+
 export const dashboardFixture = {
   totalQuantity: 170,
   productCount: 3,
@@ -121,7 +129,7 @@ export const handlers = [
 
     return HttpResponse.json(authenticatedUser)
   }),
-  http.get('*/api/v1/products', () => HttpResponse.json(productFixtures)),
+  http.get('*/api/v1/products', () => HttpResponse.json(productPageFixture)),
   http.get('*/api/v1/dashboard/summary', () =>
     HttpResponse.json(dashboardFixture),
   ),
