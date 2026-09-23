@@ -54,6 +54,9 @@ describe('DashboardPage', () => {
     expect(await within(productRegion).findByText('Chá Verde Orgânico')).toBeVisible()
     expect(within(productRegion).queryByText(/preço/i)).not.toBeInTheDocument()
     expect(within(productRegion).queryByText(/atualizado/i)).not.toBeInTheDocument()
+    expect(within(productRegion).getByRole('table').parentElement).toHaveClass(
+      'min-h-[480px]',
+    )
   })
 
   it('navigates through product preview pages with compact controls', async () => {

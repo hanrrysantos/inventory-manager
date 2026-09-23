@@ -16,7 +16,7 @@ import { deleteProduct, getProduct } from './products-api'
 import { useProducts } from './use-products'
 
 const PAGE_SIZE = 20
-const SORT_PROPERTIES = ['id', 'name', 'sku'] as const
+const SORT_PROPERTIES = ['name', 'sku'] as const
 
 export function ProductsPage() {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -137,8 +137,6 @@ export function ProductsPage() {
                 <option value="name,desc">Nome (Z–A)</option>
                 <option value="sku,asc">SKU (A–Z)</option>
                 <option value="sku,desc">SKU (Z–A)</option>
-                <option value="id,asc">Mais antigos</option>
-                <option value="id,desc">Mais recentes</option>
               </select>
             </label>
             <label className="flex h-11 items-center gap-2 rounded-xl border border-[#cfddd3] px-3 text-sm font-medium text-[#52645a]">

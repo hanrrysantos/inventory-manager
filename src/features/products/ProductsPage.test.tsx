@@ -173,6 +173,12 @@ describe('ProductsPage', () => {
     const searchParams = new URLSearchParams(window.location.search)
     expect(searchParams.get('sort')).toBe('sku')
     expect(searchParams.get('direction')).toBe('desc')
+    expect(
+      screen.queryByRole('option', { name: /mais antigos/i }),
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('option', { name: /mais recentes/i }),
+    ).not.toBeInTheDocument()
   })
 
   it('normalizes an invalid page before requesting products', async () => {
