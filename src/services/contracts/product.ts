@@ -6,3 +6,12 @@ export interface Product {
   categoryName: string
   minStock: number
 }
+
+export interface ProductInput {
+  name: string
+  sku: string
+  minStock: number
+  categoryId: number
+}
+
+export type ProductUpdateInput = Pick<ProductInput, 'name' | 'minStock'>

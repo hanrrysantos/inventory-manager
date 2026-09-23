@@ -6,6 +6,7 @@ interface PaginationControlsProps {
   totalPages: number
   onPageChange: (page: number) => void
   compact?: boolean
+  label?: string
 }
 
 export function PaginationControls({
@@ -13,12 +14,13 @@ export function PaginationControls({
   totalPages,
   onPageChange,
   compact = false,
+  label = 'Paginação',
 }: PaginationControlsProps) {
   if (totalPages <= 1) return null
 
   return (
     <nav
-      aria-label="Paginação de produtos"
+      aria-label={label}
       className={cn(
         'flex items-center justify-center border-t border-[#e1ebe4]',
         compact ? 'gap-2 px-4 py-3' : 'gap-4 px-5 py-4',

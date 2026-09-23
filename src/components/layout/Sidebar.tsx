@@ -1,4 +1,4 @@
-import { LayoutDashboard, Package } from 'lucide-react'
+import { LayoutDashboard, Package, Tags } from 'lucide-react'
 import { NavLink } from 'react-router-dom'
 import { cn } from '../../lib/cn'
 import { BrandMark } from '../ui/BrandMark'
@@ -10,6 +10,7 @@ interface SidebarProps {
 const links = [
   { to: '/dashboard', label: 'Painel', icon: LayoutDashboard },
   { to: '/products', label: 'Produtos', icon: Package },
+  { to: '/categories', label: 'Categorias', icon: Tags },
 ]
 
 export function Sidebar({ onNavigate }: SidebarProps) {

@@ -19,6 +19,7 @@ describe('authenticated application shell', () => {
     expect(screen.queryByText('Verdejar')).not.toBeInTheDocument()
     expect(within(navigation).getByRole('link', { name: /painel/i })).toBeVisible()
     expect(within(navigation).getByRole('link', { name: /produtos/i })).toBeVisible()
+    expect(within(navigation).getByRole('link', { name: /categorias/i })).toBeVisible()
     expect(screen.queryByText(/fornecedores/i)).not.toBeInTheDocument()
     expect(screen.queryByText(/relatórios/i)).not.toBeInTheDocument()
     expect(screen.queryByText(/configurações/i)).not.toBeInTheDocument()

@@ -14,13 +14,14 @@ consulta de produtos. Frontend e API são mantidos em repositórios separados.
 | Landing (`/`) | Apresentação do EstoqueHub, problema de controle manual e recursos reais de indicadores, alertas e busca de produtos |
 | Acesso (`/login`) | Login por e-mail/senha ou Google, vínculo explícito de conta e criação de conta |
 | Dashboard (`/dashboard`) | Indicadores de estoque e itens que precisam de atenção |
-| Produtos (`/products`) | Consulta com busca por nome ou SKU e filtros de estoque |
+| Produtos (`/products`) | Consulta paginada, ordenação, estoque baixo, detalhes e administração por `ADMIN` |
+| Categorias (`/categories`) | Consulta paginada, detalhes e administração por `ADMIN` |
 
 Interface responsiva com estados de carregamento, erro e lista vazia.
 O cadastro de conta envia `POST /api/v1/auth/register` e, após a conclusão,
-retorna ao acesso para o login regular. Cadastro e edição de produtos,
-movimentações, fornecedores, relatórios e configurações ainda não estão
-disponíveis nesta versão.
+retorna ao acesso para o login regular. Busca textual e filtros por
+categoria/status, movimentações, fornecedores, relatórios e configurações
+ainda não estão disponíveis nesta versão.
 
 ## Tecnologias
 
