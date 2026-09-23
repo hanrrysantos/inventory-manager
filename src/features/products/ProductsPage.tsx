@@ -1,4 +1,5 @@
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { Plus } from 'lucide-react'
 import { useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { EmptyState } from '../../components/feedback/EmptyState'
@@ -6,8 +7,12 @@ import { ErrorState } from '../../components/feedback/ErrorState'
 import { PageLoader } from '../../components/feedback/PageLoader'
 import { PaginationControls } from '../../components/navigation/PaginationControls'
 import { AppDialog } from '../../components/ui/AppDialog'
+import { getApiErrorMessage } from '../../services/api-error'
+import type { Product } from '../../services/contracts/product'
+import { useAuth } from '../auth/use-auth'
+import { ProductForm } from './ProductForm'
 import { ProductTable } from './ProductTable'
-import { getProduct } from './products-api'
+import { deleteProduct, getProduct } from './products-api'
 import { useProducts } from './use-products'
 
 const PAGE_SIZE = 20
@@ -15,7 +20,14 @@ const SORT_PROPERTIES = ['id', 'name', 'sku'] as const
 
 export function ProductsPage() {
   const [searchParams, setSearchParams] = useSearchParams()
+  const { user } = useAuth()
+  const queryClient = useQueryClient()
   const [selectedProductId, setSelectedProductId] = useState<number | null>(null)
+  const [formProduct, setFormProduct] = useState<Product | 'new' | null>(null)
+  const [deletingProduct, setDeletingProduct] = useState<Product | null>(null)
+  const [deleteError, setDeleteError] = useState<string | null>(null)
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [notice, setNotice] = useState<string | null>(null)
   const requestedPage = Number(searchParams.get('page') ?? 0)
   const page = Number.isInteger(requestedPage) && requestedPage >= 0 ? requestedPage : 0
   const requestedProperty = searchParams.get('sort')
@@ -35,6 +47,26 @@ export function ProductsPage() {
     queryFn: () => getProduct(selectedProductId!),
     enabled: selectedProductId !== null,
   })
+  const isAdmin = user?.role === 'ADMIN'
+
+  const handleDelete = async () => {
+    if (!deletingProduct) return
+    setDeleteError(null)
+    setIsDeleting(true)
+    try {
+      await deleteProduct(deletingProduct.id)
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['products'] }),
+        queryClient.invalidateQueries({ queryKey: ['dashboard'] }),
+      ])
+      setDeletingProduct(null)
+      setNotice('Produto excluído.')
+    } catch (error) {
+      setDeleteError(getApiErrorMessage(error, 'Não foi possível excluir o produto.'))
+    } finally {
+      setIsDeleting(false)
+    }
+  }
 
   const updatePage = (nextPage: number) => {
     const next = new URLSearchParams(searchParams)
@@ -109,8 +141,22 @@ export function ProductsPage() {
               />
               Somente estoque baixo
             </label>
+            {isAdmin && (
+              <button
+                type="button"
+                className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-[#107842] px-4 font-medium text-white"
+                onClick={() => setFormProduct('new')}
+              >
+                <Plus className="size-4" aria-hidden="true" />
+                Novo produto
+              </button>
+            )}
           </div>
         </div>
+
+        {notice && (
+          <p className="mx-5 mb-5 rounded-xl bg-[#eef7f0] p-3 text-sm text-[#173b27]" role="status">{notice}</p>
+        )}
 
         {!hasProducts ? (
           <EmptyState
@@ -122,6 +168,11 @@ export function ProductsPage() {
             <ProductTable
               products={productPage.content}
               onView={(product) => setSelectedProductId(product.id)}
+              onEdit={isAdmin ? setFormProduct : undefined}
+              onDelete={isAdmin ? (product) => {
+                setDeleteError(null)
+                setDeletingProduct(product)
+              } : undefined}
             />
             <PaginationControls
               page={productPage.page}
@@ -168,6 +219,30 @@ export function ProductsPage() {
               </div>
             </dl>
           )}
+        </AppDialog>
+      )}
+
+      {formProduct && (
+        <AppDialog title={formProduct === 'new' ? 'Novo produto' : 'Editar produto'} onClose={() => setFormProduct(null)}>
+          <ProductForm
+            initialValue={formProduct === 'new' ? undefined : formProduct}
+            onCancel={() => setFormProduct(null)}
+            onSuccess={(message) => {
+              setFormProduct(null)
+              setNotice(message)
+            }}
+          />
+        </AppDialog>
+      )}
+
+      {deletingProduct && (
+        <AppDialog title="Excluir produto" onClose={() => setDeletingProduct(null)}>
+          <p className="text-sm text-[#52645a]">Excluir <strong>{deletingProduct.name}</strong>? Esta ação não pode ser desfeita.</p>
+          {deleteError && <p className="mt-4 rounded-xl bg-red-50 p-3 text-sm text-red-700" role="alert">{deleteError}</p>}
+          <div className="mt-6 flex justify-end gap-3">
+            <button type="button" className="h-11 rounded-xl border border-[#cfddd3] px-4 font-medium" disabled={isDeleting} onClick={() => setDeletingProduct(null)}>Cancelar</button>
+            <button type="button" className="h-11 rounded-xl bg-red-700 px-4 font-medium text-white disabled:opacity-60" disabled={isDeleting} onClick={() => void handleDelete()}>{isDeleting ? 'Excluindo...' : 'Confirmar exclusão'}</button>
+          </div>
         </AppDialog>
       )}
     </main>
