@@ -135,6 +135,24 @@ export const handlers = [
     return HttpResponse.json(authenticatedUser)
   }),
   http.get('*/api/v1/products', () => HttpResponse.json(productPageFixture)),
+  http.get('*/api/v1/products/low-stock', () => {
+    const products = productFixtures.filter(
+      ({ totalQuantity, minStock }) => totalQuantity <= minStock,
+    )
+    return HttpResponse.json({
+      content: products,
+      page: 0,
+      size: 20,
+      totalElements: products.length,
+      totalPages: 1,
+    })
+  }),
+  http.get('*/api/v1/products/:id', ({ params }) => {
+    const product = productFixtures.find(({ id }) => id === Number(params.id))
+    return product
+      ? HttpResponse.json(product)
+      : HttpResponse.json({ message: 'Produto não encontrado' }, { status: 404 })
+  }),
   http.get('*/api/v1/categories', () =>
     HttpResponse.json({
       content: categoryFixtures,

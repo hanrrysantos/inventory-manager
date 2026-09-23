@@ -1,10 +1,11 @@
 import { useQuery } from '@tanstack/react-query'
 import type { PageQuery } from '../../services/contracts/pagination'
-import { getProducts } from './products-api'
+import { getLowStockProducts, getProducts } from './products-api'
 
-export function useProducts(query: PageQuery) {
+export function useProducts(query: PageQuery, lowStock = false) {
   return useQuery({
-    queryKey: ['products', query],
-    queryFn: () => getProducts(query),
+    queryKey: ['products', lowStock ? 'low-stock' : 'all', query],
+    queryFn: () =>
+      lowStock ? getLowStockProducts(query) : getProducts(query),
   })
 }
