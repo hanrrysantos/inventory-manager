@@ -22,7 +22,7 @@ export function ProductTable({
   const hasActions = Boolean(onView || onEdit || onDelete)
 
   return (
-    <div className="overflow-x-auto">
+    <div className={compact ? 'min-h-[480px] overflow-x-auto' : 'overflow-x-auto'}>
       <table className="w-full min-w-[720px] border-collapse text-left">
         <thead className="bg-[#f4f9f5] text-xs uppercase text-[#68796e]">
           <tr>
