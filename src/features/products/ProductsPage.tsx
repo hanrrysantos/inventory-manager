@@ -1,7 +1,7 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Plus } from 'lucide-react'
 import { useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { Navigate, useSearchParams } from 'react-router-dom'
 import { EmptyState } from '../../components/feedback/EmptyState'
 import { ErrorState } from '../../components/feedback/ErrorState'
 import { PageLoader } from '../../components/feedback/PageLoader'
@@ -27,6 +27,7 @@ export function ProductsPage() {
   const [deletingProduct, setDeletingProduct] = useState<Product | null>(null)
   const [deleteError, setDeleteError] = useState<string | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [isFormBusy, setIsFormBusy] = useState(false)
   const [notice, setNotice] = useState<string | null>(null)
   const requestedPage = Number(searchParams.get('page') ?? 0)
   const page = Number.isInteger(requestedPage) && requestedPage >= 0 ? requestedPage : 0
@@ -49,7 +50,7 @@ export function ProductsPage() {
   })
   const isAdmin = user?.role === 'ADMIN'
 
-  const handleDelete = async () => {
+  const handleDelete = async (close: () => void) => {
     if (!deletingProduct) return
     setDeleteError(null)
     setIsDeleting(true)
@@ -59,8 +60,8 @@ export function ProductsPage() {
         queryClient.invalidateQueries({ queryKey: ['products'] }),
         queryClient.invalidateQueries({ queryKey: ['dashboard'] }),
       ])
-      setDeletingProduct(null)
       setNotice('Produto excluído.')
+      close()
     } catch (error) {
       setDeleteError(getApiErrorMessage(error, 'Não foi possível excluir o produto.'))
     } finally {
@@ -105,6 +106,13 @@ export function ProductsPage() {
   }
 
   const productPage = productsQuery.data
+  if (page > 0 && page >= productPage.totalPages) {
+    const next = new URLSearchParams(searchParams)
+    const lastPage = Math.max(productPage.totalPages - 1, 0)
+    if (lastPage === 0) next.delete('page')
+    else next.set('page', String(lastPage))
+    return <Navigate replace to={{ search: next.toString() }} />
+  }
   const hasProducts = productPage.content.length > 0
 
   return (
@@ -160,8 +168,8 @@ export function ProductsPage() {
 
         {!hasProducts ? (
           <EmptyState
-            title="Nenhum produto cadastrado"
-            description="O catálogo ainda não possui produtos."
+            title={lowStock ? 'Nenhum produto com estoque baixo' : 'Nenhum produto cadastrado'}
+            description={lowStock ? 'Não há produtos abaixo do estoque mínimo.' : 'O catálogo ainda não possui produtos.'}
           />
         ) : (
           <>
@@ -223,26 +231,28 @@ export function ProductsPage() {
       )}
 
       {formProduct && (
-        <AppDialog title={formProduct === 'new' ? 'Novo produto' : 'Editar produto'} onClose={() => setFormProduct(null)}>
-          <ProductForm
-            initialValue={formProduct === 'new' ? undefined : formProduct}
-            onCancel={() => setFormProduct(null)}
-            onSuccess={(message) => {
-              setFormProduct(null)
-              setNotice(message)
-            }}
-          />
+        <AppDialog title={formProduct === 'new' ? 'Novo produto' : 'Editar produto'} onClose={() => setFormProduct(null)} busy={isFormBusy}>
+          {(close) => <ProductForm
+              initialValue={formProduct === 'new' ? undefined : formProduct}
+              onCancel={close}
+              onBusyChange={setIsFormBusy}
+              onSuccess={(message) => {
+                setNotice(message)
+                close()
+              }}
+            />}
         </AppDialog>
       )}
 
       {deletingProduct && (
-        <AppDialog title="Excluir produto" onClose={() => setDeletingProduct(null)}>
-          <p className="text-sm text-[#52645a]">Excluir <strong>{deletingProduct.name}</strong>? Esta ação não pode ser desfeita.</p>
+        <AppDialog title="Excluir produto" onClose={() => setDeletingProduct(null)} busy={isDeleting}>
+          {(close) => <><p className="text-sm text-[#52645a]">Excluir <strong>{deletingProduct.name}</strong>? Esta ação não pode ser desfeita.</p>
           {deleteError && <p className="mt-4 rounded-xl bg-red-50 p-3 text-sm text-red-700" role="alert">{deleteError}</p>}
           <div className="mt-6 flex justify-end gap-3">
-            <button type="button" className="h-11 rounded-xl border border-[#cfddd3] px-4 font-medium" disabled={isDeleting} onClick={() => setDeletingProduct(null)}>Cancelar</button>
-            <button type="button" className="h-11 rounded-xl bg-red-700 px-4 font-medium text-white disabled:opacity-60" disabled={isDeleting} onClick={() => void handleDelete()}>{isDeleting ? 'Excluindo...' : 'Confirmar exclusão'}</button>
+            <button type="button" className="h-11 rounded-xl border border-[#cfddd3] px-4 font-medium" disabled={isDeleting} onClick={close}>Cancelar</button>
+            <button type="button" className="h-11 rounded-xl bg-red-700 px-4 font-medium text-white disabled:opacity-60" disabled={isDeleting} onClick={() => void handleDelete(close)}>{isDeleting ? 'Excluindo...' : 'Confirmar exclusão'}</button>
           </div>
+          </>}
         </AppDialog>
       )}
     </main>

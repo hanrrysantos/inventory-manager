@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQueryClient } from '@tanstack/react-query'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { getApiErrorMessage } from '../../services/api-error'
 import type { Product } from '../../services/contracts/product'
@@ -19,6 +19,7 @@ interface ProductFormProps {
   initialValue?: Product
   onCancel: () => void
   onSuccess: (message: string) => void
+  onBusyChange?: (busy: boolean) => void
 }
 
 export function ProductForm(props: ProductFormProps) {
@@ -29,7 +30,7 @@ export function ProductForm(props: ProductFormProps) {
   )
 }
 
-function CreateProductForm({ onCancel, onSuccess }: ProductFormProps) {
+function CreateProductForm({ onCancel, onSuccess, onBusyChange }: ProductFormProps) {
   const queryClient = useQueryClient()
   const [apiError, setApiError] = useState<string | null>(null)
   // ponytail: first 100 categories; add a paginated searchable selector when a catalog exceeds that ceiling.
@@ -44,6 +45,8 @@ function CreateProductForm({ onCancel, onSuccess }: ProductFormProps) {
   })
   const categories = categoriesQuery.data?.content ?? []
   const cannotSubmit = isSubmitting || categoriesQuery.isPending || categories.length === 0
+
+  useEffect(() => onBusyChange?.(isSubmitting), [isSubmitting, onBusyChange])
 
   const onSubmit = handleSubmit(async (data) => {
     setApiError(null)
@@ -91,7 +94,7 @@ function CreateProductForm({ onCancel, onSuccess }: ProductFormProps) {
   )
 }
 
-function EditProductForm({ initialValue, onCancel, onSuccess }: ProductFormProps & { initialValue: Product }) {
+function EditProductForm({ initialValue, onCancel, onSuccess, onBusyChange }: ProductFormProps & { initialValue: Product }) {
   const queryClient = useQueryClient()
   const [apiError, setApiError] = useState<string | null>(null)
   const {
@@ -102,6 +105,8 @@ function EditProductForm({ initialValue, onCancel, onSuccess }: ProductFormProps
     resolver: zodResolver(productEditSchema),
     defaultValues: { name: initialValue.name, minStock: initialValue.minStock },
   })
+
+  useEffect(() => onBusyChange?.(isSubmitting), [isSubmitting, onBusyChange])
 
   const onSubmit = handleSubmit(async (data) => {
     setApiError(null)

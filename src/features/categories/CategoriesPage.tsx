@@ -1,7 +1,7 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Eye, Pencil, Plus, Trash2 } from 'lucide-react'
 import { useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { Navigate, useSearchParams } from 'react-router-dom'
 import { EmptyState } from '../../components/feedback/EmptyState'
 import { ErrorState } from '../../components/feedback/ErrorState'
 import { PageLoader } from '../../components/feedback/PageLoader'
@@ -26,6 +26,7 @@ export function CategoriesPage() {
   const [deletingCategory, setDeletingCategory] = useState<Category | null>(null)
   const [deleteError, setDeleteError] = useState<string | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [isFormBusy, setIsFormBusy] = useState(false)
   const [notice, setNotice] = useState<string | null>(null)
   const requestedPage = Number(searchParams.get('page') ?? 0)
   const page = Number.isInteger(requestedPage) && requestedPage >= 0 ? requestedPage : 0
@@ -48,15 +49,15 @@ export function CategoriesPage() {
   })
   const isAdmin = user?.role === 'ADMIN'
 
-  const handleDelete = async () => {
+  const handleDelete = async (close: () => void) => {
     if (!deletingCategory) return
     setDeleteError(null)
     setIsDeleting(true)
     try {
       await deleteCategory(deletingCategory.id)
       await queryClient.invalidateQueries({ queryKey: ['categories'] })
-      setDeletingCategory(null)
       setNotice('Categoria excluída.')
+      close()
     } catch (error) {
       setDeleteError(
         getApiErrorMessage(error, 'Não foi possível excluir a categoria.'),
@@ -98,6 +99,13 @@ export function CategoriesPage() {
   }
 
   const categoryPage = categoriesQuery.data
+  if (page > 0 && page >= categoryPage.totalPages) {
+    const next = new URLSearchParams(searchParams)
+    const lastPage = Math.max(categoryPage.totalPages - 1, 0)
+    if (lastPage === 0) next.delete('page')
+    else next.set('page', String(lastPage))
+    return <Navigate replace to={{ search: next.toString() }} />
+  }
 
   return (
     <main className="p-5 md:p-8">
@@ -248,15 +256,19 @@ export function CategoriesPage() {
         <AppDialog
           title={formCategory === 'new' ? 'Nova categoria' : 'Editar categoria'}
           onClose={() => setFormCategory(null)}
+          busy={isFormBusy}
         >
-          <CategoryForm
-            initialValue={formCategory === 'new' ? undefined : formCategory}
-            onCancel={() => setFormCategory(null)}
-            onSuccess={(message) => {
-              setFormCategory(null)
-              setNotice(message)
-            }}
-          />
+          {(close) => (
+            <CategoryForm
+              initialValue={formCategory === 'new' ? undefined : formCategory}
+              onCancel={close}
+              onBusyChange={setIsFormBusy}
+              onSuccess={(message) => {
+                setNotice(message)
+                close()
+              }}
+            />
+          )}
         </AppDialog>
       )}
 
@@ -264,8 +276,9 @@ export function CategoriesPage() {
         <AppDialog
           title="Excluir categoria"
           onClose={() => setDeletingCategory(null)}
+          busy={isDeleting}
         >
-          <p className="text-sm text-[#52645a]">
+          {(close) => <><p className="text-sm text-[#52645a]">
             Excluir <strong>{deletingCategory.name}</strong>? Esta ação não
             pode ser desfeita.
           </p>
@@ -279,7 +292,7 @@ export function CategoriesPage() {
               type="button"
               className="h-11 rounded-xl border border-[#cfddd3] px-4 font-medium"
               disabled={isDeleting}
-              onClick={() => setDeletingCategory(null)}
+              onClick={close}
             >
               Cancelar
             </button>
@@ -287,11 +300,12 @@ export function CategoriesPage() {
               type="button"
               className="h-11 rounded-xl bg-red-700 px-4 font-medium text-white disabled:opacity-60"
               disabled={isDeleting}
-              onClick={() => void handleDelete()}
+              onClick={() => void handleDelete(close)}
             >
               {isDeleting ? 'Excluindo...' : 'Confirmar exclusão'}
             </button>
           </div>
+          </>}
         </AppDialog>
       )}
     </main>

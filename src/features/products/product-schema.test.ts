@@ -48,4 +48,18 @@ describe('product schemas', () => {
       productEditSchema.safeParse({ name: 'Café', minStock: 0 }).success,
     ).toBe(true)
   })
+
+  it('rejects an empty minimum stock quantity', () => {
+    expect(
+      productCreateSchema.safeParse({
+        name: 'Café',
+        sku: 'CAF-1',
+        minStock: '',
+        categoryId: 1,
+      }).success,
+    ).toBe(false)
+    expect(
+      productEditSchema.safeParse({ name: 'Café', minStock: '' }).success,
+    ).toBe(false)
+  })
 })

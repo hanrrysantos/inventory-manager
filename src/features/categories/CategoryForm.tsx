@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQueryClient } from '@tanstack/react-query'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { getApiErrorMessage } from '../../services/api-error'
 import type { Category } from '../../services/contracts/category'
@@ -11,12 +11,14 @@ interface CategoryFormProps {
   initialValue?: Category
   onCancel: () => void
   onSuccess: (message: string) => void
+  onBusyChange?: (busy: boolean) => void
 }
 
 export function CategoryForm({
   initialValue,
   onCancel,
   onSuccess,
+  onBusyChange,
 }: CategoryFormProps) {
   const queryClient = useQueryClient()
   const [apiError, setApiError] = useState<string | null>(null)
@@ -31,6 +33,8 @@ export function CategoryForm({
       description: initialValue?.description ?? '',
     },
   })
+
+  useEffect(() => onBusyChange?.(isSubmitting), [isSubmitting, onBusyChange])
 
   const onSubmit = handleSubmit(async (data) => {
     setApiError(null)

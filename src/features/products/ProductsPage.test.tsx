@@ -69,6 +69,28 @@ describe('ProductsPage', () => {
     expect(await screen.findByText(/nenhum produto cadastrado/i)).toBeVisible()
   })
 
+  it('returns to the last valid page instead of showing a false empty catalog', async () => {
+    window.history.replaceState({}, '', '/products?page=2')
+    server.use(
+      http.get('*/api/v1/products', ({ request }) => {
+        const page = Number(new URL(request.url).searchParams.get('page'))
+        return HttpResponse.json({
+          content: page === 0 ? productFixtures : [],
+          page,
+          size: 20,
+          totalElements: 3,
+          totalPages: 1,
+        })
+      }),
+    )
+
+    render(<App />)
+
+    expect(await screen.findByText('Chá Verde Orgânico')).toBeVisible()
+    expect(new URLSearchParams(window.location.search).has('page')).toBe(false)
+    expect(screen.queryByText(/nenhum produto cadastrado/i)).not.toBeInTheDocument()
+  })
+
   it('shows an error with a retry action when the API fails', async () => {
     server.use(
       http.get('*/api/v1/products', () =>

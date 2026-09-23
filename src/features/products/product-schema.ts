@@ -6,10 +6,13 @@ const name = z
   .min(1, 'Informe o nome')
   .max(255, 'Use no máximo 255 caracteres')
 
-const minStock = z.coerce
-  .number()
-  .int('Use um número inteiro')
-  .min(0, 'O estoque mínimo não pode ser negativo')
+const minStock = z.preprocess(
+  (value) => (value === '' ? undefined : value),
+  z.coerce
+    .number()
+    .int('Use um número inteiro')
+    .min(0, 'O estoque mínimo não pode ser negativo'),
+)
 
 export const productCreateSchema = z.object({
   name,

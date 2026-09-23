@@ -185,4 +185,26 @@ describe('CategoriesPage', () => {
       screen.getByRole('dialog', { name: /excluir categoria/i }),
     ).toBeVisible()
   })
+
+  it('returns to the last valid page instead of showing a false empty catalog', async () => {
+    window.history.replaceState({}, '', '/categories?page=2')
+    server.use(
+      http.get('*/api/v1/categories', ({ request }) => {
+        const page = Number(new URL(request.url).searchParams.get('page'))
+        return HttpResponse.json({
+          content: page === 0 ? categoryFixtures : [],
+          page,
+          size: 20,
+          totalElements: 2,
+          totalPages: 1,
+        })
+      }),
+    )
+
+    render(<App />)
+
+    expect(await screen.findByText('Bebidas')).toBeVisible()
+    expect(new URLSearchParams(window.location.search).has('page')).toBe(false)
+    expect(screen.queryByText(/nenhuma categoria cadastrada/i)).not.toBeInTheDocument()
+  })
 })
