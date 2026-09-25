@@ -70,8 +70,9 @@ projetos. O `.gitignore` importado do frontend poderá permanecer em
 ## Automação
 
 O workflow Maven permanecerá em `.github/workflows`, pois o GitHub somente
-descobre workflows nesse caminho na raiz. Seus comandos, cache e filtros de
-caminho serão ajustados para `backend/`.
+descobre workflows nesse caminho na raiz. Somente o diretório de execução dos
+comandos será ajustado para `backend/`; nome, gatilhos e etapas atuais serão
+preservados. O workflow não publica nem altera deploys.
 
 Os arquivos Docker do backend serão movidos com a aplicação e continuarão
 operando a partir do diretório `backend/`.

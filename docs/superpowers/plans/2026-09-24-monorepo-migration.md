@@ -18,6 +18,7 @@
 - Não alterar regras de negócio, contratos da API, plataformas de deploy, domínios ou ciclos de release.
 - Não adicionar gerenciador de monorepo, dependência ou abstração de workspace.
 - Manter `.github/`, `.agents/`, `AGENTS.md`, `.gitignore` e `.gitattributes` na raiz.
+- No CI, alterar somente o diretório de execução para `backend/`; preservar nome, gatilhos e etapas existentes.
 - Manter segredos e arquivos `.env` fora do histórico.
 - Não fazer push.
 - Após implementação e testes, executar `code-review`; em caso de `CHANGES_REQUESTED`, não executar `fix-findings` sem autorização.
@@ -27,7 +28,7 @@
 - Histórico do frontend: o commit `96de71d` deve ser ancestral de `HEAD` e sua linha histórica deve continuar com 59 commits.
 - Histórico do backend: o commit anterior à migração deve permanecer ancestral de `HEAD`, com renomes detectáveis pelo Git.
 - Segredos locais: `backend/.env` e `frontend/.env` devem continuar ignorados e nenhum `.env` deve estar rastreado.
-- Caminhos de automação: Maven, Docker e cache do workflow devem usar `backend/`, sem depender dos caminhos antigos da raiz.
+- Caminhos de automação: Maven e Docker devem executar em `backend/`, sem alterar nome, gatilhos ou etapas do workflow.
 - Documentação: nenhum README deve instruir o usuário a clonar o antigo repositório separado do frontend.
 
 ---
@@ -180,19 +181,13 @@ Modify `backend/README.md`:
 Replace `.github/workflows/maven.yml` with:
 
 ```yaml
-name: CI - Backend Build and Tests
+name: CI - Build and Tests
 
 on:
   push:
-    branches: ["main"]
-    paths:
-      - "backend/**"
-      - ".github/workflows/maven.yml"
+    branches: [ "main" ]
   pull_request:
-    branches: ["main"]
-    paths:
-      - "backend/**"
-      - ".github/workflows/maven.yml"
+    branches: [ "main" ]
   workflow_dispatch:
 
 jobs:
@@ -211,8 +206,6 @@ jobs:
         with:
           distribution: "temurin"
           java-version: "21"
-          cache: "maven"
-          cache-dependency-path: backend/pom.xml
 
       - name: Give permission to Maven Wrapper
         run: chmod +x mvnw
