@@ -1,11 +1,11 @@
 # EstoqueHub
 
 Interface web para acompanhamento de estoque, com autenticação, indicadores e
-consulta de produtos. Frontend e API são mantidos em repositórios separados.
+consulta de produtos. Frontend e API são mantidos no mesmo monorepo.
 
 [Acessar aplicação](https://controle-de-estoque.hanrry.top) ·
 [Documentação da API](https://api-controle-de-estoque.hanrry.top/swagger-ui/index.html) ·
-[Repositório do backend](https://github.com/hanrrysantos/inventory-manager)
+[Código do backend](../backend)
 
 ## Funcionalidades
 
@@ -34,8 +34,8 @@ Testing Library e MSW.
 Requisitos: Node.js 22.12+ da linha 22 ou Node.js 24, npm e acesso à API.
 
 ```bash
-git clone https://github.com/hanrrysantos/inventory-manager-frontend.git
-cd inventory-manager-frontend
+git clone https://github.com/hanrrysantos/inventory-manager.git
+cd inventory-manager/frontend
 npm ci
 cp .env.example .env
 npm run dev
