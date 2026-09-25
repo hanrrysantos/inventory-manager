@@ -34,6 +34,9 @@ logs/
 # Visual Studio Code
 .vscode/
 
+# Git worktrees
+.worktrees/
+
 # Operating system files
 .DS_Store
 Thumbs.db
