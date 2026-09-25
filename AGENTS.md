@@ -2,19 +2,22 @@
 
 ## Projeto
 
-Este repositório contém uma API REST em Java 21 com Spring Boot 3.
+Este monorepo contém uma API REST em Java 21 com Spring Boot 3 e um frontend
+em React, TypeScript e Vite.
+
+O backend fica em `backend/` e o frontend em `frontend/`.
 
 O código principal está em:
 
-`src/main/java/br/com/hanrry/inventory`
+`backend/src/main/java/br/com/hanrry/inventory`
 
 Configurações e migrations Flyway ficam em:
 
-`src/main/resources`
+`backend/src/main/resources`
 
 Os testes ficam em:
 
-`src/test/java/br/com/hanrry/inventory`
+`backend/src/test/java/br/com/hanrry/inventory`
 
 O projeto está passando por uma evolução arquitetural incremental de uma
 organização por camadas técnicas para uma organização por domínio.
@@ -27,31 +30,32 @@ Não assuma que toda a arquitetura-alvo já está implementada.
 Para decisões arquiteturais, limites dos módulos, responsabilidades e
 restrições da evolução do projeto, consulte:
 
-`docs/architecture.md`
+`backend/docs/architecture.md`
 
 Para tarefas de implementação planejadas, consulte:
 
-`docs/plans/`
+`backend/docs/plans/`
 
 Antes de realizar mudanças estruturais, consulte o plano correspondente e
-`docs/architecture.md`.
+`backend/docs/architecture.md`.
 
 O plano define o escopo da etapa atual. Não antecipe decisões ou tarefas de
 etapas posteriores.
 
 ## Comandos
 
-- `bash ./mvnw clean test`: executa a suíte completa e gera o relatório JaCoCo.
-- `bash ./mvnw package`: compila e empacota a aplicação em `target/`.
-- `bash ./mvnw spring-boot:run`: inicia a API localmente na porta `8080`.
-- `docker build -t inventory-manager .`: cria a imagem Docker multiestágio.
-- `docker run --env-file .env -p 8080:8080 inventory-manager`: executa a imagem com as configurações locais.
+- `cd backend && bash ./mvnw clean test`: executa a suíte completa e gera o relatório JaCoCo.
+- `cd backend && bash ./mvnw package`: compila e empacota a aplicação.
+- `cd backend && bash ./mvnw spring-boot:run`: inicia a API localmente na porta `8080`.
+- `docker build -t inventory-manager ./backend`: cria a imagem Docker multiestágio.
+- `cd backend && docker compose up -d --build`: inicia a API e o PostgreSQL.
 
-O Maven Wrapper atualmente deve ser executado com `bash ./mvnw`.
+O Maven Wrapper atualmente deve ser executado dentro de `backend/` com
+`bash ./mvnw`.
 
 O relatório JaCoCo fica em:
 
-`target/site/jacoco/`
+`backend/target/site/jacoco/`
 
 ## Estilo e Convenções
 
@@ -70,7 +74,7 @@ Evite introduzir abstrações, dependências ou refatorações fora do escopo da
 tarefa atual.
 
 Durante a evolução arquitetural, siga os limites de domínio definidos em
-`docs/architecture.md` e no plano correspondente.
+`backend/docs/architecture.md` e no plano correspondente.
 
 Não reorganize módulos que pertençam a tarefas posteriores.
 
@@ -93,7 +97,7 @@ concluída.
 
 ## Workflow
 
-Ao executar tarefas definidas em `docs/plans/`:
+Ao executar tarefas definidas em `backend/docs/plans/`:
 
 1. Execute somente a tarefa explicitamente autorizada.
 2. Não antecipe tarefas posteriores.
@@ -131,6 +135,6 @@ Nunca versione `.env`, tokens, senhas, secrets ou credenciais reais.
 
 Alterações no schema do banco devem ser feitas por novas migrations em:
 
-`src/main/resources/db/migration`
+`backend/src/main/resources/db/migration`
 
 Nunca edite migrations Flyway já aplicadas.
