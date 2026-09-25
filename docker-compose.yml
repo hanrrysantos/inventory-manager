@@ -32,6 +32,7 @@ services:
       RESEND_API_KEY: ${RESEND_API_KEY:-}
       RESEND_FROM: ${RESEND_FROM:-}
       RESEND_TO: ${RESEND_TO:-}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
     depends_on:
       db:
         condition: service_healthy
