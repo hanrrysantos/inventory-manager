@@ -1,31 +1,45 @@
-name: CI - Build and Tests
+name: CI - Backend
 
 on:
   push:
     branches: [ "main" ]
+    paths:
+      - "backend/**"
+      - ".github/workflows/backend-ci.yml"
   pull_request:
     branches: [ "main" ]
+    paths:
+      - "backend/**"
+      - ".github/workflows/backend-ci.yml"
   workflow_dispatch:
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  build-and-test:
+  backend-ci:
+    name: Backend CI
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     defaults:
       run:
         working-directory: backend
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Java 21
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v6
         with:
           distribution: "temurin"
           java-version: "21"
-
-      - name: Give permission to Maven Wrapper
-        run: chmod +x mvnw
+          cache: "maven"
+          cache-dependency-path: backend/pom.xml
 
       - name: Run tests with JaCoCo
         run: ./mvnw clean test

@@ -1,4 +1,4 @@
-# Controle de Estoque [![CI](https://github.com/hanrrysantos/inventory-manager/actions/workflows/maven.yml/badge.svg?branch=main)](https://github.com/hanrrysantos/inventory-manager/actions/workflows/maven.yml)
+# Controle de Estoque [![CI](https://github.com/hanrrysantos/inventory-manager/actions/workflows/backend-ci.yml/badge.svg?branch=main)](https://github.com/hanrrysantos/inventory-manager/actions/workflows/backend-ci.yml)
 
 
 API REST para controle de estoque por lotes, com foco em validade, rastreabilidade e consistência de movimentações concorrentes. Desenvolvida em Java 21 e Spring Boot 3, com frontend e API disponíveis para demonstração.
@@ -229,7 +229,7 @@ A suíte inclui testes unitários, de API e de integração, com cenários de FE
 
 Para exercitar riscos que dependem do comportamento real do banco, os testes de integração utilizam PostgreSQL em containers. Os cenários cobrem migrations, persistência, isolamento entre operações concorrentes e atomicidade das movimentações.
 
-O [workflow de CI](../.github/workflows/maven.yml) executa a suíte com JaCoCo e constrói a imagem Docker em pushes e pull requests para `main`. O status das execuções pode ser acompanhado no [GitHub Actions](https://github.com/hanrrysantos/inventory-manager/actions).
+O [workflow de CI](../.github/workflows/backend-ci.yml) executa a suíte com JaCoCo e constrói a imagem Docker em pushes e pull requests para `main`. O status das execuções pode ser acompanhado no [GitHub Actions](https://github.com/hanrrysantos/inventory-manager/actions).
 
 ## Próximos passos
 
