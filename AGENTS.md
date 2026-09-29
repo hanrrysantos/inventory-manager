@@ -597,6 +597,9 @@ Cada commit deve representar uma unidade lógica de mudança.
 
 Não misture alterações não relacionadas no mesmo commit.
 
+Nunca use coautoria em commits: não inclua trailers `Co-authored-by:`,
+`Co-Authored-By:` nem equivalentes na mensagem de commit.
+
 Não faça commit ou push sem autorização quando estiver executando um plano que
 exija aprovação por etapa.
 
@@ -619,6 +622,9 @@ Quando a mudança estiver associada a uma spec ou plan, referencie os documentos
 correspondentes.
 
 Não misture alterações não relacionadas no mesmo pull request.
+
+Nunca use coautoria em pull requests: não adicione coautores no GitHub nem
+sugira trailers de coautoria nos commits incluídos no PR.
 
 Não faça push sem autorização durante a execução de um plano.
 
