@@ -1,6 +1,6 @@
 # Inventory Ownership Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
+> **Para agentes de implementação:** execute este plano tarefa por tarefa, conforme `AGENTS.md` e a Skill `code-review` após cada grupo relevante.
 
 **Goal:** Isolar catálogo e estoque por conta autenticada usando `owner_id`.
 
@@ -11,7 +11,7 @@ identidade do JWT e serviços usam `ownerId` em todas as leituras e mutações.
 **Tech Stack:** Java 21, Spring Boot 3, Spring Data JPA, Flyway, PostgreSQL,
 JUnit 5, Mockito e MockMvc.
 
-**Spec:** `docs/superpowers/specs/2026-09-20-inventory-ownership-design.md`
+**Spec:** [`../specs/inventory-ownership.md`](../specs/inventory-ownership.md)
 
 ## Global Constraints
 

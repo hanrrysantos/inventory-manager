@@ -8,7 +8,7 @@
 
 **Stack:** Java 21, Spring Boot 3, Maven Wrapper, Spring Data JPA, PostgreSQL, Flyway, JUnit 5, Mockito, MockMvc, MapStruct, JaCoCo e PostgreSQL Testcontainers.
 
-**Referências:** `AGENTS.md` e `docs/architecture.md`.
+**Referências:** `AGENTS.md` e [`../architecture/overview.md`](../architecture/overview.md).
 
 ## Restrições Globais
 

@@ -1,6 +1,6 @@
 # Monorepo Migration Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **Para agentes de implementação:** execute este plano tarefa por tarefa, conforme `AGENTS.md` e a Skill `code-review` após cada grupo relevante.
 
 **Goal:** Reunir backend e frontend no repositório `inventory-manager`, em diretórios próprios, preservando integralmente os dois históricos Git.
 
@@ -8,7 +8,7 @@
 
 **Tech Stack:** Git, Git subtree, Java 21, Maven Wrapper, Spring Boot 3, Node.js 22.12+/24, npm, React, TypeScript, Vite, Docker Compose e GitHub Actions.
 
-**Spec:** `docs/superpowers/specs/2026-09-24-monorepo-migration-design.md`
+**Spec:** [`../specs/monorepo-migration.md`](../specs/monorepo-migration.md)
 
 ## Global Constraints
 
@@ -90,12 +90,11 @@ Run:
 mkdir -p backend
 git mv .dockerignore .env.example .mvn Dockerfile README.md docker-compose.yml mvnw mvnw.cmd pom.xml scripts src backend/
 git mv docs backend/docs
-mkdir -p docs/superpowers/specs docs/superpowers/plans
-git mv backend/docs/superpowers/specs/2026-09-24-monorepo-migration-design.md docs/superpowers/specs/
-git mv backend/docs/superpowers/plans/2026-09-24-monorepo-migration.md docs/superpowers/plans/
 ```
 
-Expected: arquivos específicos da API ficam sob `backend/`; somente os documentos desta migração retornam para `docs/superpowers/` na raiz.
+Expected: arquivos específicos da API ficam sob `backend/`. A documentação SDD
+do sistema foi posteriormente organizada em `docs/` na raiz; detalhes locais
+permanecem em `backend/docs/` e `frontend/docs/`.
 
 - [ ] **Step 4: Reposicionar a configuração local sem versioná-la**
 
@@ -159,8 +158,11 @@ Modify `AGENTS.md` so every backend path and command is rooted at `backend/`:
 backend/src/main/java/br/com/hanrry/inventory
 backend/src/main/resources
 backend/src/test/java/br/com/hanrry/inventory
-backend/docs/architecture.md
-backend/docs/plans/
+docs/architecture/
+docs/plans/
+docs/specs/
+backend/docs/
+frontend/docs/
 cd backend && bash ./mvnw clean test
 cd backend && bash ./mvnw package
 cd backend && bash ./mvnw spring-boot:run

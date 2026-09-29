@@ -8,7 +8,7 @@
 
 **Tech Stack:** Java 21, Spring Boot 3, Spring Data JPA, PostgreSQL, Flyway, JUnit 5, Spring Test, Mockito, Testcontainers PostgreSQL e `TransactionTemplate`.
 
-**Spec:** requisitos aprovados em `docs/plans/02-inventory-consistency.md` antes da substituição deste documento; decisões arquiteturais em `docs/architecture.md`.
+**Spec:** requisitos aprovados neste documento (seção de requisitos / characterization) antes de substituição futura por spec dedicada; decisões arquiteturais em [`../architecture/overview.md`](../architecture/overview.md).
 
 ## Global Constraints
 
@@ -268,13 +268,13 @@ git diff --check
 
 Confirmar que testes concorrentes usam PostgreSQL real e transações independentes; V1/V2 não foram editadas; não há RabbitMQ, eventos, notificações assíncronas, retry/DLQ, Redis ou observabilidade; `ProductMapper` não mudou; `StockAlertService` continua sendo chamado; não há `Thread.sleep` como sincronização principal; e JaCoCo foi gerado.
 
-**Conclusão:** todas as validações passam, o cenário obrigatório continua passando e a revisão contra `docs/architecture.md` confirma FEFO, locking pessimista transacional e ausência de escopo posterior.
+**Conclusão:** todas as validações passam, o cenário obrigatório continua passando e a revisão contra [`../architecture/overview.md`](../architecture/overview.md) confirma FEFO, locking pessimista transacional e ausência de escopo posterior.
 
 **Review:** executar `code-review` sobre o diff final, reportando findings, severidades, evidências, testes, status e bloqueadores. Se `CHANGES_REQUESTED`, parar sem `fix-findings`.
 
 ---
 
-## Auto-revisão contra `docs/architecture.md`
+## Auto-revisão contra [`../architecture/overview.md`](../architecture/overview.md)
 
 - `Batch` permanece no domínio `inventory`.
 - FEFO prioriza menor validade e possui desempate por ID.

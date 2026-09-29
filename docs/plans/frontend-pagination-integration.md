@@ -1,8 +1,8 @@
 # Paginação no frontend — Plano de implementação
 
-> **Objetivo:** dar ao time frontend um mapa claro dos endpoints paginados, contratos TypeScript, regras de query string e ordem sugerida de telas — alinhado ao backend após o PR `pagination/plan-04` (plano backend: [`04-pagination.md`](./04-pagination.md)).
+> **Objetivo:** dar ao time frontend um mapa claro dos endpoints paginados, contratos TypeScript, regras de query string e ordem sugerida de telas — alinhado ao backend após o PR `pagination/plan-04` (plano backend: [`pagination.md`](./pagination.md)).
 
-**Stack frontend (referência):** React, TypeScript, Vite — ver [`docs/frontend-readiness.md`](../frontend-readiness.md).
+**Stack frontend (referência):** React, TypeScript, Vite — ver [`../specs/frontend-readiness.md`](../specs/frontend-readiness.md).
 
 **OpenAPI:** `GET /swagger-ui/index.html` (schemas gerados a partir dos controllers).
 
@@ -357,9 +357,9 @@ sequenceDiagram
 
 | Documento | Conteúdo |
 | --- | --- |
-| [`04-pagination.md`](./04-pagination.md) | Plano e regras de negócio no backend |
-| [`frontend-readiness.md`](../frontend-readiness.md) | Visão geral do produto, CORS, dashboard, fases |
-| [`architecture.md`](../architecture.md) | Limites de módulos e ownership |
+| [`pagination.md`](./pagination.md) | Plano e regras de negócio no backend |
+| [`frontend-readiness.md`](../specs/frontend-readiness.md) | Visão geral do produto, CORS, dashboard, fases |
+| [`architecture/overview.md`](../architecture/overview.md) | Limites de módulos e ownership |
 
 ---
 

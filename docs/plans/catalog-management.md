@@ -1,6 +1,6 @@
 # Catalog Management Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **Para agentes de implementação:** execute este plano tarefa por tarefa, conforme `AGENTS.md` e a Skill `code-review` após cada grupo relevante.
 
 **Goal:** Deliver the complete product and category catalog supported by the current API, with read-only access for `USER` and mutations for `ADMIN`.
 
@@ -8,7 +8,7 @@
 
 **Tech Stack:** React 19, TypeScript 6, React Router 7, TanStack Query 5, Axios, React Hook Form, Zod, Tailwind CSS 4, Vitest, Testing Library, MSW.
 
-**Spec:** `docs/superpowers/specs/2026-09-22-catalog-management-design.md`
+**Spec:** [`../specs/catalog-management.md`](../specs/catalog-management.md)
 
 ## Global Constraints
 

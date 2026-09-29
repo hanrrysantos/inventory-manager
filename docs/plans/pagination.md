@@ -8,7 +8,7 @@
 
 **Tech Stack:** Java 21, Spring Boot 3, Spring Data JPA, Spring Data Web (`Pageable`), OpenAPI 3, JUnit 5, Mockito, MockMvc, Testcontainers PostgreSQL quando a tarefa exigir persistência real.
 
-**Spec:** decisões de produto em `docs/frontend-readiness.md` (Fase 3 — filtros e paginação); limites de módulo em `docs/architecture.md`.
+**Spec:** decisões de produto em [`../specs/frontend-readiness.md`](../specs/frontend-readiness.md) (Fase 3 — filtros e paginação); limites de módulo em [`../architecture/overview.md`](../architecture/overview.md).
 
 ## Global Constraints
 
@@ -48,7 +48,7 @@ Inclui:
 
 Inclui quando autorizada a tarefa correspondente (endpoints ainda inexistentes):
 
-- `GET /api/v1/inventory-logs` paginado, com filtros descritos em `docs/frontend-readiness.md`.
+- `GET /api/v1/inventory-logs` paginado, com filtros descritos em [`../specs/frontend-readiness.md`](../specs/frontend-readiness.md).
 - `GET /api/v1/products/{productId}/batches` paginado.
 
 Não inclui:
@@ -219,7 +219,7 @@ WHERE (:productId IS NULL OR p.id = :productId)
   AND (:owner IS NULL OR p.owner = :owner OR p.owner IS NULL)
 ```
 
-Default sort: `timestamp DESC`. DTO de resposta conforme `docs/frontend-readiness.md` (incluir `productName`, `batchNumber` via join ou mapper).
+Default sort: `timestamp DESC`. DTO de resposta conforme [`../specs/frontend-readiness.md`](../specs/frontend-readiness.md) (incluir `productName`, `batchNumber` via join ou mapper).
 
 ### Lotes por produto (Tarefa 8 — endpoint novo)
 
@@ -387,7 +387,7 @@ bash ./mvnw -Dtest=ProductServiceTest,ProductControllerTest test
 
 ### Tarefa 7: Histórico de movimentações paginado (endpoint novo)
 
-**Objetivo:** expor `GET /api/v1/inventory-logs` conforme `docs/frontend-readiness.md`.
+**Objetivo:** expor `GET /api/v1/inventory-logs` conforme [`../specs/frontend-readiness.md`](../specs/frontend-readiness.md).
 
 **Pré-requisito:** autorização explícita — endpoint novo.
 
@@ -459,7 +459,7 @@ Confirmar: nenhuma listagem coberta retorna array na raiz; `size` > 100 rejeitad
 
 ---
 
-## Auto-revisão contra `docs/architecture.md`
+## Auto-revisão contra [`../architecture/overview.md`](../architecture/overview.md)
 
 - Contratos HTTP permanecem DTOs; entidades JPA não são expostas.
 - Domínio `product` e `inventory` mantêm responsabilidades; paginação é concern transversal em `shared`.

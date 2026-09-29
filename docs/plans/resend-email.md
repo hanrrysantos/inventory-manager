@@ -1,6 +1,6 @@
 # Migração de envio de e-mail para Resend Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **Para agentes de implementação:** execute este plano tarefa por tarefa, conforme `AGENTS.md` e a Skill `code-review` após cada grupo relevante.
 
 **Goal:** Substituir o envio de alertas de estoque via SMTP/Gmail pelo Resend, mantendo o PDF, o agendamento e o comportamento do estoque.
 
@@ -18,7 +18,7 @@
 - Usar as variáveis `RESEND_API_KEY`, `RESEND_FROM` e `RESEND_TO`; não versionar secrets.
 - Usar quatro espaços de indentação e os packages existentes por domínio.
 - Executar os comandos Maven com `bash ./mvnw`.
-- Preservar alterações não relacionadas já existentes no `Dockerfile` e em `docs/frontend-readiness.md`.
+- Preservar alterações não relacionadas já existentes no `Dockerfile` e em [`../specs/frontend-readiness.md`](../specs/frontend-readiness.md).
 
 ---
 
@@ -467,7 +467,7 @@ git diff --stat
 ```
 
 Expected: somente arquivos da migração estarão nos commits da tarefa; as
-alterações preexistentes do `Dockerfile` e `docs/frontend-readiness.md` não
+alterações preexistentes do `Dockerfile` e [`../specs/frontend-readiness.md`](../specs/frontend-readiness.md) não
 serão incluídas por engano.
 
 - [ ] **Step 7: Commit the migration validation and documentation**
