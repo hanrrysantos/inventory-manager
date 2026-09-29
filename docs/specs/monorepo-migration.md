@@ -20,7 +20,11 @@ inventory-manager/
 ├── .gitattributes
 ├── AGENTS.md
 ├── docs/
-│   └── superpowers/
+│   ├── specs/
+│   ├── plans/
+│   ├── tasks/
+│   ├── adr/
+│   └── architecture/
 ├── backend/
 │   ├── README.md
 │   ├── pom.xml
@@ -33,6 +37,7 @@ inventory-manager/
 │   └── .env.example
 └── frontend/
     ├── README.md
+    ├── docs/
     ├── package.json
     ├── src/
     ├── public/
@@ -40,9 +45,9 @@ inventory-manager/
 ```
 
 Arquivos de orientação do repositório e automações do GitHub permanecem na
-raiz. Documentação específica do backend fica em `backend/docs`; a
-especificação da migração permanece em `docs/superpowers` por tratar do
-repositório inteiro.
+raiz. Specs, plans, tasks, ADRs e arquitetura do **sistema** ficam em `docs/`.
+Documentação específica de cada app fica em `backend/docs/` e
+`frontend/docs/`.
 
 ## Preservação do histórico
 

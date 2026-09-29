@@ -42,7 +42,7 @@ Os principais contratos existentes estão sob `/api/v1`.
 **Paginação (backend entregue):** as listagens principais retornam o envelope
 `PageResponse` (`content`, `page`, `size`, `totalElements`, `totalPages`).
 Plano de integração para o frontend:
-[`docs/plans/05-frontend-pagination-integration.md`](plans/05-frontend-pagination-integration.md).
+[`../plans/frontend-pagination-integration.md`](../plans/frontend-pagination-integration.md).
 
 ## Bloqueios obrigatórios antes da integração
 
@@ -466,7 +466,7 @@ Filtros:
 
 A listagem de produtos usa paginação no backend; busca textual por nome/SKU ainda
 não está na API — ver
-[`05-frontend-pagination-integration.md`](plans/05-frontend-pagination-integration.md).
+[`frontend-pagination-integration.md`](../plans/frontend-pagination-integration.md).
 
 ### Área “Precisa de atenção”
 
