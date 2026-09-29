@@ -97,7 +97,7 @@ A aplicação é executada como uma única unidade e possui organização por do
 
 O código de produção fica em `src/main/java/br/com/hanrry/inventory`, os testes em `src/test/java/br/com/hanrry/inventory` e as migrations em `src/main/resources/db/migration`.
 
-Consulte [as decisões arquiteturais](docs/architecture.md) e [os planos de evolução](docs/plans/). O documento de arquitetura descreve o estado desejado e inclui componentes ainda não implementados, como RabbitMQ e a infraestrutura de observabilidade.
+Consulte [arquitetura](../docs/architecture/), [specs](../docs/specs/), [planos](../docs/plans/) e [tasks](../docs/tasks/) na raiz do monorepo. A visão arquitetural descreve o estado desejado e inclui componentes ainda não implementados, como RabbitMQ e observabilidade. Detalhes locais da API: [backend/docs/](docs/).
 
 ## Deploy e infraestrutura
 
@@ -233,7 +233,7 @@ O [workflow de CI](../.github/workflows/backend-ci.yml) executa a suíte com JaC
 
 ## Próximos passos
 
-A evolução prevista em [architecture.md](docs/architecture.md) inclui:
+A evolução prevista em [architecture/overview.md](../docs/architecture/overview.md) inclui:
 
 - Publicação de eventos de reposição após a confirmação da transação.
 - Processamento assíncrono de notificações com RabbitMQ.

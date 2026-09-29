@@ -9,6 +9,7 @@ rastreabilidade de movimentações e proteção contra operações concorrentes.
 | --- | --- | --- |
 | Backend | Java 21, Spring Boot 3, PostgreSQL | [backend/README.md](backend/README.md) |
 | Frontend | React, TypeScript, Vite | [frontend/README.md](frontend/README.md) |
+| Documentação (SDD) | Specs, planos, arquitetura | [docs/README.md](docs/README.md) |
 
 ## Executar localmente
 
