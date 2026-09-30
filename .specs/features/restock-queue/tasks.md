@@ -226,11 +226,11 @@ T12 -> T13
 
 **Done when**:
 
-- [ ] `findLowStockProducts(User, Pageable)` usa o `User` recebido na consulta já existente
-- [ ] O método com só `Pageable` continua chamando `OwnerContext`
-- [ ] Teste unitário mostra que o método novo não chama `currentUser()`
-- [ ] Gate rápido passa: `cd backend && bash ./mvnw -Dtest=ProductServiceTest test`
-- [ ] Nenhum teste existente é apagado ou enfraquecido
+- [x] `findLowStockProducts(User, Pageable)` usa o `User` recebido na consulta já existente
+- [x] O método com só `Pageable` continua chamando `OwnerContext`
+- [x] Teste unitário mostra que o método novo não chama `currentUser()`
+- [x] Gate rápido passa: `cd backend && bash ./mvnw -Dtest=ProductServiceTest test`
+- [x] Nenhum teste existente é apagado ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick

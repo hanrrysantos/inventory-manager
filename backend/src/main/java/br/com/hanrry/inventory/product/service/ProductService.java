@@ -14,6 +14,7 @@ import br.com.hanrry.inventory.product.repository.ProductRepository;
 import br.com.hanrry.inventory.shared.dto.PageResponse;
 import lombok.RequiredArgsConstructor;
 import br.com.hanrry.inventory.shared.security.OwnerContext;
+import br.com.hanrry.inventory.user.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -101,6 +102,10 @@ public class ProductService {
 
     public PageResponse<ProductResponseDTO> findLowStockProducts(Pageable pageable) {
         var owner = ownerContext == null ? null : ownerContext.currentUser();
+        return findLowStockProducts(owner, pageable);
+    }
+
+    public PageResponse<ProductResponseDTO> findLowStockProducts(User owner, Pageable pageable) {
         Page<Product> page = productRepository.findLowStockProducts(owner, pageable);
         return PageResponse.from(page, productMapper::toDTO);
     }
