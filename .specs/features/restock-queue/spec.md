@@ -133,7 +133,7 @@ Esta etapa coloca `RestockNeededEvent` no RabbitMQ depois do commit. O consumido
 | RABBIT-06 | P1: Alerta sai fora da resposta HTTP | - | Done |
 | RABBIT-07 | P1: Alerta sai fora da resposta HTTP | - | Done |
 | RABBIT-08 | P1: Alerta sai fora da resposta HTTP | - | Done |
-| RABBIT-09 | P1: Falha externa não desfaz o consumo | - | In Tasks |
+| RABBIT-09 | P1: Falha externa não desfaz o consumo | - | Done |
 | RABBIT-10 | P1: Falha externa não desfaz o consumo | - | Done |
 | RABBIT-11 | P1: Falha externa não desfaz o consumo | - | Done |
 | RABBIT-12 | P2: Job agendado permanece direto | - | Done |

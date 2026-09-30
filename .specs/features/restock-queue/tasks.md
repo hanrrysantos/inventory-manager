@@ -347,12 +347,12 @@ T12 -> T13
 
 **Done when**:
 
-- [ ] O contexto aponta `spring.rabbitmq.port` para uma porta fechada e sobe sem o container do RabbitMQ
-- [ ] `POST /api/v1/batches/consume` confirmado responde `204`
-- [ ] Lote e log permanecem gravados
-- [ ] Nenhuma mensagem é entregue a um consumidor
-- [ ] Gate completo passa: `cd backend && bash ./mvnw -Dtest=RestockPublishFailureIntegrationTest test`
-- [ ] Nenhum teste existente é apagado ou enfraquecido
+- [x] O contexto aponta `spring.rabbitmq.port` para uma porta fechada e sobe sem o container do RabbitMQ
+- [x] `POST /api/v1/batches/consume` confirmado responde `204`
+- [x] Lote e log permanecem gravados
+- [x] Nenhuma mensagem é entregue a um consumidor
+- [x] Gate completo passa: `cd backend && bash ./mvnw -Dtest=RestockPublishFailureIntegrationTest test`
+- [x] Nenhum teste existente é apagado ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
