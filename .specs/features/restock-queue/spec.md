@@ -125,7 +125,7 @@ Esta etapa coloca `RestockNeededEvent` no RabbitMQ depois do commit. O consumido
 
 | Requirement ID | Story | Phase | Status |
 | --- | --- | --- | --- |
-| RABBIT-01 | P1: Consumo confirmado publica na fila | - | In Tasks |
+| RABBIT-01 | P1: Consumo confirmado publica na fila | - | Done |
 | RABBIT-02 | P1: Consumo confirmado publica na fila | - | Done |
 | RABBIT-03 | P1: Consumo confirmado publica na fila | - | Done |
 | RABBIT-04 | P1: Consumo confirmado publica na fila | - | Done |

@@ -158,6 +158,8 @@ Use [.env.example](.env.example) como referência e mantenha a `.env` fora do ve
 | `FRONTEND_ORIGINS` | Origens CORS separadas por vírgulas; padrão `http://localhost:5173`. |
 | `RESEND_API_KEY` | Chave de API para envio de e-mails. |
 | `RESEND_FROM`, `RESEND_TO` | Remetente autorizado no Resend e destinatário dos alertas. |
+| `RABBITMQ_HOST`, `RABBITMQ_PORT` | Endereço do RabbitMQ ao executar fora do Compose; padrão `localhost` e `5672`. No Compose, a API recebe automaticamente o host do serviço `rabbitmq` e a porta `5672`. |
+| `RABBITMQ_USERNAME`, `RABBITMQ_PASSWORD` | Credenciais do RabbitMQ; padrão local `guest`. No Compose, também definem o usuário do broker. |
 
 > 💡 Dica CORS: Para liberar múltiplos ambientes no frontend, configure a variável separando as origens por vírgulas
 

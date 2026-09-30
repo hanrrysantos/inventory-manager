@@ -432,9 +432,9 @@ T12 -> T13
 
 **Done when**:
 
-- [ ] A tabela explica as quatro variáveis e diz que o Compose preenche o host do serviço
-- [ ] O texto não instrui a versionar `.env`
-- [ ] Gate de build passa: `cd backend && bash ./mvnw -DskipTests package`
+- [x] A tabela explica as quatro variáveis e diz que o Compose preenche o host do serviço
+- [x] O texto não instrui a versionar `.env`
+- [x] Gate de build passa: `cd backend && bash ./mvnw -DskipTests package`
 
 **Tests**: none
 **Gate**: build
