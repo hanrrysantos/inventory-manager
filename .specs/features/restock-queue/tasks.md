@@ -140,10 +140,10 @@ T12 -> T13
 
 **Done when**:
 
-- [ ] A fila é durável e o nome é `inventory.restock-needed`
-- [ ] O template usa JSON e `MessageDeliveryMode.PERSISTENT`
-- [ ] Não há exchange própria, DLQ nem retry
-- [ ] Gate de build passa: `cd backend && bash ./mvnw -DskipTests package`
+- [x] A fila é durável e o nome é `inventory.restock-needed`
+- [x] O template usa JSON e `MessageDeliveryMode.PERSISTENT`
+- [x] Não há exchange própria, DLQ nem retry
+- [x] Gate de build passa: `cd backend && bash ./mvnw -DskipTests package`
 
 **Tests**: none
 **Gate**: build
@@ -167,9 +167,9 @@ T12 -> T13
 
 **Done when**:
 
-- [ ] O record expõe os quatro campos
-- [ ] `RestockNeededEvent` continua com três campos
-- [ ] Gate de build passa: `cd backend && bash ./mvnw -DskipTests package`
+- [x] O record expõe os quatro campos
+- [x] `RestockNeededEvent` continua com três campos
+- [x] Gate de build passa: `cd backend && bash ./mvnw -DskipTests package`
 
 **Tests**: none
 **Gate**: build
