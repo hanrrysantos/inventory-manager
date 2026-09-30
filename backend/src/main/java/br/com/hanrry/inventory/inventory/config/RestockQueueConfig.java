@@ -13,10 +13,16 @@ import org.springframework.context.annotation.Configuration;
 public class RestockQueueConfig {
 
     public static final String RESTOCK_NEEDED_QUEUE = "inventory.restock-needed";
+    public static final String RESTOCK_NEEDED_DLQ = "inventory.restock-needed.dlq";
 
     @Bean
     public Queue restockNeededQueue() {
         return new Queue(RESTOCK_NEEDED_QUEUE, true);
+    }
+
+    @Bean
+    public Queue restockNeededDlq() {
+        return new Queue(RESTOCK_NEEDED_DLQ, true);
     }
 
     @Bean
