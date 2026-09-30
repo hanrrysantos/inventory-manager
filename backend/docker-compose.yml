@@ -18,6 +18,26 @@ services:
     networks:
       - inventory-network
 
+  rabbitmq:
+    image: rabbitmq:3.13-management-alpine
+    hostname: rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USERNAME:-guest}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-guest}
+    ports:
+      - "127.0.0.1:5672:5672"
+      - "127.0.0.1:15672:15672"
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    networks:
+      - inventory-network
+
   api:
     build:
       context: .
@@ -35,8 +55,14 @@ services:
       RESEND_FROM: ${RESEND_FROM:-}
       RESEND_TO: ${RESEND_TO:-}
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USERNAME: ${RABBITMQ_USERNAME:-guest}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:-guest}
     depends_on:
       db:
+        condition: service_healthy
+      rabbitmq:
         condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "wget --spider --quiet http://localhost:8080/v3/api-docs || exit 1"]
@@ -49,6 +75,7 @@ services:
 
 volumes:
   postgres-data:
+  rabbitmq-data:
 
 networks:
   inventory-network:

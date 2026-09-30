@@ -377,6 +377,67 @@ class ProductServiceTest {
     }
 
     @Test
+    void shouldReturnLowStockProductsOfGivenOwnerWithoutCallingOwnerContext() {
+        User owner = new User();
+        owner.setId(7L);
+
+        Product product = new Product();
+        product.setId(1L);
+
+        ProductResponseDTO response = new ProductResponseDTO(
+                1L,
+                "Notebook",
+                "NOTE-001",
+                3L,
+                "Eletrônicos",
+                10L
+        );
+
+        Pageable pageable = PageRequest.of(0, 20);
+        Page<Product> lowStockPage = new PageImpl<>(List.of(product), pageable, 1);
+
+        when(productRepository.findLowStockProducts(owner, pageable)).thenReturn(lowStockPage);
+        when(productMapper.toDTO(product)).thenReturn(response);
+
+        PageResponse<ProductResponseDTO> result = productService.findLowStockProducts(owner, pageable);
+
+        assertEquals(List.of(response), result.content());
+        verify(productRepository).findLowStockProducts(owner, pageable);
+        verify(ownerContext, never()).currentUser();
+    }
+
+    @Test
+    void shouldReturnLowStockProductsOfAuthenticatedOwnerWhenOnlyPageableIsGiven() {
+        User owner = new User();
+        owner.setId(7L);
+
+        Product product = new Product();
+        product.setId(1L);
+
+        ProductResponseDTO response = new ProductResponseDTO(
+                1L,
+                "Notebook",
+                "NOTE-001",
+                3L,
+                "Eletrônicos",
+                10L
+        );
+
+        Pageable pageable = PageRequest.of(0, 20);
+        Page<Product> lowStockPage = new PageImpl<>(List.of(product), pageable, 1);
+
+        when(ownerContext.currentUser()).thenReturn(owner);
+        when(productRepository.findLowStockProducts(owner, pageable)).thenReturn(lowStockPage);
+        when(productMapper.toDTO(product)).thenReturn(response);
+
+        PageResponse<ProductResponseDTO> result = productService.findLowStockProducts(pageable);
+
+        assertEquals(List.of(response), result.content());
+        verify(ownerContext).currentUser();
+        verify(productRepository).findLowStockProducts(owner, pageable);
+    }
+
+    @Test
     void shouldReturnProductWhenTotalStockEqualsMinimumStock() {
         Product product = new Product();
         product.setId(1L);
