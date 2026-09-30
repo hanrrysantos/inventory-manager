@@ -12,41 +12,53 @@ Esta etapa coloca `RestockNeededEvent` no RabbitMQ depois do commit. O consumido
 - [ ] Rollback de consumo não publica mensagem.
 - [ ] Falha de publicação, PDF ou e-mail não desfaz lote nem log e não muda o `204`.
 
+
+
 ## Out of Scope
 
-| Feature | Reason |
-| --- | --- |
-| Retry, redelivery e DLQ | Etapa seguinte: notificações resilientes |
-| Idempotência contra redelivery | Mesma etapa seguinte. Um redelivery pode enviar outro e-mail |
-| Histórico `PENDING` / `SENT` / `FAILED` | Mesma etapa seguinte |
-| Transactional Outbox | Arquitetura adia o outbox. Falha de publicação pode perder o alerta daquela requisição |
-| Isolamento do alerta por `owner` e destinatário por conta | Fora desde a spec de eventos após commit |
-| Nova regra de limiar ou PDF por produto | O evento continua um sinal. O consumidor relê o estoque baixo |
-| RabbitMQ em `auth`, `user`, `product` ou no consumo FEFO | A fila existe só neste caminho |
-| Actuator, Micrometer, Prometheus e Grafana | Fase de observabilidade |
-| Mudança do contrato HTTP de consumo, criação ou entrada de estoque | O `204` de `POST /api/v1/batches/consume` permanece |
+
+| Feature                                                            | Reason                                                                                 |
+| ------------------------------------------------------------------ | -------------------------------------------------------------------------------------- |
+| Retry, redelivery e DLQ                                            | Etapa seguinte: notificações resilientes                                               |
+| Idempotência contra redelivery                                     | Mesma etapa seguinte. Um redelivery pode enviar outro e-mail                           |
+| Histórico `PENDING` / `SENT` / `FAILED`                            | Mesma etapa seguinte                                                                   |
+| Transactional Outbox                                               | Arquitetura adia o outbox. Falha de publicação pode perder o alerta daquela requisição |
+| Isolamento do alerta por `owner` e destinatário por conta          | Fora desde a spec de eventos após commit                                               |
+| Nova regra de limiar ou PDF por produto                            | O evento continua um sinal. O consumidor relê o estoque baixo                          |
+| RabbitMQ em `auth`, `user`, `product` ou no consumo FEFO           | A fila existe só neste caminho                                                         |
+| Actuator, Micrometer, Prometheus e Grafana                         | Fase de observabilidade                                                                |
+| Mudança do contrato HTTP de consumo, criação ou entrada de estoque | O `204` de `POST /api/v1/batches/consume` permanece                                    |
+
 
 ---
 
+
+
 ## Assumptions & Open Questions
 
-| Assumption / decision | Chosen default | Rationale | Confirmed? |
-| --- | --- | --- | --- |
-| Limite do incremento | Só transporte. Consumidor processa uma vez, registra falha de PDF ou e-mail e confirma a mensagem | Decisão de 2026-09-29. Retry e DLQ são a etapa seguinte | y |
-| Broker fora depois do commit | HTTP `204`, log com `eventId`, alerta daquela requisição pode não sair | Decisão de 2026-09-29. Sem outbox | y |
-| Job agendado | `checkInventoryAndNotify` direto, sem publicar na fila | Decisão de 2026-09-29. Só `consumeStock` confirmado publica | y |
-| Durabilidade | Fila durável e mensagem persistente | Restart do broker não descarta evento já publicado. A perda aceita é a falha de publicação | y |
-| Mensagem incompleta | Log, confirmação da mensagem e nenhum e-mail | Sem DLQ, mensagem inválida não pode voltar para sempre | y |
-| Redelivery acidental | Pode gerar outro e-mail | Idempotência está fora. Cada mensagem relê o estoque | y |
-| Credencial do broker | Variável de ambiente, sem secret versionado | Padrão do repositório | y |
-| Métrica de fila | Só log com `eventId` | Prometheus fica na fase de observabilidade | y |
-| `ownerId` na mensagem | O publicador lê o proprietário autenticado no thread do request e grava o id na mensagem. O consumidor relê o estoque baixo desse proprietário | `OwnerContext` lança exceção sem `SecurityContext`. O consumidor da fila não tem o contexto da requisição. Sem o id, o alerta do consumo não sai | y |
+
+| Assumption / decision        | Chosen default                                                                                                                                 | Rationale                                                                                                                                        | Confirmed? |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | ---------- |
+| Limite do incremento         | Só transporte. Consumidor processa uma vez, registra falha de PDF ou e-mail e confirma a mensagem                                              | Decisão de 2026-09-29. Retry e DLQ são a etapa seguinte                                                                                          | y          |
+| Broker fora depois do commit | HTTP `204`, log com `eventId`, alerta daquela requisição pode não sair                                                                         | Decisão de 2026-09-29. Sem outbox                                                                                                                | y          |
+| Job agendado                 | `checkInventoryAndNotify` direto, sem publicar na fila                                                                                         | Decisão de 2026-09-29. Só `consumeStock` confirmado publica                                                                                      | y          |
+| Durabilidade                 | Fila durável e mensagem persistente                                                                                                            | Restart do broker não descarta evento já publicado. A perda aceita é a falha de publicação                                                       | y          |
+| Mensagem incompleta          | Log, confirmação da mensagem e nenhum e-mail                                                                                                   | Sem DLQ, mensagem inválida não pode voltar para sempre                                                                                           | y          |
+| Redelivery acidental         | Pode gerar outro e-mail                                                                                                                        | Idempotência está fora. Cada mensagem relê o estoque                                                                                             | y          |
+| Credencial do broker         | Variável de ambiente, sem secret versionado                                                                                                    | Padrão do repositório                                                                                                                            | y          |
+| Métrica de fila              | Só log com `eventId`                                                                                                                           | Prometheus fica na fase de observabilidade                                                                                                       | y          |
+| `ownerId` na mensagem        | O publicador lê o proprietário autenticado no thread do request e grava o id na mensagem. O consumidor relê o estoque baixo desse proprietário | `OwnerContext` lança exceção sem `SecurityContext`. O consumidor da fila não tem o contexto da requisição. Sem o id, o alerta do consumo não sai | y          |
+
 
 **Open questions:** none
 
 ---
 
+
+
 ## User Stories
+
+
 
 ### P1: Consumo confirmado publica na fila ⭐ MVP
 
@@ -65,6 +77,8 @@ Esta etapa coloca `RestockNeededEvent` no RabbitMQ depois do commit. O consumido
 
 ---
 
+
+
 ### P1: Alerta sai fora da resposta HTTP ⭐ MVP
 
 **User Story**: As a operador, I want `POST /api/v1/batches/consume` to finish with `204` before the email, so that the stock movement does not wait on PDF or Resend.
@@ -82,6 +96,8 @@ Esta etapa coloca `RestockNeededEvent` no RabbitMQ depois do commit. O consumido
 
 ---
 
+
+
 ### P1: Falha externa não desfaz o consumo ⭐ MVP
 
 **User Story**: As a operador, I want a broker, PDF, or email failure to leave the committed consumption in place, so that stock and the HTTP result stay aligned.
@@ -98,6 +114,8 @@ Esta etapa coloca `RestockNeededEvent` no RabbitMQ depois do commit. O consumido
 
 ---
 
+
+
 ### P2: Job agendado permanece direto
 
 **User Story**: As a gestor, I want the scheduled low-stock scan to keep calling the alert in process, so that the queue is only the path of a committed consumption.
@@ -113,38 +131,46 @@ Esta etapa coloca `RestockNeededEvent` no RabbitMQ depois do commit. O consumido
 
 ---
 
+
+
 ## Edge Cases
 
-1. WHEN `consumeStock` confirma com quantidade pedida zero ou negativa e não lança `InsufficientStockException` THEN o sistema SHALL publicar a mensagem. <!-- RABBIT-14 -->
-2. IF o consumidor estiver parado WHEN a publicação sucede THEN o sistema SHALL deixar a mensagem na fila até um consumidor recebê-la, e a API SHALL já ter respondido `204`. <!-- RABBIT-15 -->
-3. The sistema SHALL usar o RabbitMQ somente entre a publicação de `RestockNeededEvent` e o consumidor de notificação. <!-- RABBIT-16 -->
+1. WHEN `consumeStock` confirma com quantidade pedida zero ou negativa e não lança `InsufficientStockException` THEN o sistema SHALL publicar a mensagem. 
+2. IF o consumidor estiver parado WHEN a publicação sucede THEN o sistema SHALL deixar a mensagem na fila até um consumidor recebê-la, e a API SHALL já ter respondido `204`. 
+3. The sistema SHALL usar o RabbitMQ somente entre a publicação de `RestockNeededEvent` e o consumidor de notificação. 
 
 ---
 
+
+
 ## Requirement Traceability
 
-| Requirement ID | Story | Phase | Status |
-| --- | --- | --- | --- |
-| RABBIT-01 | P1: Consumo confirmado publica na fila | - | In Tasks |
-| RABBIT-02 | P1: Consumo confirmado publica na fila | - | In Tasks |
-| RABBIT-03 | P1: Consumo confirmado publica na fila | - | In Tasks |
-| RABBIT-04 | P1: Consumo confirmado publica na fila | - | In Tasks |
-| RABBIT-05 | P1: Alerta sai fora da resposta HTTP | - | In Tasks |
-| RABBIT-06 | P1: Alerta sai fora da resposta HTTP | - | In Tasks |
-| RABBIT-07 | P1: Alerta sai fora da resposta HTTP | - | In Tasks |
-| RABBIT-08 | P1: Alerta sai fora da resposta HTTP | - | In Tasks |
-| RABBIT-09 | P1: Falha externa não desfaz o consumo | - | In Tasks |
-| RABBIT-10 | P1: Falha externa não desfaz o consumo | - | In Tasks |
-| RABBIT-11 | P1: Falha externa não desfaz o consumo | - | In Tasks |
-| RABBIT-12 | P2: Job agendado permanece direto | - | In Tasks |
-| RABBIT-13 | P2: Job agendado permanece direto | - | In Tasks |
-| RABBIT-14 | P1: Consumo confirmado publica na fila | - | In Tasks |
-| RABBIT-15 | P1: Alerta sai fora da resposta HTTP | - | In Tasks |
-| RABBIT-16 | P1: Alerta sai fora da resposta HTTP | - | In Tasks |
+
+| Requirement ID | Story                                  | Phase | Status   |
+| -------------- | -------------------------------------- | ----- | -------- |
+| RABBIT-01      | P1: Consumo confirmado publica na fila | -     | In Tasks |
+| RABBIT-02      | P1: Consumo confirmado publica na fila | -     | In Tasks |
+| RABBIT-03      | P1: Consumo confirmado publica na fila | -     | In Tasks |
+| RABBIT-04      | P1: Consumo confirmado publica na fila | -     | Done     |
+| RABBIT-05      | P1: Alerta sai fora da resposta HTTP   | -     | In Tasks |
+| RABBIT-06      | P1: Alerta sai fora da resposta HTTP   | -     | In Tasks |
+| RABBIT-07      | P1: Alerta sai fora da resposta HTTP   | -     | In Tasks |
+| RABBIT-08      | P1: Alerta sai fora da resposta HTTP   | -     | Done     |
+| RABBIT-09      | P1: Falha externa não desfaz o consumo | -     | In Tasks |
+| RABBIT-10      | P1: Falha externa não desfaz o consumo | -     | In Tasks |
+| RABBIT-11      | P1: Falha externa não desfaz o consumo | -     | In Tasks |
+| RABBIT-12      | P2: Job agendado permanece direto      | -     | In Tasks |
+| RABBIT-13      | P2: Job agendado permanece direto      | -     | In Tasks |
+| RABBIT-14      | P1: Consumo confirmado publica na fila | -     | In Tasks |
+| RABBIT-15      | P1: Alerta sai fora da resposta HTTP   | -     | In Tasks |
+| RABBIT-16      | P1: Alerta sai fora da resposta HTTP   | -     | In Tasks |
+
 
 **Coverage:** 16 total, 16 mapped to tasks, 0 unmapped
 
 ---
+
+
 
 ## Success Criteria
 

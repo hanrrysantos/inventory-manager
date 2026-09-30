@@ -195,14 +195,14 @@ T12 -> T13
 
 **Done when**:
 
-- [ ] O método está em `AFTER_COMMIT` e envia uma `RestockQueueMessage` para `inventory.restock-needed`
-- [ ] A classe não importa `notification`
-- [ ] Falha de `RabbitTemplate` ou de `OwnerContext` é logada com `eventId` e não é relançada
-- [ ] Sem proprietário autenticado, nenhuma mensagem é enviada
-- [ ] Teste unitário cobre envio, falha de broker e ausência de proprietário
-- [ ] `BatchService` continua publicando `RestockNeededEvent` no commit, inclusive com quantidade zero ou negativa, e não publica em `InsufficientStockException`, `createBatch` ou `addStock`
-- [ ] Gate rápido passa: `cd backend && bash ./mvnw -Dtest=RestockEventPublisherTest,BatchServiceTest test`
-- [ ] Nenhum teste existente é apagado ou enfraquecido
+- [x] O método está em `AFTER_COMMIT` e envia uma `RestockQueueMessage` para `inventory.restock-needed`
+- [x] A classe não importa `notification`
+- [x] Falha de `RabbitTemplate` ou de `OwnerContext` é logada com `eventId` e não é relançada
+- [x] Sem proprietário autenticado, nenhuma mensagem é enviada
+- [x] Teste unitário cobre envio, falha de broker e ausência de proprietário
+- [x] `BatchService` continua publicando `RestockNeededEvent` no commit, inclusive com quantidade zero ou negativa, e não publica em `InsufficientStockException`, `createBatch` ou `addStock`
+- [x] Gate rápido passa: `cd backend && bash ./mvnw -Dtest=RestockEventPublisherTest,BatchServiceTest test`
+- [x] Nenhum teste existente é apagado ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
