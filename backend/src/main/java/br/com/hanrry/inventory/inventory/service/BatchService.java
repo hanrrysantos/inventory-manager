@@ -12,20 +12,23 @@ import br.com.hanrry.inventory.shared.exception.inventory.batch.BatchNotFound;
 import br.com.hanrry.inventory.shared.exception.inventory.batch.InvalidQuantityException;
 import br.com.hanrry.inventory.shared.exception.inventory.batch.InsufficientStockException;
 import br.com.hanrry.inventory.shared.exception.product.product.ProductNotFoundException;
+import br.com.hanrry.inventory.inventory.event.RestockNeededEvent;
 import br.com.hanrry.inventory.inventory.mapper.BatchMapper;
 import br.com.hanrry.inventory.inventory.repository.BatchRepository;
 import br.com.hanrry.inventory.product.repository.ProductRepository;
-import br.com.hanrry.inventory.notification.service.StockAlertService;
 import lombok.RequiredArgsConstructor;
 import br.com.hanrry.inventory.shared.dto.PageResponse;
 import br.com.hanrry.inventory.shared.security.OwnerContext;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -35,7 +38,7 @@ public class BatchService {
     private final BatchRepository batchRepository;
     private final InventoryLogService inventoryLogService;
     private final ProductRepository productRepository;
-    private final StockAlertService stockAlertService;
+    private final ApplicationEventPublisher eventPublisher;
     private final OwnerContext ownerContext;
 
     @Transactional
@@ -124,7 +127,11 @@ public class BatchService {
             throw new InsufficientStockException("Insufficient Stock");
         }
 
-        this.stockAlertService.checkInventoryAndNotify();
+        eventPublisher.publishEvent(new RestockNeededEvent(
+                UUID.randomUUID(),
+                request.productId(),
+                Instant.now()
+        ));
     }
 
     public PageResponse<BatchResponseDTO> findExpiredBatches(Pageable pageable) {

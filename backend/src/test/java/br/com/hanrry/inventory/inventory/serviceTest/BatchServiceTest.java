@@ -15,14 +15,15 @@ import br.com.hanrry.inventory.shared.exception.product.product.ProductNotFoundE
 import br.com.hanrry.inventory.inventory.mapper.BatchMapper;
 import br.com.hanrry.inventory.inventory.repository.BatchRepository;
 import br.com.hanrry.inventory.product.repository.ProductRepository;
+import br.com.hanrry.inventory.inventory.event.RestockNeededEvent;
 import br.com.hanrry.inventory.inventory.service.BatchService;
 import br.com.hanrry.inventory.inventory.service.InventoryLogService;
-import br.com.hanrry.inventory.notification.service.StockAlertService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -48,7 +49,7 @@ class BatchServiceTest {
     private ProductRepository productRepository;
 
     @Mock
-    private StockAlertService stockAlertService;
+    private ApplicationEventPublisher eventPublisher;
 
     @InjectMocks
     private BatchService batchService;
@@ -126,6 +127,7 @@ class BatchServiceTest {
         verify(batchRepository).save(batch);
         verify(inventoryLogService).createLog(savedBatch, 10L, LogType.INPUT);
         verify(batchMapper).toDTO(savedBatch);
+        verifyNoInteractions(eventPublisher);
     }
 
     @Test
@@ -224,6 +226,7 @@ class BatchServiceTest {
         verify(batchRepository).save(batch);
         verify(inventoryLogService).createLog(savedBatch, 5L, LogType.INPUT);
         verify(batchMapper).toDTO(savedBatch);
+        verifyNoInteractions(eventPublisher);
     }
 
     @Test
@@ -291,8 +294,8 @@ class BatchServiceTest {
         verify(inventoryLogService)
                 .createLog(batch, 5L, LogType.OUTPUT);
 
-        verify(stockAlertService)
-                .checkInventoryAndNotify();
+        verify(eventPublisher)
+                .publishEvent(any(RestockNeededEvent.class));
     }
 
     @Test
@@ -327,8 +330,8 @@ class BatchServiceTest {
         verify(inventoryLogService)
                 .createLog(secondBatch, 7L, LogType.OUTPUT);
 
-        verify(stockAlertService)
-                .checkInventoryAndNotify();
+        verify(eventPublisher)
+                .publishEvent(any(RestockNeededEvent.class));
     }
 
     @Test
@@ -348,7 +351,7 @@ class BatchServiceTest {
         );
 
         verifyNoInteractions(inventoryLogService);
-        verifyNoInteractions(stockAlertService);
+        verifyNoInteractions(eventPublisher);
     }
 
     @Test
@@ -377,8 +380,8 @@ class BatchServiceTest {
         assertEquals(9L, firstBatch.getQuantity() + secondBatch.getQuantity());
         verify(inventoryLogService, times(1))
                 .createLog(any(Batch.class), eq(1L), eq(LogType.OUTPUT));
-        verify(stockAlertService)
-                .checkInventoryAndNotify();
+        verify(eventPublisher)
+                .publishEvent(any(RestockNeededEvent.class));
     }
 
     @Test
@@ -400,8 +403,8 @@ class BatchServiceTest {
 
         assertEquals(5L, batch.getQuantity());
         verifyNoInteractions(inventoryLogService);
-        verify(stockAlertService)
-                .checkInventoryAndNotify();
+        verify(eventPublisher)
+                .publishEvent(any(RestockNeededEvent.class));
     }
 
     @Test
@@ -423,8 +426,8 @@ class BatchServiceTest {
 
         assertEquals(5L, batch.getQuantity());
         verifyNoInteractions(inventoryLogService);
-        verify(stockAlertService)
-                .checkInventoryAndNotify();
+        verify(eventPublisher)
+                .publishEvent(any(RestockNeededEvent.class));
     }
 
     @Test
@@ -452,8 +455,8 @@ class BatchServiceTest {
         verify(inventoryLogService)
                 .createLog(batch, 5L, LogType.OUTPUT);
 
-        verify(stockAlertService, never())
-                .checkInventoryAndNotify();
+        verify(eventPublisher, never())
+                .publishEvent(any());
     }
 
     @Test
