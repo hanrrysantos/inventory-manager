@@ -126,20 +126,20 @@ Esta etapa coloca `RestockNeededEvent` no RabbitMQ depois do commit. O consumido
 | Requirement ID | Story | Phase | Status |
 | --- | --- | --- | --- |
 | RABBIT-01 | P1: Consumo confirmado publica na fila | - | In Tasks |
-| RABBIT-02 | P1: Consumo confirmado publica na fila | - | In Tasks |
-| RABBIT-03 | P1: Consumo confirmado publica na fila | - | In Tasks |
+| RABBIT-02 | P1: Consumo confirmado publica na fila | - | Done |
+| RABBIT-03 | P1: Consumo confirmado publica na fila | - | Done |
 | RABBIT-04 | P1: Consumo confirmado publica na fila | - | Done |
-| RABBIT-05 | P1: Alerta sai fora da resposta HTTP | - | In Tasks |
+| RABBIT-05 | P1: Alerta sai fora da resposta HTTP | - | Done |
 | RABBIT-06 | P1: Alerta sai fora da resposta HTTP | - | Done |
 | RABBIT-07 | P1: Alerta sai fora da resposta HTTP | - | Done |
 | RABBIT-08 | P1: Alerta sai fora da resposta HTTP | - | Done |
 | RABBIT-09 | P1: Falha externa não desfaz o consumo | - | In Tasks |
 | RABBIT-10 | P1: Falha externa não desfaz o consumo | - | Done |
 | RABBIT-11 | P1: Falha externa não desfaz o consumo | - | Done |
-| RABBIT-12 | P2: Job agendado permanece direto | - | In Tasks |
-| RABBIT-13 | P2: Job agendado permanece direto | - | In Tasks |
-| RABBIT-14 | P1: Consumo confirmado publica na fila | - | In Tasks |
-| RABBIT-15 | P1: Alerta sai fora da resposta HTTP | - | In Tasks |
+| RABBIT-12 | P2: Job agendado permanece direto | - | Done |
+| RABBIT-13 | P2: Job agendado permanece direto | - | Done |
+| RABBIT-14 | P1: Consumo confirmado publica na fila | - | Done |
+| RABBIT-15 | P1: Alerta sai fora da resposta HTTP | - | Done |
 | RABBIT-16 | P1: Alerta sai fora da resposta HTTP | - | Done |
 
 **Coverage:** 16 total, 16 mapped to tasks, 0 unmapped

@@ -314,16 +314,16 @@ T12 -> T13
 
 **Done when**:
 
-- [ ] `RabbitMQContainer` sobe junto com o PostgreSQL já usado
-- [ ] Consumo confirmado responde `204` enquanto o `EmailSender` está bloqueado e deixa uma mensagem durável
-- [ ] Depois que o consumidor corre, o e-mail sai só se houver estoque baixo
-- [ ] `InsufficientStockException`, `createBatch` e `addStock` não deixam mensagem
-- [ ] Quantidade zero ou negativa que confirma ainda publica
-- [ ] Com o consumidor parado, a mensagem permanece na fila e o `204` já foi respondido
-- [ ] O job chama a verificação direta e a fila não ganha mensagem
-- [ ] Falha de Resend depois do consumo da mensagem mantém lote e log e não reenvia
-- [ ] Gate completo passa: `cd backend && bash ./mvnw -Dtest=RestockNeededEventIntegrationTest,BatchServiceTest test`
-- [ ] Nenhum teste existente é apagado ou enfraquecido
+- [x] `RabbitMQContainer` sobe junto com o PostgreSQL já usado
+- [x] Consumo confirmado responde `204` enquanto o `EmailSender` está bloqueado e deixa uma mensagem durável
+- [x] Depois que o consumidor corre, o e-mail sai só se houver estoque baixo
+- [x] `InsufficientStockException`, `createBatch` e `addStock` não deixam mensagem
+- [x] Quantidade zero ou negativa que confirma ainda publica
+- [x] Com o consumidor parado, a mensagem permanece na fila e o `204` já foi respondido
+- [x] O job chama a verificação direta e a fila não ganha mensagem
+- [x] Falha de Resend depois do consumo da mensagem mantém lote e log e não reenvia
+- [x] Gate completo passa: `cd backend && bash ./mvnw -Dtest=RestockNeededEventIntegrationTest,BatchServiceTest test`
+- [x] Nenhum teste existente é apagado ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
