@@ -254,11 +254,11 @@ T12 -> T13
 
 **Done when**:
 
-- [ ] O método com `User` relê por esse proprietário, não envia e-mail se a lista vier vazia e envia o PDF atual quando houver item
-- [ ] O método sem argumento não recebe `RabbitTemplate` e não publica mensagem
-- [ ] Testes unitários cobrem envio, lista vazia e a ausência de publicação no método do job
-- [ ] Gate rápido passa: `cd backend && bash ./mvnw -Dtest=StockAlertServiceTest test`
-- [ ] Nenhum teste existente é apagado ou enfraquecido
+- [x] O método com `User` relê por esse proprietário, não envia e-mail se a lista vier vazia e envia o PDF atual quando houver item
+- [x] O método sem argumento não recebe `RabbitTemplate` e não publica mensagem
+- [x] Testes unitários cobrem envio, lista vazia e a ausência de publicação no método do job
+- [x] Gate rápido passa: `cd backend && bash ./mvnw -Dtest=StockAlertServiceTest test`
+- [x] Nenhum teste existente é apagado ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick

@@ -4,8 +4,10 @@ import br.com.hanrry.inventory.notification.document.PdfService;
 import br.com.hanrry.inventory.notification.email.EmailSender;
 import br.com.hanrry.inventory.product.dto.product.ProductResponseDTO;
 import br.com.hanrry.inventory.product.service.ProductService;
+import br.com.hanrry.inventory.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -22,8 +24,14 @@ public class StockAlertService {
 
     @Scheduled(initialDelay = 10000, fixedRate = 36000000)
     public void checkInventoryAndNotify() {
-        List<ProductResponseDTO> lowStockProducts = productService.getLowStockProducts();
+        notifyLowStock(productService.getLowStockProducts());
+    }
 
+    public void checkInventoryAndNotify(User owner) {
+        notifyLowStock(productService.findLowStockProducts(owner, Pageable.unpaged()).content());
+    }
+
+    private void notifyLowStock(List<ProductResponseDTO> lowStockProducts) {
         if (!lowStockProducts.isEmpty()) {
             List<String> allProductNames = lowStockProducts.stream()
                     .map(ProductResponseDTO::name)
