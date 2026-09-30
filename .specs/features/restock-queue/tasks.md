@@ -378,11 +378,11 @@ T12 -> T13
 
 **Done when**:
 
-- [ ] O serviço usa a imagem oficial do RabbitMQ e não publica a porta de gerenciamento na internet além do bind local necessário para desenvolvimento
-- [ ] A API recebe `RABBITMQ_HOST`, `RABBITMQ_PORT`, `RABBITMQ_USERNAME` e `RABBITMQ_PASSWORD` apontando para esse serviço
-- [ ] A API só sobe depois do broker saudável
-- [ ] `docker compose -f backend/docker-compose.yml config --quiet` termina com código 0
-- [ ] Gate de build passa: `cd backend && bash ./mvnw -DskipTests package`
+- [x] O serviço usa a imagem oficial do RabbitMQ e não publica a porta de gerenciamento na internet além do bind local necessário para desenvolvimento
+- [x] A API recebe `RABBITMQ_HOST`, `RABBITMQ_PORT`, `RABBITMQ_USERNAME` e `RABBITMQ_PASSWORD` apontando para esse serviço
+- [x] A API só sobe depois do broker saudável
+- [x] `docker compose -f backend/docker-compose.yml config --quiet` termina com código 0
+- [x] Gate de build passa: `cd backend && bash ./mvnw -DskipTests package`
 
 **Tests**: none
 **Gate**: build
