@@ -282,13 +282,13 @@ T12 -> T13
 
 **Done when**:
 
-- [ ] `@RabbitListener` escuta só `inventory.restock-needed`
-- [ ] Mensagem completa carrega o usuário e chama `checkInventoryAndNotify(User)`
-- [ ] Campo ausente, usuário inexistente, falha de PDF ou falha de Resend geram log com `eventId` quando ele existir, não enviam e-mail no caso inválido e não lançam exceção
-- [ ] `RestockNeededEventListener` e o teste dele não existem mais
-- [ ] Nenhum outro módulo declara `@RabbitListener` ou `RabbitTemplate.convertAndSend`
-- [ ] Gate rápido passa: `cd backend && bash ./mvnw -Dtest=RestockQueueListenerTest,StockAlertServiceTest,BatchServiceTest test`
-- [ ] Nenhum teste existente é apagado ou enfraquecido, fora a remoção do teste do listener antigo
+- [x] `@RabbitListener` escuta só `inventory.restock-needed`
+- [x] Mensagem completa carrega o usuário e chama `checkInventoryAndNotify(User)`
+- [x] Campo ausente, usuário inexistente, falha de PDF ou falha de Resend geram log com `eventId` quando ele existir, não enviam e-mail no caso inválido e não lançam exceção
+- [x] `RestockNeededEventListener` e o teste dele não existem mais
+- [x] Nenhum outro módulo declara `@RabbitListener` ou `RabbitTemplate.convertAndSend`
+- [x] Gate rápido passa: `cd backend && bash ./mvnw -Dtest=RestockQueueListenerTest,StockAlertServiceTest,BatchServiceTest test`
+- [x] Nenhum teste existente é apagado ou enfraquecido, fora a remoção do teste do listener antigo
 
 **Tests**: unit
 **Gate**: quick
