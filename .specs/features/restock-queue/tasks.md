@@ -111,12 +111,12 @@ T12 -> T13
 
 **Done when**:
 
-- [ ] `spring.rabbitmq.host` lê `RABBITMQ_HOST` com padrão `localhost`
-- [ ] `spring.rabbitmq.port` lê `RABBITMQ_PORT` com padrão `5672`
-- [ ] `spring.rabbitmq.username` lê `RABBITMQ_USERNAME` com padrão `guest`
-- [ ] `spring.rabbitmq.password` lê `RABBITMQ_PASSWORD` com padrão `guest`
-- [ ] Nenhum secret real entra no arquivo
-- [ ] Gate de build passa: `cd backend && bash ./mvnw -DskipTests package`
+- [x] `spring.rabbitmq.host` lê `RABBITMQ_HOST` com padrão `localhost`
+- [x] `spring.rabbitmq.port` lê `RABBITMQ_PORT` com padrão `5672`
+- [x] `spring.rabbitmq.username` lê `RABBITMQ_USERNAME` com padrão `guest`
+- [x] `spring.rabbitmq.password` lê `RABBITMQ_PASSWORD` com padrão `guest`
+- [x] Nenhum secret real entra no arquivo
+- [x] Gate de build passa: `cd backend && bash ./mvnw -DskipTests package`
 
 **Tests**: none
 **Gate**: build
