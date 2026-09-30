@@ -406,9 +406,9 @@ T12 -> T13
 
 **Done when**:
 
-- [ ] `RABBITMQ_HOST`, `RABBITMQ_PORT`, `RABBITMQ_USERNAME` e `RABBITMQ_PASSWORD` estão no exemplo
-- [ ] Os valores são locais (`localhost`, `5672`, `guest`) e não são credenciais de produção
-- [ ] Gate de build passa: `cd backend && bash ./mvnw -DskipTests package`
+- [x] `RABBITMQ_HOST`, `RABBITMQ_PORT`, `RABBITMQ_USERNAME` e `RABBITMQ_PASSWORD` estão no exemplo
+- [x] Os valores são locais (`localhost`, `5672`, `guest`) e não são credenciais de produção
+- [x] Gate de build passa: `cd backend && bash ./mvnw -DskipTests package`
 
 **Tests**: none
 **Gate**: build
