@@ -3,14 +3,8 @@ name: CI - Frontend
 on:
   push:
     branches: [ "main" ]
-    paths:
-      - "frontend/**"
-      - ".github/workflows/frontend-ci.yml"
   pull_request:
     branches: [ "main" ]
-    paths:
-      - "frontend/**"
-      - ".github/workflows/frontend-ci.yml"
   workflow_dispatch:
 
 permissions:
@@ -25,15 +19,39 @@ jobs:
     name: Frontend CI
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    defaults:
-      run:
-        working-directory: frontend
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Detect frontend changes
+        id: changes
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+          HEAD_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+        run: |
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if [ -z "$BASE_SHA" ] || [ "$BASE_SHA" = "0000000000000000000000000000000000000000" ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if git diff --name-only "$BASE_SHA" "$HEAD_SHA" -- frontend .github/workflows/frontend-ci.yml | grep -q .; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Frontend unchanged; reporting Frontend CI as success."
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Set up Node.js 22
+        if: steps.changes.outputs.run == 'true'
         uses: actions/setup-node@v7
         with:
           node-version: "22"
@@ -41,13 +59,21 @@ jobs:
           cache-dependency-path: frontend/package-lock.json
 
       - name: Install dependencies
+        if: steps.changes.outputs.run == 'true'
+        working-directory: frontend
         run: npm ci
 
       - name: Run lint
+        if: steps.changes.outputs.run == 'true'
+        working-directory: frontend
         run: npm run lint
 
       - name: Run tests
+        if: steps.changes.outputs.run == 'true'
+        working-directory: frontend
         run: npm test
 
       - name: Build application
+        if: steps.changes.outputs.run == 'true'
+        working-directory: frontend
         run: npm run build
