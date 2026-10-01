@@ -237,12 +237,15 @@ O [workflow de CI](../.github/workflows/backend-ci.yml) executa a suíte com JaC
 
 A evolução prevista em [architecture/overview.md](../docs/architecture/overview.md) inclui:
 
-- Publicação de eventos de reposição após a confirmação da transação.
-- Processamento assíncrono de notificações com RabbitMQ.
-- Persistência do estado das notificações, idempotência, retry e fila de mensagens não processadas (DLQ).
 - Observabilidade com Actuator, Micrometer, Prometheus e Grafana.
+- Transactional Outbox (publicação garantida após commit).
+- Reprocessamento operacional a partir da DLQ de reposição.
 
-Esses itens representam trabalho futuro. A implementação atual envia alertas de forma síncrona; o desacoplamento busca impedir que falhas externas afetem movimentações de estoque.
+O consumidor da fila `inventory.restock-needed` persiste histórico por `eventId`
+(`PENDING`, `SENT`, `FAILED`), aplica idempotência, retry configurável via
+`RESTOCK_NOTIFICATION_MAX_ATTEMPTS` (padrão `3`) e encaminha falhas definitivas
+para `inventory.restock-needed.dlq`. O job agendado continua in-process, fora
+da fila.
 
 ## Autor
 

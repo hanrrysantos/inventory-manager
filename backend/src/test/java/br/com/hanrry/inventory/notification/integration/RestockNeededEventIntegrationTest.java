@@ -55,6 +55,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static br.com.hanrry.inventory.inventory.config.RestockQueueConfig.RESTOCK_NEEDED_DLQ;
 import static br.com.hanrry.inventory.inventory.config.RestockQueueConfig.RESTOCK_NEEDED_QUEUE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -64,6 +65,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
@@ -132,10 +134,17 @@ class RestockNeededEventIntegrationTest {
         registry.add("spring.rabbitmq.port", RABBITMQ::getAmqpPort);
         registry.add("spring.rabbitmq.username", RABBITMQ::getAdminUsername);
         registry.add("spring.rabbitmq.password", RABBITMQ::getAdminPassword);
+        registry.add("spring.rabbitmq.listener.simple.retry.max-attempts", () -> 3);
     }
 
     @BeforeEach
-    void authenticateOwner() {
+    void authenticateOwner() throws InterruptedException {
+        listenerRegistry.getListenerContainers().forEach(MessageListenerContainer::stop);
+        amqpAdmin.purgeQueue(RESTOCK_NEEDED_QUEUE, false);
+        amqpAdmin.purgeQueue(RESTOCK_NEEDED_DLQ, false);
+        jdbcTemplate.update("DELETE FROM tb_restock_notifications");
+        awaitInFlightQueueProcessing();
+        listenerRegistry.getListenerContainers().forEach(MessageListenerContainer::start);
         reset(emailSender);
         SecurityContextHolder.getContext().setAuthentication(
                 new UsernamePasswordAuthenticationToken(OWNER_EMAIL, null, List.of()));
@@ -146,6 +155,8 @@ class RestockNeededEventIntegrationTest {
     @AfterEach
     void restoreQueueAndAuthentication() {
         amqpAdmin.purgeQueue(RESTOCK_NEEDED_QUEUE, false);
+        amqpAdmin.purgeQueue(RESTOCK_NEEDED_DLQ, false);
+        jdbcTemplate.update("DELETE FROM tb_restock_notifications");
         listenerRegistry.getListenerContainers().forEach(MessageListenerContainer::start);
         SecurityContextHolder.clearContext();
     }
@@ -288,30 +299,34 @@ class RestockNeededEventIntegrationTest {
     }
 
     @Test
-    void shouldRunScheduledCheckInProcessWithoutPublishing() {
+    void shouldRunScheduledCheckInProcessWithoutPublishing() throws InterruptedException {
         stopConsumer();
+        awaitInFlightQueueProcessing();
+        jdbcTemplate.update("DELETE FROM tb_restock_notifications");
+        clearInvocations(emailSender);
 
         stockAlertService.checkInventoryAndNotify();
 
-        verify(emailSender).sendLowStockAlert(anyList(), any());
+        verify(emailSender, times(1)).sendLowStockAlert(anyList(), any());
         assertNull(rabbitTemplate.receive(RESTOCK_NEEDED_QUEUE, NO_MESSAGE_WAIT_MS));
+        assertEquals(0, restockNotificationCount());
     }
 
     @Test
-    void shouldKeepStockAndNotResendWhenResendFailsAfterConsumingMessage() throws Exception {
+    void shouldKeepStockAndMoveToDlqWhenResendFailsAfterMaxAttempts() throws Exception {
         String batchNumber = uniqueBatchNumber("RESEND-FAIL");
         batchService.createBatch(batchRequest(batchNumber, 10L));
         doThrow(new EmailSendException("Falha ao enviar alerta de estoque pelo Resend", null))
                 .when(emailSender)
                 .sendLowStockAlert(anyList(), any());
-        CountDownLatch alertReturned = countDownWhenQueueAlertReturns();
 
         performConsume().andExpect(status().isNoContent());
 
-        assertTrue(alertReturned.await(WAIT_SECONDS, TimeUnit.SECONDS));
+        awaitFailedNotification();
         stopConsumer();
         assertEquals(0, readyMessages());
-        verify(emailSender, times(1)).sendLowStockAlert(anyList(), any());
+        assertEquals(1, dlqMessages());
+        verify(emailSender, times(3)).sendLowStockAlert(anyList(), any());
         Batch persisted = batchRepository.findByBatchNumber(batchNumber).orElseThrow();
         assertEquals(9L, persisted.getQuantity());
         assertEquals(1, outputLogsForBatch(persisted.getId()).size());
@@ -342,6 +357,46 @@ class RestockNeededEventIntegrationTest {
 
     private int readyMessages() {
         return amqpAdmin.getQueueInfo(RESTOCK_NEEDED_QUEUE).getMessageCount();
+    }
+
+    private int dlqMessages() {
+        return amqpAdmin.getQueueInfo(RESTOCK_NEEDED_DLQ).getMessageCount();
+    }
+
+    private int restockNotificationCount() {
+        Integer count = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM tb_restock_notifications", Integer.class);
+        return count == null ? 0 : count;
+    }
+
+    private void awaitInFlightQueueProcessing() throws InterruptedException {
+        long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(3);
+        while (System.nanoTime() < deadline) {
+            if (readyMessages() == 0) {
+                Thread.sleep(300);
+                if (readyMessages() == 0) {
+                    return;
+                }
+            }
+            Thread.sleep(100);
+        }
+    }
+
+    private void awaitFailedNotification() throws InterruptedException {
+        long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(WAIT_SECONDS);
+        while (System.nanoTime() < deadline) {
+            Integer failed = jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM tb_restock_notifications WHERE status = 'FAILED'",
+                    Integer.class
+            );
+            if (failed != null && failed == 1) {
+                return;
+            }
+            Thread.sleep(200);
+        }
+        assertEquals(1, jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM tb_restock_notifications WHERE status = 'FAILED'",
+                Integer.class
+        ));
     }
 
     private void awaitReadyMessages(int expected) throws InterruptedException {
