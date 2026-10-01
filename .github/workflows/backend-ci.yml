@@ -1,4 +1,4 @@
-name: CI - Backend
+name: Backend
 
 on:
   push:
@@ -21,8 +21,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  backend-ci:
-    name: Backend CI
+  test:
+    name: Test
     runs-on: ubuntu-latest
     timeout-minutes: 30
     defaults:
