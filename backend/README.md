@@ -78,7 +78,8 @@ A aplicação combina uma API REST em Java 21 e Spring Boot 3 integrada ao Postg
 | Persistência | PostgreSQL, Spring Data JPA e Flyway para modelagem relacional, gestão de transações e versionamento do banco. |
 | Contratos | DTOs, MapStruct e OpenAPI (Swagger UI) para mapeamento de entidades e documentação interativa. |
 | Notificações | Resend API para envio de e-mails e OpenPDF para geração dinâmica do relatório de reposição. |
-| Testes | JUnit 5, Mockito, MockMvc e Testcontainers (PostgreSQL); relatório de cobertura com JaCoCo. |
+| Testes | JUnit 5, Mockito, MockMvc e Testcontainers (PostgreSQL e RabbitMQ); relatório de cobertura com JaCoCo. |
+| Observabilidade | Spring Boot Actuator, Micrometer e Prometheus; Grafana local no Compose. |
 | Execução e CI | Maven Wrapper, Docker, Docker Compose e GitHub Actions para integração contínua. |
 
 ## Arquitetura
@@ -137,12 +138,18 @@ cp .env.example .env
 docker compose up -d --build
 ```
 
-Se já possui uma `.env`, atualize-a usando o exemplo como referência, sem sobrescrevê-la. O Compose inicia a API e o PostgreSQL, com dados persistidos em volume. As migrations Flyway são aplicadas na inicialização.
+Se já possui uma `.env`, atualize-a usando o exemplo como referência, sem sobrescrevê-la. O Compose inicia a API, o PostgreSQL, o RabbitMQ, o Prometheus e o Grafana. As migrations Flyway são aplicadas na inicialização.
 
 - Swagger: http://localhost:8080/swagger-ui/index.html
 - OpenAPI JSON: http://localhost:8080/v3/api-docs
+- Health (Actuator): http://127.0.0.1:8081/actuator/health
+- Métricas Prometheus: http://127.0.0.1:8081/actuator/prometheus
+- Prometheus UI: http://127.0.0.1:9090
+- Grafana: http://127.0.0.1:3000 (padrão local `admin` / `admin`)
 - Logs: `docker compose logs -f api`
 - Encerrar: `docker compose down` (preserva o volume do banco).
+
+Cada resposta HTTP inclui o header `X-Request-Id`. O mesmo valor aparece nos logs do request (`requestId=`). A publicação na fila loga `requestId` e `eventId` juntos.
 
 ### Variáveis de ambiente
 
@@ -160,6 +167,9 @@ Use [.env.example](.env.example) como referência e mantenha a `.env` fora do ve
 | `RESEND_FROM`, `RESEND_TO` | Remetente autorizado no Resend e destinatário dos alertas. |
 | `RABBITMQ_HOST`, `RABBITMQ_PORT` | Endereço do RabbitMQ ao executar fora do Compose; padrão `localhost` e `5672`. No Compose, a API recebe automaticamente o host do serviço `rabbitmq` e a porta `5672`. |
 | `RABBITMQ_USERNAME`, `RABBITMQ_PASSWORD` | Credenciais do RabbitMQ; padrão local `guest`. No Compose, também definem o usuário do broker. |
+| `RESTOCK_NOTIFICATION_MAX_ATTEMPTS` | Tentativas do consumidor da fila de reposição; padrão `3`. |
+| `MANAGEMENT_PORT` | Porta do Actuator (`/actuator/health` e `/actuator/prometheus`); padrão `8081`. No Compose fica em `127.0.0.1:8081`. |
+| `GRAFANA_ADMIN_USER`, `GRAFANA_ADMIN_PASSWORD` | Login local do Grafana; padrão `admin` / `admin`. |
 
 > 💡 Dica CORS: Para liberar múltiplos ambientes no frontend, configure a variável separando as origens por vírgulas
 
@@ -237,9 +247,10 @@ O [workflow de CI](../.github/workflows/backend-ci.yml) executa a suíte com JaC
 
 A evolução prevista em [architecture/overview.md](../docs/architecture/overview.md) inclui:
 
-- Observabilidade com Actuator, Micrometer, Prometheus e Grafana.
 - Transactional Outbox (publicação garantida após commit).
 - Reprocessamento operacional a partir da DLQ de reposição.
+
+O Compose local expõe Actuator em `127.0.0.1:8081`, Prometheus em `127.0.0.1:9090` e Grafana em `127.0.0.1:3000`, com dashboard dos counters de reposição. O scrape não usa credencial e fica na rede interna; a porta `8081` no host é só loopback.
 
 O consumidor da fila `inventory.restock-needed` persiste histórico por `eventId`
 (`PENDING`, `SENT`, `FAILED`), aplica idempotência, retry configurável via
