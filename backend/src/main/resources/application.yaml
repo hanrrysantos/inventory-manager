@@ -64,3 +64,26 @@ springdoc:
     tags-sorter: alpha
     operation-sorter: alpha
     displayOperationId: false
+
+management:
+  server:
+    port: ${MANAGEMENT_PORT:8081}
+  endpoints:
+    web:
+      exposure:
+        include:
+          - health
+          - prometheus
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+  health:
+    rabbit:
+      enabled: false
+    db:
+      enabled: false
+
+logging:
+  pattern:
+    console: "%d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX} %-5level [%thread] %logger{36} [requestId=%X{requestId:-}] : %msg%n"
