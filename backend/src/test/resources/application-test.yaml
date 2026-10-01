@@ -20,3 +20,7 @@ jwt:
 google:
   client:
     id: test-client-id
+
+management:
+  server:
+    port: -1

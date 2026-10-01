@@ -3,9 +3,15 @@ package br.com.hanrry.inventory.auth.config;
 import br.com.hanrry.inventory.auth.security.JwtAuthenticationFilter;
 import br.com.hanrry.inventory.auth.security.JsonAccessDeniedHandler;
 import br.com.hanrry.inventory.auth.security.JsonAuthenticationEntryPoint;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.web.context.WebServerApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -16,6 +22,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+import java.io.IOException;
 
 @Configuration
 @EnableWebSecurity
@@ -37,6 +48,47 @@ public class SecurityConfig {
     }
 
     @Bean
+    @Order(1)
+    public SecurityFilterChain actuatorSecurityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .securityMatcher(this::isManagementActuatorRequest)
+                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
+                .csrf(csrf -> csrf.disable())
+                .addFilterBefore(new UnexposedActuatorNotFoundFilter(), UsernamePasswordAuthenticationFilter.class);
+        return http.build();
+    }
+
+    private boolean isManagementActuatorRequest(HttpServletRequest request) {
+        WebApplicationContext context = WebApplicationContextUtils.getWebApplicationContext(request.getServletContext());
+        if (context == null || !WebServerApplicationContext.hasServerNamespace(context, "management")) {
+            return false;
+        }
+        String uri = request.getRequestURI();
+        return uri != null && (uri.startsWith("/actuator") || "/error".equals(uri));
+    }
+
+    private static final class UnexposedActuatorNotFoundFilter extends OncePerRequestFilter {
+        @Override
+        protected void doFilterInternal(
+                HttpServletRequest request,
+                HttpServletResponse response,
+                FilterChain filterChain
+        ) throws ServletException, IOException {
+            String uri = request.getRequestURI();
+            if (uri != null
+                    && uri.startsWith("/actuator/")
+                    && !uri.equals("/actuator/health")
+                    && !uri.startsWith("/actuator/health/")
+                    && !uri.equals("/actuator/prometheus")) {
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                return;
+            }
+            filterChain.doFilter(request, response);
+        }
+    }
+
+    @Bean
+    @Order(2)
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
