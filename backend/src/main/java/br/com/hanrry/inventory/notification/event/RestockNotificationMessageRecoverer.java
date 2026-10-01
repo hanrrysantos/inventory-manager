@@ -2,8 +2,8 @@ package br.com.hanrry.inventory.notification.event;
 
 import br.com.hanrry.inventory.inventory.config.RestockQueueConfig;
 import br.com.hanrry.inventory.inventory.event.RestockQueueMessage;
-import br.com.hanrry.inventory.notification.entity.enums.RestockNotificationStatus;
 import br.com.hanrry.inventory.notification.repository.RestockNotificationRepository;
+import br.com.hanrry.inventory.notification.service.RestockNotificationStateService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
@@ -20,6 +20,7 @@ public class RestockNotificationMessageRecoverer implements MessageRecoverer {
 
     private final RabbitTemplate rabbitTemplate;
     private final RestockNotificationRepository restockNotificationRepository;
+    private final RestockNotificationStateService restockNotificationStateService;
     private final MessageConverter messageConverter;
 
     @Override
@@ -39,11 +40,10 @@ public class RestockNotificationMessageRecoverer implements MessageRecoverer {
         if (!(body instanceof RestockQueueMessage queueMessage) || queueMessage.eventId() == null) {
             return;
         }
-        restockNotificationRepository.findByEventId(queueMessage.eventId()).ifPresent(notification -> {
-            notification.setStatus(RestockNotificationStatus.FAILED);
-            notification.setFailureReason(cause.getMessage());
-            restockNotificationRepository.save(notification);
-            log.error("Notificação de reposição marcada como FAILED. eventId={}", queueMessage.eventId(), cause);
-        });
+        if (restockNotificationRepository.findByEventId(queueMessage.eventId()).isEmpty()) {
+            return;
+        }
+        restockNotificationStateService.markFailed(queueMessage.eventId(), cause.getMessage());
+        log.error("Notificação de reposição marcada como FAILED. eventId={}", queueMessage.eventId(), cause);
     }
 }

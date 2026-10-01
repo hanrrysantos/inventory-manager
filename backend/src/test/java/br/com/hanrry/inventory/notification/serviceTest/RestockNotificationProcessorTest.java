@@ -74,6 +74,9 @@ class RestockNotificationProcessorTest {
     @Test
     void shouldSkipWhenClaimReturnsAlreadyDone() {
         RestockQueueMessage message = new RestockQueueMessage(EVENT_ID, 13L, OCCURRED_AT, 7L);
+        User owner = new User();
+        owner.setId(7L);
+        when(userRepository.findById(7L)).thenReturn(Optional.of(owner));
         when(restockNotificationStateService.claim(message)).thenReturn(ClaimOutcome.SKIP_ALREADY_DONE);
 
         processor.process(message);
@@ -85,6 +88,9 @@ class RestockNotificationProcessorTest {
     @Test
     void shouldSkipWhenClaimReturnsConcurrent() {
         RestockQueueMessage message = new RestockQueueMessage(EVENT_ID, 13L, OCCURRED_AT, 7L);
+        User owner = new User();
+        owner.setId(7L);
+        when(userRepository.findById(7L)).thenReturn(Optional.of(owner));
         when(restockNotificationStateService.claim(message)).thenReturn(ClaimOutcome.SKIP_CONCURRENT);
 
         processor.process(message);
@@ -95,12 +101,12 @@ class RestockNotificationProcessorTest {
     @Test
     void shouldMarkFailedWhenOwnerDoesNotExist() {
         RestockQueueMessage message = new RestockQueueMessage(EVENT_ID, 13L, OCCURRED_AT, 7L);
-        when(restockNotificationStateService.claim(message)).thenReturn(ClaimOutcome.PROCEED);
         when(userRepository.findById(7L)).thenReturn(Optional.empty());
 
         processor.process(message);
 
         verify(restockNotificationStateService).markFailed(EVENT_ID, "Proprietário da mensagem de reposição não encontrado");
+        verify(restockNotificationStateService, never()).claim(any());
         verifyNoInteractions(stockAlertService);
     }
 

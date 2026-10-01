@@ -18,6 +18,9 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
 
+import br.com.hanrry.inventory.shared.observability.RestockMetrics;
+import io.micrometer.core.instrument.MeterRegistry;
+
 import java.lang.reflect.Field;
 import java.util.List;
 
@@ -145,6 +148,8 @@ class StockAlertServiceTest {
         assertThat(StockAlertService.class.getDeclaredFields())
                 .extracting(Field::getType)
                 .noneMatch(type -> AmqpTemplate.class.isAssignableFrom(type)
-                        || ApplicationEventPublisher.class.isAssignableFrom(type));
+                        || ApplicationEventPublisher.class.isAssignableFrom(type)
+                        || RestockMetrics.class.equals(type)
+                        || MeterRegistry.class.isAssignableFrom(type));
     }
 }

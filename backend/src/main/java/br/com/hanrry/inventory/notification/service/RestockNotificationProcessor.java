@@ -25,11 +25,6 @@ public class RestockNotificationProcessor {
             return;
         }
 
-        ClaimOutcome claimOutcome = restockNotificationStateService.claim(message);
-        if (claimOutcome != ClaimOutcome.PROCEED) {
-            return;
-        }
-
         var owner = userRepository.findById(message.ownerId());
         if (owner.isEmpty()) {
             restockNotificationStateService.markFailed(message.eventId(), OWNER_NOT_FOUND_REASON);
@@ -38,6 +33,11 @@ public class RestockNotificationProcessor {
                     message.eventId(),
                     message.ownerId()
             );
+            return;
+        }
+
+        ClaimOutcome claimOutcome = restockNotificationStateService.claim(message);
+        if (claimOutcome != ClaimOutcome.PROCEED) {
             return;
         }
 

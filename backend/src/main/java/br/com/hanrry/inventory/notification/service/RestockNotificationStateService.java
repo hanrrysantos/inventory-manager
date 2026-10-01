@@ -4,6 +4,7 @@ import br.com.hanrry.inventory.inventory.event.RestockQueueMessage;
 import br.com.hanrry.inventory.notification.entity.RestockNotification;
 import br.com.hanrry.inventory.notification.entity.enums.RestockNotificationStatus;
 import br.com.hanrry.inventory.notification.repository.RestockNotificationRepository;
+import br.com.hanrry.inventory.shared.observability.RestockMetrics;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,7 @@ public class RestockNotificationStateService {
     }
 
     private final RestockNotificationRepository restockNotificationRepository;
+    private final RestockMetrics restockMetrics;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public ClaimOutcome claim(RestockQueueMessage message) {
@@ -60,17 +62,29 @@ public class RestockNotificationStateService {
     public void markSent(UUID eventId) {
         RestockNotification notification = restockNotificationRepository.findByEventId(eventId)
                 .orElseThrow();
+        RestockNotificationStatus previous = notification.getStatus();
         notification.setStatus(RestockNotificationStatus.SENT);
         notification.setFailureReason(null);
         restockNotificationRepository.save(notification);
+        if (previous != RestockNotificationStatus.SENT) {
+            restockMetrics.incrementSent();
+        }
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void markFailed(UUID eventId, String reason) {
-        RestockNotification notification = restockNotificationRepository.findByEventId(eventId)
-                .orElseThrow();
+        Optional<RestockNotification> existing = restockNotificationRepository.findByEventId(eventId);
+        if (existing.isEmpty()) {
+            restockMetrics.incrementFailed();
+            return;
+        }
+        RestockNotification notification = existing.get();
+        RestockNotificationStatus previous = notification.getStatus();
         notification.setStatus(RestockNotificationStatus.FAILED);
         notification.setFailureReason(reason);
         restockNotificationRepository.save(notification);
+        if (previous != RestockNotificationStatus.FAILED) {
+            restockMetrics.incrementFailed();
+        }
     }
 }
