@@ -1,17 +1,22 @@
-# EstoqueHub
+# Inventory Manager — Frontend
 
 Interface web para acompanhamento de estoque, com autenticação, indicadores e
 consulta de produtos. Frontend e API são mantidos no mesmo monorepo.
 
-[Acessar aplicação](https://controle-de-estoque.hanrry.top) ·
-[Documentação da API](https://api-controle-de-estoque.hanrry.top/swagger-ui/index.html) ·
-[Código do backend](../backend)
+| Recurso | Descrição | Link de acesso |
+| :--- | :--- | :--- |
+| **Aplicação Web** | Inventory Manager em produção | [controle-de-estoque.hanrry.top](https://controle-de-estoque.hanrry.top/) |
+| **Documentação da API** | Swagger UI da API | [api-controle-de-estoque.hanrry.top/swagger-ui/index.html](https://api-controle-de-estoque.hanrry.top/swagger-ui/index.html) |
+| **Código do Backend** | API no monorepo | [backend](../backend) |
+
+Este diretório contém somente a interface web. A autenticação, as regras de
+estoque e a persistência são fornecidas pela API do projeto.
 
 ## Funcionalidades
 
 | Tela | Recursos |
 | --- | --- |
-| Landing (`/`) | Apresentação do EstoqueHub, problema de controle manual e recursos reais de indicadores, alertas e busca de produtos |
+| Landing (`/`) | Apresentação do Inventory Manager e dos recursos de indicadores, alertas e consulta de produtos |
 | Acesso (`/login`) | Login por e-mail/senha ou Google, vínculo explícito de conta e criação de conta |
 | Dashboard (`/dashboard`) | Indicadores de estoque e itens que precisam de atenção |
 | Produtos (`/products`) | Consulta paginada, ordenação, estoque baixo, detalhes e administração por `ADMIN` |
@@ -31,7 +36,7 @@ Testing Library e MSW.
 
 ## Executar localmente
 
-Requisitos: Node.js 22.12+ da linha 22 ou Node.js 24, npm e acesso à API.
+Requisitos: Node.js 22.12+ da linha 22 ou Node.js 24, npm e uma API acessível.
 
 ```bash
 git clone https://github.com/hanrrysantos/inventory-manager.git
@@ -41,16 +46,18 @@ cp .env.example .env
 npm run dev
 ```
 
-Acesse o endereço informado pelo Vite, normalmente `http://localhost:5173`.
-O `.env` define a URL base do backend, sem barra final:
+Acesse o endereço informado pelo Vite, normalmente
+<http://localhost:5173>. O `.env` define a URL base do backend, sem barra
+final, e o client ID Web do Google:
 
 ```dotenv
 VITE_API_URL=https://api-controle-de-estoque.hanrry.top
 VITE_GOOGLE_CLIENT_ID=1234567890-abc123.apps.googleusercontent.com
 ```
 
-Para usar a API local, altere a URL para `http://localhost:8080` e reinicie
-o Vite. O backend precisa permitir a origem do frontend em `FRONTEND_ORIGINS`.
+Para usar a API local, defina `VITE_API_URL=http://localhost:8080` e reinicie
+o Vite. O backend precisa permitir a origem do frontend em `FRONTEND_ORIGINS`;
+veja as instruções de execução no [README do backend](../backend/README.md).
 Configure `VITE_GOOGLE_CLIENT_ID` com o client ID Web do mesmo projeto Google
 usado pelo backend. Adicione a origem local e a publicada nas *Authorized
 JavaScript origins* do Google Cloud Console. Esse valor é público; nunca use

@@ -1,4 +1,4 @@
-# Controle de Estoque [![CI](https://github.com/hanrrysantos/inventory-manager/actions/workflows/backend-ci.yml/badge.svg?branch=main)](https://github.com/hanrrysantos/inventory-manager/actions/workflows/backend-ci.yml)
+# Backend — Inventory Manager [![CI](https://github.com/hanrrysantos/inventory-manager/actions/workflows/backend-ci.yml/badge.svg?branch=main)](https://github.com/hanrrysantos/inventory-manager/actions/workflows/backend-ci.yml)
 
 
 API REST para controle de estoque por lotes, com foco em validade, rastreabilidade e consistência de movimentações concorrentes. Desenvolvida em Java 21 e Spring Boot 3, com frontend e API disponíveis para demonstração.
@@ -9,7 +9,7 @@ API REST para controle de estoque por lotes, com foco em validade, rastreabilida
 | **Documentação API** | Interface Swagger UI para testes dos endpoints | [api-controle-de-estoque.hanrry.top/swagger-ui/index.html](https://api-controle-de-estoque.hanrry.top/swagger-ui/index.html) |
 | **Código Frontend** | Código-fonte da interface no monorepo | [frontend](../frontend) |
 
-> 💡 As operações administrativas exigem permissão de `ADMIN`. O passo a passo detalhado de autenticação pode ser consultado na seção [Como usar a API](#como-usar-a-api).
+> Operações administrativas exigem a role `ADMIN`. Veja [Como usar a API](#como-usar-a-api) para autenticação e exemplos.
 
 ## Sumário
 
@@ -22,12 +22,12 @@ API REST para controle de estoque por lotes, com foco em validade, rastreabilida
 - [Como executar](#como-executar)
 - [Como usar a API](#como-usar-a-api)
 - [Testes e qualidade](#testes-e-qualidade)
-- [Próximos passos](#próximos-passos)
+- [Evolução técnica](#evolução-técnica)
 - [Autor](#autor)
 
 ## Sobre o projeto
 
-Em cenários de alto volume, falhas na gestão de estoque costumam gerar divergências no saldo por conta de movimentações concorrentes, além de prejuízos causados pelo vencimento de produtos. Para resolver esse desafio de confiabilidade, desenvolvi o Controle de Estoque: uma solução centralizada criada para garantir a integridade dos dados, automatizar a priorização de consumo por validade e manter o histórico de entradas e saídas por lote.
+Em cenários de alto volume, falhas na gestão de estoque podem gerar divergências no saldo por conta de movimentações concorrentes, além de prejuízos causados pelo vencimento de produtos. O Inventory Manager busca resolver esse desafio de confiabilidade: garantir a integridade dos dados, priorizar o consumo por validade e manter o histórico de entradas e saídas por lote.
 
 A aplicação combina uma API REST em Java 21 e Spring Boot 3 integrada ao PostgreSQL, com controle transacional rigoroso para operações simultâneas, lógica de consumo baseada no critério FEFO (First Expire, First Out) e alertas automatizados de estoque baixo com emissão de relatórios em PDF. O resultado é uma aplicação acessível por interface web e API, com uma suíte de testes de integração que verifica cenários de concorrência e rollback.
 
@@ -243,20 +243,21 @@ Para exercitar riscos que dependem do comportamento real do banco, os testes de 
 
 O [workflow de CI](../.github/workflows/backend-ci.yml) executa a suíte com JaCoCo e constrói a imagem Docker em pushes e pull requests para `main`. O status das execuções pode ser acompanhado no [GitHub Actions](https://github.com/hanrrysantos/inventory-manager/actions).
 
-## Próximos passos
-
-A evolução prevista em [architecture/overview.md](../docs/architecture/overview.md) inclui:
-
-- Transactional Outbox (publicação garantida após commit).
-- Reprocessamento operacional a partir da DLQ de reposição.
-
 O Compose local expõe Actuator em `127.0.0.1:8081`, Prometheus em `127.0.0.1:9090` e Grafana em `127.0.0.1:3000`, com dashboard dos counters de reposição. O scrape não usa credencial e fica na rede interna; a porta `8081` no host é só loopback.
 
-O consumidor da fila `inventory.restock-needed` persiste histórico por `eventId`
-(`PENDING`, `SENT`, `FAILED`), aplica idempotência, retry configurável via
-`RESTOCK_NOTIFICATION_MAX_ATTEMPTS` (padrão `3`) e encaminha falhas definitivas
-para `inventory.restock-needed.dlq`. O job agendado continua in-process, fora
-da fila.
+O consumidor da fila `inventory.restock-needed` já persiste histórico por
+`eventId` (`PENDING`, `SENT`, `FAILED`), aplica idempotência, permite configurar
+tentativas via `RESTOCK_NOTIFICATION_MAX_ATTEMPTS` (padrão `3`) e encaminha
+falhas definitivas para `inventory.restock-needed.dlq`. O job agendado continua
+in-process, fora da fila.
+
+## Evolução técnica
+
+A arquitetura documentada prevê Transactional Outbox para garantir a publicação
+de eventos após o commit e ferramentas operacionais para reprocessar mensagens
+da DLQ. Consulte o [overview da arquitetura](../docs/architecture/overview.md)
+e os [planos](../docs/plans/) para distinguir o estado atual do trabalho
+planejado.
 
 ## Autor
 
