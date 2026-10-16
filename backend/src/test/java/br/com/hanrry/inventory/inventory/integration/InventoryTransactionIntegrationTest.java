@@ -133,7 +133,7 @@ class InventoryTransactionIntegrationTest {
 
     @Test
     void shouldUseBatchIdAsDeterministicTieBreakerForSameExpiryDate() {
-        LocalDate sameExpiryDate = LocalDate.of(2026, 10, 1);
+        LocalDate sameExpiryDate = LocalDate.now().plusDays(30);
         String firstBatchNumber = uniqueBatchNumber("TIE-FIRST");
         String secondBatchNumber = uniqueBatchNumber("TIE-SECOND");
 
